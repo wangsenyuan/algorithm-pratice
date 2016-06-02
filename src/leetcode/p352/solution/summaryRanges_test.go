@@ -1,4 +1,4 @@
-package p352
+package solution
 
 import (
 	"fmt"

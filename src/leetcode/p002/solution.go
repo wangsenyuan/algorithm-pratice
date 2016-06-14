@@ -23,6 +23,13 @@ func next(node *ListNode) *ListNode {
 	return node.Next
 }
 
+func value(node *ListNode) int {
+	if node == nil {
+		return 0
+	}
+	return node.Val
+}
+
 func addTwoNumbers(l1 *ListNode, l2 *ListNode) *ListNode {
 
 	var add func(a *ListNode, b *ListNode, carray int) *ListNode
@@ -32,17 +39,7 @@ func addTwoNumbers(l1 *ListNode, l2 *ListNode) *ListNode {
 			return nil
 		}
 
-		if a == nil && b == nil {
-			return &ListNode{carray, nil}
-		}
-		var sum = 0
-		if a == nil {
-			sum = b.Val + carray
-		} else if b == nil {
-			sum = a.Val + carray
-		} else {
-			sum = a.Val + b.Val + carray
-		}
+		sum := value(a) + value(b) + carray
 
 		if sum < 10 {
 			return &ListNode{sum, add(next(a), next(b), 0)}

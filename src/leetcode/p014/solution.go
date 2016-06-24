@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"sort"
+	"math"
 )
 
 func main() {
@@ -16,8 +17,16 @@ func longestCommonPrefix(strs []string) string {
 	}
 	prefix := make([]string, 0, len(strs))
 
+	minLen := math.MaxInt32
+
 	for _, str := range strs {
-		prefix = appendStrPrefix(prefix, str)
+		if len(str) < minLen {
+			minLen = len(str)
+		}
+	}
+
+	for _, str := range strs {
+		prefix = appendStrPrefix(prefix, str, minLen)
 	}
 
 	sort.Strings(prefix)
@@ -26,7 +35,7 @@ func longestCommonPrefix(strs []string) string {
 }
 
 func findCommonPrefix(pres []string, n int) string {
-	i, j := 0, len(pres)-1
+	i, j := 0, len(pres) - 1
 
 	for i <= j {
 		m := (i + j) / 2
@@ -39,7 +48,7 @@ func findCommonPrefix(pres []string, n int) string {
 		}
 	}
 
-	return pres[i-1]
+	return pres[i - 1]
 }
 
 func countOfPreAt(pres []string, p int) int {
@@ -58,16 +67,16 @@ func countOfPreAt(pres []string, p int) int {
 	return (j - 1) - (i + 1) + 1
 }
 
-func appendStrPrefix(pre []string, str string) []string {
-	for i := 0; i <= len(str); i++ {
+func appendStrPrefix(pre []string, str string, minLen int) []string {
+	for i := 0; i <= minLen; i++ {
 		pre = appendMore(pre, str[:i])
 	}
 	return pre
 }
 
 func appendMore(strs []string, str string) []string {
-	if len(strs)+1 == cap(strs) {
-		tmp := make([]string, len(strs), 2*cap(strs))
+	if len(strs) + 1 == cap(strs) {
+		tmp := make([]string, len(strs), 2 * cap(strs))
 		copy(tmp, strs)
 		strs = tmp
 	}

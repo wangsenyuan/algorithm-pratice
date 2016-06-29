@@ -18,6 +18,9 @@ func main() {
 
 func maxSumSubmatrix(matrix [][]int, target int) int {
 	m := len(matrix)
+	if m == 0 {
+		return 0
+	}
 	n := len(matrix[0])
 	row := false
 	if m > n {

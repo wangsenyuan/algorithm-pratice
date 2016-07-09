@@ -15,7 +15,9 @@ func kSmallestPairs(nums1 []int, nums2 []int, k int) [][]int {
 	result := make([][]int, 0, k)
 
 	i, j := 0, 0
+	x, y := 0, 0
 	for len(result) < k {
+		fmt.Printf("%d %d\n", i, j)
 		result = append(result, []int{nums1[i], nums2[j]})
 
 		c := nums1[i] + nums2[j]
@@ -37,12 +39,26 @@ func kSmallestPairs(nums1 []int, nums2 []int, k int) [][]int {
 			i--
 		}
 
-		if nums1[a]+nums2[j] <= nums1[i]+nums2[b] {
+		if nums1[a]+nums2[j] < nums1[i]+nums2[b] {
 			i = a
-		} else {
+		} else if nums1[a]+nums2[j] > nums1[i]+nums2[b] {
+			j = b
+		} else if a > x {
+			i = a
+		} else if b > y {
 			j = b
 		}
+
+		x = max(a, x)
+		y = max(b, y)
 	}
 
 	return result
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
 }

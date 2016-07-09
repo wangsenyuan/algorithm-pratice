@@ -1,0 +1,27 @@
+<component name="libraryTable">
+  <library name="GOPATH &lt;Go&gt;">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/../go/src/hello" />
+      <root url="file://$PROJECT_DIR$/../go/src/chapter4" />
+      <root url="file://$PROJECT_DIR$/../go/src/chapter3" />
+      <root url="file://$PROJECT_DIR$/../go/src/honnef.co" />
+      <root url="file://$PROJECT_DIR$/../go/src/chapter1" />
+      <root url="file://$PROJECT_DIR$/../go/src/golang.org" />
+      <root url="file://$PROJECT_DIR$/../go/src/chapter2" />
+      <root url="file://$PROJECT_DIR$/../go/src/github.com" />
+      <root url="file://$PROJECT_DIR$/../go/src/chapter6" />
+      <root url="file://$PROJECT_DIR$/../go/src/leetcode" />
+      <root url="file://$PROJECT_DIR$/../go/src/chapter8" />
+      <root url="file://$PROJECT_DIR$/../go/src/chapter7" />
+      <root url="file://$PROJECT_DIR$/../go/src/stacker" />
+      <root url="file://$PROJECT_DIR$/../go/src/gopl" />
+      <root url="file://$PROJECT_DIR$/../go/src/chapter5" />
+      <root url="file://$PROJECT_DIR$/../go/src/gopkg.in" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <excluded>
+      <root url="file://$PROJECT_DIR$" />
+    </excluded>
+  </library>
+</component>

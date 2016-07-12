@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="83d3a2c8-1dc0-4e19-9caa-a0784842b42a" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/leetcode/p373/solution.go" afterPath="$PROJECT_DIR$/src/leetcode/p373/solution.go" />
     </list>
     <ignored path="Go.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -18,6 +17,7 @@
   <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/Go$solution_test_go.coverage" NAME="solution_test.go Coverage Results" MODIFIED="1465300582732" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="GoCoverage" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
+    <SUITE FILE_PATH="coverage/Go$TestValidParentheses_in_solution_test_go.coverage" NAME="TestValidParentheses in solution_test.go Coverage Results" MODIFIED="1468312397409" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="GoCoverage" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
   </component>
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
@@ -28,41 +28,33 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="solution.go" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/leetcode/p371/solution.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="272">
-              <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="solution.go" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/leetcode/p020/solution.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="512">
-              <caret line="32" column="24" selection-start-line="32" selection-start-column="24" selection-end-line="32" selection-end-column="24" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="solution.go" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/leetcode/p030/solution.go">
+        <entry file="file://$PROJECT_DIR$/src/leetcode/p032/solution.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-62">
-              <caret line="36" column="0" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
+            <state relative-caret-position="160">
+              <caret line="10" column="36" selection-start-line="10" selection-start-column="36" selection-end-line="10" selection-end-column="36" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="solution.go" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/leetcode/p373/solution.go">
+      <file leaf-file-name="solution_test.go" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/leetcode/p032/solution_test.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="208">
-              <caret line="16" column="9" selection-start-line="16" selection-start-column="9" selection-end-line="16" selection-end-column="9" />
+            <state relative-caret-position="183">
+              <caret line="12" column="26" selection-start-line="12" selection-start-column="26" selection-end-line="12" selection-end-column="26" />
+              <folding>
+                <element signature="e#14#30#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="description.txt" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/leetcode/p032/description.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="64">
+              <caret line="4" column="26" selection-start-line="4" selection-start-column="20" selection-end-line="4" selection-end-column="26" />
               <folding />
             </state>
           </provider>
@@ -110,6 +102,8 @@
         <option value="$PROJECT_DIR$/src/leetcode/p020/solution.go" />
         <option value="$PROJECT_DIR$/src/leetcode/p373/solution.go" />
         <option value="$PROJECT_DIR$/src/leetcode/p030/solution.go" />
+        <option value="$PROJECT_DIR$/src/leetcode/p032/solution_test.go" />
+        <option value="$PROJECT_DIR$/src/leetcode/p032/solution.go" />
       </list>
     </option>
   </component>
@@ -158,6 +152,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scratches" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -358,6 +354,28 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+              <option name="myItemId" value="p032" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Go" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Go" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="leetcode" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
               <option name="myItemId" value="p030" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
@@ -430,9 +448,7 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scratches" />
       <pane id="Scope" />
-      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -450,21 +466,7 @@
       <recent name="$PROJECT_DIR$/src/leetcode/p352/solution" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Application.Build solution.go and run">
-    <configuration default="false" name="Build solution.go and run (5)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true">
-      <module name="Go" />
-      <working_directory value="$PROJECT_DIR$/" />
-      <filePath value="$PROJECT_DIR$/src/leetcode/p015/solution.go" />
-      <kind value="FILE" />
-      <method />
-    </configuration>
-    <configuration default="false" name="Build solution.go and run (1)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true">
-      <module name="Go" />
-      <working_directory value="$PROJECT_DIR$/" />
-      <filePath value="$PROJECT_DIR$/src/leetcode/p371/solution.go" />
-      <kind value="FILE" />
-      <method />
-    </configuration>
+  <component name="RunManager" selected="Go Test.TestValidParentheses in solution_test.go">
     <configuration default="false" name="Build solution.go and run (2)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true">
       <module name="Go" />
       <working_directory value="$PROJECT_DIR$/" />
@@ -484,6 +486,22 @@
       <working_directory value="$PROJECT_DIR$/" />
       <filePath value="$PROJECT_DIR$/src/leetcode/p030/solution.go" />
       <kind value="FILE" />
+      <method />
+    </configuration>
+    <configuration default="false" name="Build solution.go and run (4)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true">
+      <module name="Go" />
+      <working_directory value="$PROJECT_DIR$/" />
+      <filePath value="$PROJECT_DIR$/src/leetcode/p032/solution.go" />
+      <kind value="FILE" />
+      <method />
+    </configuration>
+    <configuration default="false" name="TestValidParentheses in solution_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true">
+      <module name="Go" />
+      <working_directory value="$PROJECT_DIR$/" />
+      <framework value="gotest" />
+      <kind value="PACKAGE" />
+      <package value="leetcode/p032" />
+      <pattern value="^TestValidParentheses$" />
       <method />
     </configuration>
     <configuration default="true" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" factoryName="Plugin">
@@ -993,19 +1011,19 @@
       <method />
     </configuration>
     <list size="5">
-      <item index="0" class="java.lang.String" itemvalue="Go Application.Build solution.go and run (5)" />
-      <item index="1" class="java.lang.String" itemvalue="Go Application.Build solution.go and run (1)" />
-      <item index="2" class="java.lang.String" itemvalue="Go Application.Build solution.go and run (2)" />
-      <item index="3" class="java.lang.String" itemvalue="Go Application.Build solution.go and run (3)" />
-      <item index="4" class="java.lang.String" itemvalue="Go Application.Build solution.go and run" />
+      <item index="0" class="java.lang.String" itemvalue="Go Application.Build solution.go and run (2)" />
+      <item index="1" class="java.lang.String" itemvalue="Go Application.Build solution.go and run (3)" />
+      <item index="2" class="java.lang.String" itemvalue="Go Application.Build solution.go and run" />
+      <item index="3" class="java.lang.String" itemvalue="Go Application.Build solution.go and run (4)" />
+      <item index="4" class="java.lang.String" itemvalue="Go Test.TestValidParentheses in solution_test.go" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Go Application.Build solution.go and run" />
-        <item index="1" class="java.lang.String" itemvalue="Go Application.Build solution.go and run (3)" />
-        <item index="2" class="java.lang.String" itemvalue="Go Application.Build solution.go and run (2)" />
-        <item index="3" class="java.lang.String" itemvalue="Go Application.Build solution.go and run (1)" />
-        <item index="4" class="java.lang.String" itemvalue="Go Application.Build solution.go and run (5)" />
+        <item index="0" class="java.lang.String" itemvalue="Go Test.TestValidParentheses in solution_test.go" />
+        <item index="1" class="java.lang.String" itemvalue="Go Application.Build solution.go and run (4)" />
+        <item index="2" class="java.lang.String" itemvalue="Go Application.Build solution.go and run" />
+        <item index="3" class="java.lang.String" itemvalue="Go Application.Build solution.go and run (3)" />
+        <item index="4" class="java.lang.String" itemvalue="Go Application.Build solution.go and run (2)" />
       </list>
     </recent_temporary>
   </component>
@@ -1052,37 +1070,44 @@
       <workItem from="1467342823092" duration="408000" />
       <workItem from="1467893022954" duration="730000" />
       <workItem from="1467979130502" duration="587000" />
+      <workItem from="1468310527204" duration="2714000" />
     </task>
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="TestCanPlayCases_in_solution_test_go - 2016.06.07 at 20h 01m 30s.xml">
-      <configuration name="TestCanPlayCases in solution_test.go" configurationId="GoTestRunConfiguration" />
+    <history-entry file="TestValidParentheses_in_solution_test_go - 2016.07.12 at 16h 33m 18s.xml">
+      <configuration name="TestValidParentheses in solution_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
-    <history-entry file="TestCanPlayCases_in_solution_test_go - 2016.06.07 at 20h 01m 41s.xml">
-      <configuration name="TestCanPlayCases in solution_test.go" configurationId="GoTestRunConfiguration" />
+    <history-entry file="TestValidParentheses_in_solution_test_go - 2016.07.12 at 16h 33m 29s.xml">
+      <configuration name="TestValidParentheses in solution_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
-    <history-entry file="gobench_summaryRanges_test_go - 2016.06.02 at 17h 16m 48s.xml">
-      <configuration name="gobench summaryRanges_test.go" configurationId="GoTestRunConfiguration" />
+    <history-entry file="TestValidParentheses_in_solution_test_go - 2016.07.12 at 16h 38m 47s.xml">
+      <configuration name="TestValidParentheses in solution_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
-    <history-entry file="solution_test_go - 2016.06.07 at 19h 54m 23s.xml">
-      <configuration name="solution_test.go" configurationId="GoTestRunConfiguration" />
+    <history-entry file="TestValidParentheses_in_solution_test_go - 2016.07.12 at 16h 39m 16s.xml">
+      <configuration name="TestValidParentheses in solution_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
-    <history-entry file="solution_test_go - 2016.06.07 at 19h 55m 00s.xml">
-      <configuration name="solution_test.go" configurationId="GoTestRunConfiguration" />
+    <history-entry file="TestValidParentheses_in_solution_test_go - 2016.07.12 at 16h 39m 28s.xml">
+      <configuration name="TestValidParentheses in solution_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
-    <history-entry file="solution_test_go - 2016.06.07 at 19h 56m 23s.xml">
-      <configuration name="solution_test.go" configurationId="GoTestRunConfiguration" />
+    <history-entry file="TestValidParentheses_in_solution_test_go - 2016.07.12 at 16h 44m 49s.xml">
+      <configuration name="TestValidParentheses in solution_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
-    <history-entry file="solution_test_go - 2016.06.07 at 20h 05m 29s.xml">
-      <configuration name="solution_test.go" configurationId="GoTestRunConfiguration" />
+    <history-entry file="TestValidParentheses_in_solution_test_go - 2016.07.12 at 16h 45m 12s.xml">
+      <configuration name="TestValidParentheses in solution_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
-    <history-entry file="solution_test_go - 2016.06.07 at 20h 10m 38s.xml">
-      <configuration name="solution_test.go" configurationId="GoTestRunConfiguration" />
+    <history-entry file="TestValidParentheses_in_solution_test_go - 2016.07.12 at 16h 45m 30s.xml">
+      <configuration name="TestValidParentheses in solution_test.go" configurationId="GoTestRunConfiguration" />
+    </history-entry>
+    <history-entry file="TestValidParentheses_in_solution_test_go - 2016.07.12 at 16h 46m 01s.xml">
+      <configuration name="TestValidParentheses in solution_test.go" configurationId="GoTestRunConfiguration" />
+    </history-entry>
+    <history-entry file="TestValidParentheses_in_solution_test_go - 2016.07.12 at 16h 46m 21s.xml">
+      <configuration name="TestValidParentheses in solution_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="23195000" />
+    <option name="totallyTimeSpent" value="25909000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1280" height="800" extended-state="0" />
@@ -1095,7 +1120,8 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.26770538" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2684659" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Coverage" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32956383" sideWeight="0.5" order="4" side_tool="true" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32719547" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -1105,14 +1131,13 @@
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4362606" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.43607953" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Coverage" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32956383" sideWeight="0.5" order="4" side_tool="true" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
@@ -1157,36 +1182,10 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/src/leetcode/p030/solution.go</url>
-          <line>24</line>
-          <properties />
-          <option name="timeStamp" value="125" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/src/leetcode/p030/solution.go</url>
-          <line>25</line>
-          <properties />
-          <option name="timeStamp" value="126" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/src/leetcode/p030/solution.go</url>
-          <line>28</line>
-          <properties />
-          <option name="timeStamp" value="127" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/src/leetcode/p030/solution.go</url>
-          <line>20</line>
-          <properties />
-          <option name="timeStamp" value="129" />
-        </line-breakpoint>
-      </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog />
       </breakpoints-dialog>
-      <option name="time" value="130" />
+      <option name="time" value="142" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -1195,27 +1194,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/codejam/year2016/round2/rps/solution_test.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="576">
-          <caret line="38" column="1" selection-start-line="38" selection-start-column="1" selection-end-line="38" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/codejam/year2016/round2/rps/solution.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1664">
-          <caret line="109" column="1" selection-start-line="109" selection-start-column="1" selection-end-line="109" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/geeks/permutations/main.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="224">
-          <caret line="19" column="41" selection-start-line="19" selection-start-column="41" selection-end-line="19" selection-end-column="41" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/geeks/permutations/iterate/permutation.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="512">
@@ -1518,6 +1496,22 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/leetcode/p030/solution.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="155">
+          <caret line="23" column="20" selection-start-line="23" selection-start-column="20" selection-end-line="23" selection-end-column="20" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/leetcode/p020/solution.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="512">
+          <caret line="32" column="24" selection-start-line="32" selection-start-column="24" selection-end-line="32" selection-end-column="24" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/leetcode/p371/solution.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="272">
@@ -1534,18 +1528,28 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/leetcode/p020/solution.go">
+    <entry file="file://$PROJECT_DIR$/src/leetcode/p032/description.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="512">
-          <caret line="32" column="24" selection-start-line="32" selection-start-column="24" selection-end-line="32" selection-end-column="24" />
+        <state relative-caret-position="64">
+          <caret line="4" column="26" selection-start-line="4" selection-start-column="20" selection-end-line="4" selection-end-column="26" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/leetcode/p030/solution.go">
+    <entry file="file://$PROJECT_DIR$/src/leetcode/p032/solution_test.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-62">
-          <caret line="36" column="0" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
+        <state relative-caret-position="183">
+          <caret line="12" column="26" selection-start-line="12" selection-start-column="26" selection-end-line="12" selection-end-column="26" />
+          <folding>
+            <element signature="e#14#30#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/leetcode/p032/solution.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="160">
+          <caret line="10" column="36" selection-start-line="10" selection-start-column="36" selection-end-line="10" selection-end-column="36" />
           <folding />
         </state>
       </provider>

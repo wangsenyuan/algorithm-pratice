@@ -12,11 +12,11 @@ func longestValidParentheses(s string) int {
 	p := 0
 	r := 0
 	for i, c := range s {
-		if c == ')' && p > 0 && s[stack[p - 1]] == '(' {
+		if c == ')' && p > 0 && s[stack[p-1]] == '(' {
 			if p == 1 {
-				r = max(r, i + 1)
+				r = i + 1
 			} else {
-				r = max(r, i - stack[p - 2])
+				r = max(r, i-stack[p-2])
 			}
 			p--
 		} else {
@@ -34,4 +34,3 @@ func max(a, b int) int {
 	}
 	return b
 }
-

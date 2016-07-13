@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="83d3a2c8-1dc0-4e19-9caa-a0784842b42a" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/leetcode/p042/solution.go" afterPath="$PROJECT_DIR$/src/leetcode/p042/solution.go" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/leetcode/p042/solution_test.go" afterPath="$PROJECT_DIR$/src/leetcode/p042/solution_test.go" />
     </list>
     <ignored path="Go.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -52,7 +53,7 @@
         <entry file="file://$PROJECT_DIR$/src/leetcode/p042/solution.go">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="108">
-              <caret line="23" column="18" selection-start-line="23" selection-start-column="18" selection-end-line="23" selection-end-column="18" />
+              <caret line="8" column="18" selection-start-line="8" selection-start-column="18" selection-end-line="8" selection-end-column="18" />
               <folding>
                 <element signature="e#14#26#0" expanded="true" />
               </folding>
@@ -64,8 +65,15 @@
         <entry file="file://$PROJECT_DIR$/src/leetcode/p042/solution_test.go">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="144">
-              <caret line="9" column="58" selection-start-line="9" selection-start-column="17" selection-end-line="9" selection-end-column="58" />
-              <folding />
+              <caret line="11" column="9" selection-start-line="9" selection-start-column="17" selection-end-line="9" selection-end-column="58" />
+              <folding>
+                <marker date="1468412140000" expanded="false" signature="21:30" ph="..." />
+                <marker date="1468412140000" expanded="true" signature="60:357" ph="{...}" />
+                <marker date="1468412140000" expanded="true" signature="81:113" ph="{...}" />
+                <marker date="1468412140000" expanded="true" signature="123:159" ph="{...}" />
+                <marker date="1468412140000" expanded="true" signature="220:355" ph="{...}" />
+                <marker date="1468412140000" expanded="true" signature="271:352" ph="{...}" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -1150,7 +1158,7 @@
       <workItem from="1467979130502" duration="587000" />
       <workItem from="1468310527204" duration="2714000" />
       <workItem from="1468380302594" duration="445000" />
-      <workItem from="1468410232397" duration="677000" />
+      <workItem from="1468410232397" duration="1268000" />
     </task>
     <servers />
   </component>
@@ -1187,7 +1195,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="27031000" />
+    <option name="totallyTimeSpent" value="27622000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1280" height="800" extended-state="0" />
@@ -1620,15 +1628,22 @@
     <entry file="file://$PROJECT_DIR$/src/leetcode/p042/solution_test.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="144">
-          <caret line="9" column="58" selection-start-line="9" selection-start-column="17" selection-end-line="9" selection-end-column="58" />
-          <folding />
+          <caret line="11" column="9" selection-start-line="9" selection-start-column="17" selection-end-line="9" selection-end-column="58" />
+          <folding>
+            <marker date="1468412140000" expanded="false" signature="21:30" ph="..." />
+            <marker date="1468412140000" expanded="true" signature="60:357" ph="{...}" />
+            <marker date="1468412140000" expanded="true" signature="81:113" ph="{...}" />
+            <marker date="1468412140000" expanded="true" signature="123:159" ph="{...}" />
+            <marker date="1468412140000" expanded="true" signature="220:355" ph="{...}" />
+            <marker date="1468412140000" expanded="true" signature="271:352" ph="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/leetcode/p042/solution.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="108">
-          <caret line="23" column="18" selection-start-line="23" selection-start-column="18" selection-end-line="23" selection-end-column="18" />
+          <caret line="8" column="18" selection-start-line="8" selection-start-column="18" selection-end-line="8" selection-end-column="18" />
           <folding>
             <element signature="e#14#26#0" expanded="true" />
           </folding>

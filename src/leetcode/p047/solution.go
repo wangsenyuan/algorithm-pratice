@@ -37,6 +37,7 @@ func permuteUnique(nums []int) [][]int {
 			}
 
 			rs = append(rs, copySlice(nums))
+			break
 		}
 	}
 

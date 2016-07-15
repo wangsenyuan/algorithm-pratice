@@ -11,6 +11,7 @@ func trap(height []int) int {
 	if n <= 2 {
 		return 0
 	}
+
 	v := 0
 	for i, j := 0, n-1; i < j; {
 		if height[i] <= height[j] {

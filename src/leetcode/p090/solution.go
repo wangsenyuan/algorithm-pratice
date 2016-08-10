@@ -34,7 +34,7 @@ func subsetsWithDup(nums []int) [][]int {
 
 	subsets(0, []int{}, -1)
 
-	sort.Sort(byNumber(rs))
+	//sort.Sort(byNumber(rs))
 	return rs
 }
 

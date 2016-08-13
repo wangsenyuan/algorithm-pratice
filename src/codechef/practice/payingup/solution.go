@@ -16,7 +16,6 @@ func main() {
 		for j := 0; j < n; j++ {
 			fmt.Scanf("%d", &nums[j])
 		}
-
 		if play(m, nums) {
 			fmt.Println("Yes")
 		} else {
@@ -28,20 +27,26 @@ func main() {
 func play(m int, nums []int) bool {
 	sort.Ints(nums)
 	n := len(nums)
+	sums := make([]int, n+1)
+	for i := range nums {
+		sums[i+1] = sums[i] + nums[i]
+	}
 
 	var doPlay func(i int, left int) bool
 
 	doPlay = func(i int, left int) bool {
-		for j := i; j < n; j++ {
-			if nums[j] == left {
-				return true
-			} else if nums[j] < left {
-				return doPlay(j+1, left-nums[j]) || doPlay(j+1, left)
-			}
+		if left == 0 || left == sums[n]-sums[i] {
+			return true
+		}
+		if left < nums[i] {
+			return false
+		}
+		if left > sums[n]-sums[i] {
+			return false
 		}
 
-		return false
+		return doPlay(i+1, left-nums[i]) || doPlay(i+1, left)
 	}
 
-	return doPlay(0, m)
+	return m > 0 && doPlay(0, m)
 }

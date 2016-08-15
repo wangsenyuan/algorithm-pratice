@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+)
 
 func main() {
 	var t int
@@ -13,8 +16,7 @@ func main() {
 		for j := 0; j < n; j++ {
 			fmt.Scanf("%d", &nums[j])
 		}
-		r := play(m, nums)
-		if r {
+		if play(m, nums) {
 			fmt.Println("Yes")
 		} else {
 			fmt.Println("No")
@@ -23,20 +25,28 @@ func main() {
 }
 
 func play(m int, nums []int) bool {
+	sort.Ints(nums)
 	n := len(nums)
+	sums := make([]int, n+1)
+	for i := range nums {
+		sums[i+1] = sums[i] + nums[i]
+	}
 
-	x := 1 << uint(n)
+	var doPlay func(i int, left int) bool
 
-	for i := 1; i < x; i++ {
-		sum := 0
-		for j := 0; j < n; j++ {
-			if (i & (1 << uint(j))) > 0 {
-				sum += nums[j]
-			}
-		}
-		if sum == m {
+	doPlay = func(i int, left int) bool {
+		if left == 0 || left == sums[n]-sums[i] {
 			return true
 		}
+		if left < nums[i] {
+			return false
+		}
+		if left > sums[n]-sums[i] {
+			return false
+		}
+
+		return doPlay(i+1, left-nums[i]) || doPlay(i+1, left)
 	}
-	return false
+
+	return m > 0 && doPlay(0, m)
 }

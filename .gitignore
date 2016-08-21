@@ -4,3 +4,5 @@ pkg/
 !/**/*.go
 !/**/main.go
 .idea/
+/**/debug
+/**/debug.test

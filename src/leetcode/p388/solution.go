@@ -4,13 +4,13 @@ import "fmt"
 
 func main() {
 	//input := "dir\n\tsubdir1\n\tsubdir2\n\t\tfile.ext"
-	input := "dir\n\tsubdir1\n\t\tfile1.ext\n\t\tsubsubdir1\n\tsubdir2\n\t\tsubsubdir2\n\t\t\tfile2.ext"
-	//input := "dir\n        file.txt";
+	//input := "dir\n\tsubdir1\n\t\tfile1.ext\n\t\tsubsubdir1\n\tsubdir2\n\t\tsubsubdir2\n\t\t\tfile2.ext"
+	input := "dir\n        file.txt"
 	fmt.Println(lengthLongestPath(input))
 }
 
 func lengthLongestPath(input string) int {
-	stack := make([]folder, len(input))
+	stack := make([]int, len(input))
 	p := 0
 	from := 0
 	isFile := false
@@ -20,21 +20,19 @@ func lengthLongestPath(input string) int {
 	for i < len(input) {
 		c := input[i]
 		if c == '\n' {
-			for p > 0 && stack[p-1].level >= level {
+			for p > level {
 				p--
 			}
+			l := i - from
+			if p > 0 {
+				l += 1 + stack[p-1]
+			}
 			if isFile {
-				l := fileLength(stack, p, i-from)
 				if l > res {
 					res = l
 				}
 			} else {
-				path := input[from:i]
-				if p > 0 {
-					last := stack[p-1]
-					path = last.path + "/" + path
-				}
-				stack[p] = folder{path, level}
+				stack[p] = l
 				p++
 			}
 			level = 0
@@ -50,28 +48,17 @@ func lengthLongestPath(input string) int {
 	}
 
 	if i > from && isFile {
-		for p > 0 && stack[p-1].level >= level {
+		for p > level {
 			p--
 		}
-		l := fileLength(stack, p, i-from)
+		l := i - from
+		if p > 0 {
+			l += 1 + stack[p-1]
+		}
 		if l > res {
 			res = l
 		}
 	}
 
 	return res
-}
-
-func fileLength(stack []folder, p int, l int) int {
-	if p == 0 {
-		return l
-	}
-
-	last := stack[p-1]
-	return len(last.path) + l + 1
-}
-
-type folder struct {
-	path  string
-	level int
 }

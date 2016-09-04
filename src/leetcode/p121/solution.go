@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+)
 
 func main() {
 	//fmt.Println(maxProfit([]int{7, 1, 5, 3, 6, 4}))
@@ -13,6 +16,22 @@ func main() {
 }
 
 func maxProfit(prices []int) int {
+	buy, sell := math.MinInt32, 0
+
+	for _, price := range prices {
+		if buy < -price {
+			buy = -price
+		}
+
+		if buy+price > sell {
+			sell = buy + price
+		}
+	}
+
+	return sell
+}
+
+func maxProfit1(prices []int) int {
 	st := make([]int, len(prices))
 	i := 0
 	profit := 0

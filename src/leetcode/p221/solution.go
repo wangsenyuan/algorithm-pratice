@@ -22,64 +22,44 @@ func main() {
 }
 
 func maximalSquare(matrix [][]byte) int {
-	m, n := size(matrix)
+	m := len(matrix)
 	if m == 0 {
 		return 0
 	}
 
-	fill := make([][]int, m+1)
-	fill[0] = make([]int, n+1)
-	for i := 0; i < m; i++ {
-		fill[i+1] = make([]int, n+1)
-		for j := 0; j < n; j++ {
-			fill[i+1][j+1] = fill[i+1][j] + fill[i][j+1] - fill[i][j]
-			if matrix[i][j] == '1' {
-				fill[i+1][j+1]++
-			}
-		}
-	}
-
-	check := func(x int) bool {
-		for i := 0; i+x <= m; i++ {
-			for j := 0; j+x <= n; j++ {
-				area := fill[i+x][j+x] - fill[i+x][j] - fill[i][j+x] + fill[i][j]
-				if area == x*x {
-					return true
-				}
-			}
-		}
-		return false
-	}
-
-	lp := 0
-	up := m
-	if n < m {
-		up = n
-	}
-
-	res := 0
-	for lp <= up {
-		mid := lp + (up-lp)/2
-		if check(mid) {
-			res = mid
-			lp = mid + 1
-		} else {
-			up = mid - 1
-		}
-	}
-	return res * res
-}
-
-func size(matrix [][]byte) (int, int) {
-	m := len(matrix)
-	if m == 0 {
-		return 0, 0
-	}
-
 	n := len(matrix[0])
 	if n == 0 {
-		return 0, 0
+		return 0
 	}
 
-	return m, n
+	dp := make([]int, n+1)
+	width := 0
+	prev := 0
+	for i := 0; i < m; i++ {
+		for j := 0; j < n; j++ {
+			tmp := dp[j+1]
+			if matrix[i][j] == '1' {
+				dp[j+1] = min(dp[j], dp[j+1], prev) + 1
+				if dp[j+1] > width {
+					width = dp[j+1]
+				}
+			} else {
+				dp[j+1] = 0
+			}
+			prev = tmp
+		}
+	}
+
+	return width * width
+}
+
+func min(a, b, c int) int {
+	if a <= b && a <= c {
+		return a
+	}
+	if b <= a && b <= c {
+		return b
+	}
+
+	return c
 }

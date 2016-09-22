@@ -23,49 +23,25 @@ func (head *ListNode) String() string {
 }
 
 func isPalindrome(head *ListNode) bool {
-	sz := size(head)
-
-	if sz <= 1 {
-		return true
+	slow, fast := head, head
+	var rev *ListNode
+	for fast != nil && fast.Next != nil {
+		fast = fast.Next.Next
+		rev, slow.Next, slow = slow, rev, slow.Next
 	}
 
-	half := sz / 2
+	if fast != nil {
+		slow = slow.Next
+	}
+	head = slow
 
-	a := head
-	for i := 0; i < half-1; i++ {
-		a = a.Next
+	res := true
+
+	for rev != nil {
+		res = res && rev.Val == slow.Val
+		tmp := rev.Next
+		rev.Next, head, slow, rev = head, rev, slow.Next, tmp
 	}
 
-	b, _ := reverse(a.Next)
-
-	for c, d := head, b; 0 < half; half-- {
-		if c.Val != d.Val {
-			break
-		}
-		c, d = c.Next, d.Next
-	}
-
-	b, _ = reverse(b)
-
-	a.Next = b
-
-	return half == 0
-}
-
-func reverse(head *ListNode) (*ListNode, *ListNode) {
-	if head.Next == nil {
-		return head, head
-	}
-
-	newHead, last := reverse(head.Next)
-	last.Next = head
-	head.Next = nil
-	return newHead, head
-}
-
-func size(head *ListNode) int {
-	if head == nil {
-		return 0
-	}
-	return 1 + size(head.Next)
+	return res
 }

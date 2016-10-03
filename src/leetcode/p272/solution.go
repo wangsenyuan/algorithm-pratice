@@ -48,11 +48,8 @@ func closestKValues(root *TreeNode, target float64, k int) []int {
 			res = closestValue(root.Right)
 		}
 
-		if res != nil {
-			px := diffAbs(float64(res.Val), target)
-			if px < p {
-				return res
-			}
+		if res != nil && diffAbs(float64(res.Val), target) < p {
+			return res
 		}
 		return root
 	}

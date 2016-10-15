@@ -11,31 +11,34 @@ func findMaximumXOR(nums []int) int {
 	t := &Trie{children: make([]*Trie, 2)}
 
 	for _, num := range nums {
-		t.add(num, 31)
+		tmp := t
+		for i := 31; i >= 0; i-- {
+			x := (num >> uint(i)) & 1
+
+			if tmp.children[x] == nil {
+				tmp.children[x] = &Trie{children: make([]*Trie, 2)}
+			}
+
+			tmp = t.children[x]
+		}
 	}
 
 	res := 0
 
 	for _, num := range nums {
-		at := t
-		for i := 31; i >= 0 && at != nil; i-- {
-			if (num>>uint(i))&1 == 0 {
-				if at.children[1] != nil {
-					at = at.children[1]
-				} else {
-					at = at.children[0]
-				}
+		tmp := t
+		cur := 0
+		for i := 31; i >= 0; i-- {
+			x := uint(num >> uint(i) & 1)
+			if tmp.children[x^1] != nil {
+				cur = cur | (1 << uint(i))
+				tmp = tmp.children[x^1]
 			} else {
-				if at.children[0] != nil {
-					at = at.children[0]
-				} else {
-					at = at.children[1]
-				}
+				tmp = tmp.children[x]
 			}
 		}
-
-		if at != nil && at.num^num > res {
-			res = at.num ^ num
+		if cur > res {
+			res = cur
 		}
 	}
 
@@ -44,19 +47,4 @@ func findMaximumXOR(nums []int) int {
 
 type Trie struct {
 	children []*Trie
-	num      int
-}
-
-func (t *Trie) add(num int, i uint) {
-	t.num = num
-	if i == 0 {
-		return
-	}
-	x := (num >> i) & 1
-
-	if t.children[x] == nil {
-		t.children[x] = &Trie{children: make([]*Trie, 2)}
-	}
-
-	t.children[x].add(num, i-1)
 }

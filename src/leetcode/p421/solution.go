@@ -19,14 +19,14 @@ func findMaximumXOR(nums []int) int {
 				tmp.children[x] = &Trie{children: make([]*Trie, 2)}
 			}
 
-			tmp = t.children[x]
+			tmp = tmp.children[x]
 		}
 	}
 
 	res := 0
 
 	for _, num := range nums {
-		tmp := t
+		var tmp = t
 		cur := 0
 		for i := 31; i >= 0; i-- {
 			x := uint(num >> uint(i) & 1)

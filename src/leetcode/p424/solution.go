@@ -40,9 +40,6 @@ func play(s []byte, k int) int {
 		}
 		for !meet(snake) {
 			snake[s[j]]--
-			if snake[s[j]] == 0 {
-				delete(snake, s[j])
-			}
 			j++
 		}
 	}

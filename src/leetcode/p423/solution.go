@@ -23,8 +23,14 @@ func main() {
 eight: 8
 nine: 9
 **/
-func originalDigits(s string) string {
-	dict := make(map[byte]int)
+
+var order = []byte{'x', 's', 'v', 'u', 'z', 'r', 'w', 'o', 'n', 'e'}
+
+var dict = make(map[byte]int)
+
+var name = make(map[byte]string)
+
+func init() {
 	dict['x'] = 6
 	dict['s'] = 7
 	dict['v'] = 5
@@ -35,8 +41,7 @@ func originalDigits(s string) string {
 	dict['o'] = 1
 	dict['n'] = 9
 	dict['e'] = 8
-	order := []byte{'x', 's', 'v', 'u', 'z', 'r', 'w', 'o', 'n', 'e'}
-	name := make(map[byte]string)
+
 	name['x'] = "six"
 	name['s'] = "seven"
 	name['v'] = "five"
@@ -47,18 +52,13 @@ func originalDigits(s string) string {
 	name['o'] = "one"
 	name['n'] = "nine"
 	name['e'] = "eight"
+}
 
-	bs := []byte(s)
-	sort.Sort(sortBytes(bs))
-
+func originalDigits(s string) string {
 	words := make(map[byte]int)
-	j := 0
-	for i := 1; i <= len(bs); i++ {
-		if i < len(bs) && bs[i] == bs[i-1] {
-			continue
-		}
-		words[bs[j]] = i - j
-		j = i
+
+	for i := 0; i < len(s); i++ {
+		words[s[i]]++
 	}
 
 	var res []byte

@@ -32,7 +32,7 @@ func play(s []byte, k int) int {
 	}
 
 	for i := 0; i <= len(s); i++ {
-		if i < len(s) && meet(snake) {
+		if i < len(s) {
 			snake[s[i]]++
 		}
 		if i-j > res {

@@ -1,9 +1,45 @@
 package util
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 )
+
+/**
+ * Definition for singly-linked list.
+ */
+type ListNode struct {
+	Val  int
+	Next *ListNode
+}
+
+func (list *ListNode) String() string {
+	if list == nil {
+		return "nil"
+	}
+	return fmt.Sprintf("%d -> %v", list.Val, list.Next)
+}
+
+func ParseAsList(str string) *ListNode {
+	str = strings.Replace(str, "[", "", 1)
+	str = strings.Replace(str, "]", "", 1)
+	nodes := strings.Split(str, ",")
+
+	if len(nodes) == 0 {
+		return nil
+	}
+
+	head := &ListNode{Val: parseNum(nodes[0])}
+	prev := head
+	for i := range nodes {
+		cur := &ListNode{Val: parseNum(nodes[i])}
+		prev.Next = cur
+		prev = cur
+	}
+
+	return head
+}
 
 /**
  * Definition for a binary tree node.

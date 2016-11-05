@@ -50,6 +50,13 @@ type TreeNode struct {
 	Right *TreeNode
 }
 
+func (tn *TreeNode) String() string {
+	if tn == nil {
+		return "null"
+	}
+	return fmt.Sprintf("%d,%v,%v", tn.Val, tn.Left, tn.Right)
+}
+
 func ParseAsTree(str string) *TreeNode {
 	str = strings.Replace(str, "[", "", 1)
 	str = strings.Replace(str, "]", "", 1)

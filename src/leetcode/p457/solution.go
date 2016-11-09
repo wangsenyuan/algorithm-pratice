@@ -13,6 +13,13 @@ func circularArrayLoop(nums []int) bool {
 	if len(nums) < 2 {
 		return false
 	}
+
+	for _, num := range nums {
+		if num == 0 {
+			return false
+		}
+	}
+
 	n := len(nums)
 	m := 2 * len(nums)
 	detectLoop := func(forward bool) bool {

@@ -23,8 +23,6 @@ func findContentChildren(g []int, s []int) int {
 		if g[i] <= s[j] {
 			ans++
 			i++
-			j++
-			continue
 		}
 
 		j++

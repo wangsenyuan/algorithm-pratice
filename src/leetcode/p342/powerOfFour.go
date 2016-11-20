@@ -6,6 +6,11 @@ import (
 )
 
 func isPowerOfFour(num int) bool {
+	mask := 0x5555555555555555
+	return num != 0 && (num&mask) == num && num == (num&-num)
+}
+
+func isPowerOfFour1(num int) bool {
 	if num <= 0 {
 		return false
 	}

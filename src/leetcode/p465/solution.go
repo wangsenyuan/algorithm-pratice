@@ -1,96 +1,99 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+)
 
 func main() {
-	transactions := [][]int{[]int{0, 1, 10}, []int{2, 0, 5}}
+	//transactions := [][]int{[]int{0, 1, 10}, []int{2, 0, 5}}
+	transactions := [][]int{[]int{0, 1, 10}, []int{1, 0, 1}, []int{1, 2, 5}, []int{2, 0, 5}}
 	fmt.Println(minTransfers(transactions))
 }
 
 func minTransfers(transactions [][]int) int {
-	tx := make(map[int]map[int]int)
-	for _, transaction := range transactions {
-		x, y, z := transaction[0], transaction[1], transaction[2]
-		if tx[x] == nil {
-			tx[x] = make(map[int]int)
-		}
-		tx[x][y] = z
+	net := make(map[int]int)
+	for _, tx := range transactions {
+		x, y, z := tx[0], tx[1], tx[2]
+		net[x] -= z
+		net[y] += z
 	}
 
-	res := make(map[int]map[int]int)
-	processed := make(map[int]bool)
+	arr := make([]int, 0, len(net))
 
-	for x := range tx {
-		if !processed[x] {
-			transfer(tx, x, processed, res)
+	for _, v := range net {
+		if v != 0 {
+			arr = append(arr, v)
 		}
 	}
 
-	ans := 0
-	for x := range res {
-		for _, z := range res[x] {
-			if z > 0 {
-				ans++
+	if len(arr) < 2 {
+		return 0
+	}
+
+	if len(arr) == 2 {
+		return 1
+	}
+
+	var transfer func(start int, cur int)
+	ans := math.MaxInt32
+
+	transfer = func(start int, cur int) {
+		if cur >= ans {
+			return
+		}
+
+		if ans == (len(arr)+1)/2 {
+			return
+		}
+		max, at := math.MinInt32, -1
+
+		for i := start; i < len(arr); i++ {
+			if abs(arr[i]) > max {
+				max = abs(arr[i])
+				at = i
 			}
 		}
+
+		if max == 0 || start == len(arr) {
+			if cur < ans {
+				ans = cur
+			}
+			return
+		}
+
+		arr[start], arr[at] = arr[at], arr[start]
+
+		for i := start + 1; i < len(arr); i++ {
+			if diffSign(arr[start], arr[i]) {
+				tmp := arr[i]
+				arr[i] += arr[start]
+				transfer(start+1, cur+1)
+				arr[i] = tmp
+			}
+		}
+		arr[start], arr[at] = arr[at], arr[start]
 	}
+
+	transfer(0, 0)
+
 	return ans
 }
 
-func transfer(tx map[int]map[int]int, x int, processed map[int]bool, res map[int]map[int]int) {
-	if processed[x] {
-		res = processLoop(res, x)
+func diffSign(a, b int) bool {
+	if a > 0 && b < 0 {
+		return true
 	}
-	processed[x] = true
 
-	for y, z := range tx[x] {
-		if processed[y] {
-			continue
-		}
-		res = processLine(res, x, y, z)
-		transfer(tx, x, processed, res)
+	if a < 0 && b > 0 {
+		return true
 	}
+	return false
 }
 
-func processLine(res map[int]map[int]int, x int, y int, z int) map[int]map[int]int {
-	xs := res[x]
-	if res[y] == nil {
-		res[y] = make(map[int]int)
+func abs(a int) int {
+	if a < 0 {
+		return -a
 	}
-	for a, b := range xs {
-		if b == z {
-			xs[a] = 0
-			res[y][a] = z
-		} else if b > z {
-			xs[a] = b - z
-			res[y][a] = z
-		} else {
-			xs[a] = b
-			res[y][x] = z - b
-		}
-	}
-	return res
-}
-
-func processLoop(res map[int]map[int]int, x int) map[int]map[int]int {
-	xs := res[x]
-
-	for a, b := range xs {
-		c := res[a][x]
-		if c == 0 {
-			continue
-		}
-
-		if c > b {
-			res[a][x] = c - b
-			res[x][a] = 0
-		} else if c < b {
-			res[a][x] = 0
-			res[x][a] = b - c
-		} else {
-			res[a][x] = 0
-			res[x][a] = 0
-		}
-	}
-	return res
+	return a
 }

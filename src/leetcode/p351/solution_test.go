@@ -1,4 +1,4 @@
-package p351
+package main
 
 import "testing"
 

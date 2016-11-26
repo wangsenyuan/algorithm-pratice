@@ -1,68 +1,65 @@
-package p351
+package main
+
+import "fmt"
+
+func main() {
+	fmt.Println(numberOfPatterns(1, 9))
+}
 
 //NumberOfPatterns solution
 func numberOfPatterns(m int, n int) int {
 	if n == 1 {
 		return 9
 	}
-	result = 0
 
-	helper(0, 0, make(map[int]struct{}), m, n, 1)
-
-	helper(0, 1, make(map[int]struct{}), m, n, 1)
-
-	result *= 4
-
-	helper(1, 1, make(map[int]struct{}), m, n, 1)
-
-	return result
-}
-
-var directions = [][]int{
-	[]int{1, 0}, []int{0, 1}, []int{-1, 0}, []int{0, -1},
-	[]int{1, 1}, []int{-1, -1}, []int{-1, 1}, []int{1, -1}, []int{2, 1}, []int{1, 2},
-	[]int{-2, 1}, []int{-1, 2}, []int{2, -1}, []int{1, -2}, []int{-2, -1}, []int{-1, -2}}
-
-var result = 0
-
-func helper(i int, j int, visited map[int]struct{}, m int, n int, cnt int) {
-	//fmt.Printf("check %d %d\n", i, j)
-	if cnt >= m && cnt <= n {
-		result++
-	}
-
-	if cnt == n {
-		return
-	}
-
-	visited[i*3+j] = struct{}{}
-
-	for _, d := range directions {
-		x, y := i+d[0], j+d[1]
-		//fmt.Printf("will check %d %d %b\n", x, y, valid(x, y))
-		if !valid(x, y) {
-			continue
+	var count func(last, len, used int) int
+	count = func(last, len, used int) int {
+		if len == 0 {
+			return 1
 		}
 
-		if _, ok := visited[x*3+y]; ok {
-			//fmt.Println("1")
-			x, y = x+d[0], y+d[1]
-			if !valid(x, y) {
-				continue
+		sum := 0
+		for i := 0; i < 9; i++ {
+			if isValid(i, last, used) {
+				sum += count(i, len-1, used|(1<<uint(i)))
 			}
-			if _, ok2 := visited[x*3+y]; ok2 {
-				continue
-			}
-			helper(x, y, visited, m, n, cnt+1)
-		} else {
-			//fmt.Println("2")
-			helper(x, y, visited, m, n, cnt+1)
 		}
+		return sum
+	}
+	res := 0
+	for l := m; l <= n; l++ {
+		a := count(0, l-1, 1)
+		res += a * 4
+		b := count(1, l-1, 2)
+		res += b * 4
+		res += count(4, l-1, 1<<4)
 	}
 
-	delete(visited, i*3+j)
+	return res
 }
 
-func valid(x, y int) bool {
-	return x >= 0 && x < 3 && y >= 0 && y < 3
+func isValid(index, last int, used int) bool {
+	if used&(1<<uint(index)) > 0 {
+		return false
+	}
+
+	if last == -1 {
+		return true
+	}
+
+	// knight moves or adjacent cells (in a row or in a column)
+	if (index+last)%2 == 1 {
+		return true
+	}
+
+	mid := (index + last) / 2
+
+	if mid == 4 {
+		return used&(1<<4) > 0
+	}
+	if (index%3 != last%3) && (index/3 != last/3) {
+		return true
+	}
+
+	return used&(1<<uint(mid)) > 0
 }

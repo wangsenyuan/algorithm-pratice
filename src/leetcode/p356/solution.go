@@ -1,27 +1,51 @@
 package main
 
-import "fmt"
+import "math"
 
-func countNumbersWithUniqueDigits(n int) int {
-	if n >= 11 || n == 0 {
-		return 0
+func isReflected(points [][]int) bool {
+	if len(points) == 0 {
+		return true
 	}
 
-	fx := make([]int, n+3, n+3)
-	fx[0] = 0
-	fx[1] = 10
-	fx[2] = 91
+	a, b := math.MaxInt32, math.MinInt32
 
-	for i := 3; i <= n; i++ {
-		fx[i] = (10-(i-1))*(fx[i-1]-fx[i-2]) + fx[i-1]
-		//fmt.Println("fx[%d] = %d", i)
+	type P struct {
+		x, y int
+	}
+	cache := make(map[P]bool)
+
+	for _, point := range points {
+		if point[0] < a {
+			a = point[0]
+		}
+
+		if point[0] > b {
+			b = point[0]
+		}
+		p := P{point[0], point[1]}
+		cache[p] = true
 	}
 
-	return fx[n]
-}
+	x := a + b
+	for _, point := range points {
+		var p P
+		if point[0]*2 < x {
+			//at left
+			d := x - point[0]*2
+			p = P{point[0] + d, point[1]}
+		} else if point[0]*2 > x {
+			//at right
+			d := point[0]*2 - x
+			p = P{point[0] - d, point[1]}
+		} else {
+			//at the line
+			p = P{point[0], point[1]}
+		}
 
-func main() {
-	fmt.Println(countNumbersWithUniqueDigits(0))
-	fmt.Println(countNumbersWithUniqueDigits(1))
-	fmt.Println(countNumbersWithUniqueDigits(4))
+		if !cache[p] {
+			return false
+		}
+	}
+
+	return true
 }

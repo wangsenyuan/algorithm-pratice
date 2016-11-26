@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	"leetcode/p352/solution"
+
+	"./solution"
 )
 
 func main() {

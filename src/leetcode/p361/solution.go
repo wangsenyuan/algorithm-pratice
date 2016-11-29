@@ -97,3 +97,90 @@ func check2(grid [][]byte, f [][]int, g [][]int) {
 		}
 	}
 }
+
+func maxKilledEnemies1(grid [][]byte) int {
+	res := 0
+
+	for i := 0; i < len(grid); i++ {
+		for j := 0; j < len(grid[i]); j++ {
+			if grid[i][j] != '0' {
+				continue
+			}
+
+			k := i - 1
+			cnt := 0
+			for k >= 0 && grid[k][j] != 'W' {
+				if grid[k][j] == 'E' {
+					cnt++
+				}
+				k--
+			}
+
+			k = i + 1
+			for k < len(grid) && grid[k][j] != 'W' {
+				if grid[k][j] == 'E' {
+					cnt++
+				}
+				k++
+			}
+
+			k = j - 1
+			for k >= 0 && grid[i][k] != 'W' {
+				if grid[i][k] == 'E' {
+					cnt++
+				}
+				k--
+			}
+
+			k = j + 1
+			for k < len(grid[i]) && grid[i][k] != 'W' {
+				if grid[i][k] == 'E' {
+					cnt++
+				}
+				k++
+			}
+
+			if cnt > res {
+				res = cnt
+			}
+		}
+	}
+
+	return res
+}
+
+func maxKilledEnemies2(grid [][]byte) int {
+	res := 0
+	m := len(grid)
+	if m == 0 {
+		return 0
+	}
+	colCnt := make([]int, len(grid[0]))
+
+	for i := 0; i < m; i++ {
+		rowCnt := 0
+		for j := 0; j < len(grid[i]); j++ {
+			if j == 0 || grid[i][j-1] == 'W' {
+				rowCnt = 0
+				for k := j; k < len(grid[i]) && grid[i][k] != 'W'; k++ {
+					if grid[i][k] == 'E' {
+						rowCnt++
+					}
+				}
+			}
+			if i == 0 || grid[i-1][j] == 'W' {
+				colCnt[j] = 0
+				for k := i; k < m && grid[k][j] != 'W'; k++ {
+					if grid[k][j] == 'E' {
+						colCnt[j]++
+					}
+				}
+			}
+
+			if grid[i][j] == '0' && rowCnt+colCnt[j] > res {
+				res = rowCnt + colCnt[j]
+			}
+		}
+	}
+	return res
+}

@@ -7,47 +7,33 @@ import (
 
 func largestDivisibleSubset(nums []int) []int {
 	sort.Ints(nums)
-	cnts := make([]int, 0, len(nums))
+	cnts := make([][]int, len(nums))
 	for i := 0; i < len(nums); i++ {
-		a := nums[i]
-		c := 0
-		for j, v := range cnts {
-			if a%nums[j] == 0 {
-				c = max(c, v)
+		list := make([]int, 0)
+		for j := 0; j < i; j++ {
+			if nums[i]%nums[j] != 0 {
+				continue
+			}
+			if len(cnts[j]) > len(list) {
+				list = cnts[j]
 			}
 		}
-		cnts = append(cnts, c+1)
+		cp := make([]int, len(list))
+		copy(cp, list)
+
+		cnts[i] = append(cp, nums[i])
 	}
 
-	x := -1
-	c := 0
-	for i, v := range cnts {
-		if v > c {
-			c = v
-			x = i
+	res := make([]int, 0)
+
+	for _, cnt := range cnts {
+		if len(cnt) > len(res) {
+			res = cnt
 		}
 	}
-
-	result := make([]int, c, c)
-	//fmt.Printf("%v\n", cnts)
-	for j := x; j >= 0; j-- {
-		if j < x && (nums[x]%nums[j] != 0 || cnts[x] != cnts[j]+1) {
-			continue
-		}
-		c--
-		result[c] = nums[j]
-		x = j
-	}
-
-	return result
+	return res
 }
 
-func max(a, b int) int {
-	if a >= b {
-		return a
-	}
-	return b
-}
 func main() {
-	fmt.Printf("%v\n", largestDivisibleSubset([]int{1, 2, 4, 8, 16}))
+	fmt.Printf("%v\n", largestDivisibleSubset([]int{1, 2, 4, 8, 72}))
 }

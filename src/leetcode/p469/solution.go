@@ -17,10 +17,12 @@ func isConvex(points [][]int) bool {
 	for i := 2; i <= len(points)+2; i++ {
 		p0, p1, p2 := points[(i-2)%n], points[(i-1)%n], points[i%n]
 		tmp = (p1[0]-p0[0])*(p2[1]-p0[1]) - (p2[0]-p0[0])*(p1[1]-p0[1])
-		if last*tmp < 0 {
-			return false
+		if tmp != 0 {
+			if last*tmp < 0 {
+				return false
+			}
+			last = tmp
 		}
-		last = tmp
 	}
-	return last*tmp >= 0
+	return true
 }

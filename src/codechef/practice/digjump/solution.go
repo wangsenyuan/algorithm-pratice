@@ -27,7 +27,7 @@ func findBestPath(digits string) int {
 	best := make([][]int, 10)
 
 	for i := 0; i < 10; i++ {
-		dist[i] = []int{n, n, n, n, n, n, n, n, n, n}
+		dist[i] = []int{n + 1, n + 1, n + 1, n + 1, n + 1, n + 1, n + 1, n + 1, n + 1, n + 1}
 		best[i] = []int{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
 	}
 
@@ -61,7 +61,7 @@ func findBestPath(digits string) int {
 		if first[i] >= 0 {
 			cost[i] = first[i] + 1
 		} else {
-			cost[i] = n
+			cost[i] = n + 1
 		}
 	}
 
@@ -79,7 +79,7 @@ func findBestPath(digits string) int {
 			}
 		}
 
-		w, minCost := -1, n
+		w, minCost := -1, n + 1
 		for x := 0; x < 10; x++ {
 			if visited[x] {
 				continue

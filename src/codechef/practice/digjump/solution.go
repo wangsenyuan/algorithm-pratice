@@ -44,7 +44,7 @@ func findBestPath(digits string) int {
 			if last[x] == n {
 				continue
 			}
-			if i-last[x] < dist[cur][x] {
+			if i-last[x] <= dist[cur][x] {
 				dist[cur][x] = i - last[x]
 				dist[x][cur] = i - last[x]
 				best[cur][x] = i
@@ -93,7 +93,7 @@ func findBestPath(digits string) int {
 		v = w
 	}
 
-	if first[v] == n-1 || best[v][jumpTo[v]] == n-1 {
+	if first[v] == n-1 || (jumpTo[v] >= 0 && best[v][jumpTo[v]] == n-1) {
 		return cost[v] - 1
 	}
 	return cost[v]

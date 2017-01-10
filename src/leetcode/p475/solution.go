@@ -1,17 +1,64 @@
 package main
 
 import (
-  "fmt"
-   "sort"
- )
+	"fmt"
+	"sort"
+)
 
-func main()  {
-  //houses := []int{1, 2, 3, 4}
-  houses := []int{1, 5}
-  //heaters := []int{1, 4}
-  heaters := []int{2}
-  fmt.Println(findRadius(houses, heaters))
+func main() {
+	//houses := []int{1, 2, 3, 4}
+	houses := []int{1, 5}
+	//heaters := []int{1, 4}
+	heaters := []int{2}
+	fmt.Println(findRadius(houses, heaters))
 }
+
+func findRadius(houses []int, heaters []int) int {
+
+	sort.Ints(houses)
+	sort.Ints(heaters)
+
+	ans := 0
+	i, j := 0, 0
+
+	for i < len(houses) {
+		for j < len(heaters)-1 && heaters[j] < houses[i] {
+			j++
+		}
+
+		if heaters[j] < houses[i] {
+			ans = max(ans, houses[i]-heaters[j])
+			i++
+			continue
+		}
+
+		dist := heaters[j] - houses[i]
+		if j > 0 {
+			dist = min(dist, houses[i]-heaters[j - 1])
+		}
+
+		ans = max(ans, dist)
+		i++
+	}
+
+	return ans
+}
+
+func min(a, b int) int {
+	if a <= b {
+		return a
+	}
+	return b
+}
+
+func max(a, b int) int {
+	if a >= b {
+		return a
+	}
+	return b
+}
+
+/*
 
 func findRadius(houses []int, heaters []int) int {
   sort.Ints(houses)
@@ -54,3 +101,4 @@ func findRadius(houses []int, heaters []int) int {
 
   return ans
 }
+*/

@@ -28,16 +28,14 @@ func findRadius(houses []int, heaters []int) int {
 
 		if heaters[j] < houses[i] {
 			ans = max(ans, houses[i]-heaters[j])
-			i++
-			continue
-		}
+		} else {
+			dist := heaters[j] - houses[i]
+			if j > 0 {
+				dist = min(dist, houses[i]-heaters[j - 1])
+			}
 
-		dist := heaters[j] - houses[i]
-		if j > 0 {
-			dist = min(dist, houses[i]-heaters[j - 1])
+			ans = max(ans, dist)
 		}
-
-		ans = max(ans, dist)
 		i++
 	}
 

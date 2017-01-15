@@ -39,5 +39,6 @@ func countZeroOne(str string) (int, int) {
 			ones++
 		}
 	}
+
 	return zeros, ones
 }

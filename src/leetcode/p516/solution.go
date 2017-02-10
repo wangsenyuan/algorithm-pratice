@@ -28,7 +28,7 @@ func longestPalindromeSubseq(s string) int {
 			if s[i] != s[i+k-1] {
 				dp[i][k] = max(dp[i][k-1], dp[i+1][k-1])
 			} else if k > 3 {
-				dp[i][k] = max(2+dp[i+1][k-2], dp[i][k-1])
+				dp[i][k] = 2 + dp[i+1][k-2]
 			} else {
 				dp[i][k] = k
 			}

@@ -27,8 +27,8 @@ func reversePairs(nums []int) int {
 
 		i, j, k, u := left, mid, left, left
 
-		for i < mid && j < right {
-			if nums[i] < nums[j] {
+		for i < mid || j < right {
+			if j == right || (i < mid && nums[i] < nums[j]) {
 				help[k] = nums[i]
 				i++
 			} else {
@@ -44,24 +44,6 @@ func reversePairs(nums []int) int {
 			}
 
 			k++
-		}
-
-		for i < mid {
-			help[k] = nums[i]
-			k++
-			i++
-		}
-		for j < right {
-			help[k] = nums[j]
-			k++
-
-			for u < mid && nums[u] <= 2*nums[j] {
-				u++
-			}
-			res += mid - u
-
-
-			j++
 		}
 
 		copy(nums[left:right], help[left:right])

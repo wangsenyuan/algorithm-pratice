@@ -7,10 +7,8 @@ import (
 )
 
 type Dir struct {
-	name      string
-	fileNames []string
-	files     map[string]string
-	subDirs   map[string]*Dir
+	files   map[string]string
+	subDirs map[string]*Dir
 }
 
 type FileSystem struct {
@@ -18,64 +16,54 @@ type FileSystem struct {
 }
 
 func Constructor() FileSystem {
-	return FileSystem{root: &Dir{"/", nil, nil, nil}}
+	return FileSystem{root: &Dir{make(map[string]string), make(map[string]*Dir)}}
 }
 
 func (this *FileSystem) Ls(path string) []string {
 	dir := this.root
-	segs := strings.Split(path, "/")[1:]
-	i := 0
-	for ; i < len(segs)-1; i++ {
-		seg := segs[i]
-		if len(dir.subDirs) == 0 {
-			return nil
+
+	if path != "/" {
+		segs := strings.Split(path, "/")
+		i := 1
+		for ; i < len(segs)-1; i++ {
+			dir = dir.subDirs[segs[i]]
 		}
-		if subDir, found := dir.subDirs[seg]; found {
-			dir = subDir
-		} else {
-			return nil
+
+		if _, isFile := dir.files[segs[i]]; isFile {
+			return []string{segs[i]}
 		}
+		dir = dir.subDirs[segs[i]]
 	}
 
-	if len(segs[i]) == 0 {
-		//whole directory
-		return dir.fileNames
+	var res []string
+	for dirName, _ := range dir.subDirs {
+		res = append(res, dirName)
 	}
 
-	if subDir, isDir := dir.subDirs[segs[i]]; isDir {
-		return subDir.fileNames
+	for fileName, _ := range dir.files {
+		res = append(res, fileName)
 	}
-
-	res := make([]string, 0, len(dir.fileNames))
-
-	for _, name := range dir.fileNames {
-		if strings.HasPrefix(name, segs[i]) {
-			res = append(res, name)
-		}
-	}
+	sort.Strings(res)
 	return res
 }
 
 func (this *FileSystem) Mkdir(path string) {
+	if path == "/" {
+		return
+	}
+	segs := strings.Split(path, "/")
+
 	dir := this.root
-	segs := strings.Split(path, "/")[1:]
-	for i := 0; i < len(segs); i++ {
-		if subDir, found := dir.subDirs[segs[i]]; found {
-			dir = subDir
-		} else {
-			subDir = &Dir{segs[i], nil, nil, nil}
-			if dir.subDirs == nil {
-				dir.subDirs = make(map[string]*Dir)
-			}
-			if dir.fileNames == nil {
-				dir.fileNames = make([]string, 0, 10)
-			}
-			dir.fileNames = append(dir.fileNames, segs[i])
-			sort.Strings(dir.fileNames)
+	for i := 1; i < len(segs); i++ {
+		if dir.subDirs[segs[i]] == nil {
+			subDir := &Dir{make(map[string]string), make(map[string]*Dir)}
 			dir.subDirs[segs[i]] = subDir
 			dir = subDir
+		} else {
+			dir = dir.subDirs[segs[i]]
 		}
 	}
+
 }
 
 func (this *FileSystem) AddContentToFile(filePath string, content string) {
@@ -92,15 +80,7 @@ func (this *FileSystem) AddContentToFile(filePath string, content string) {
 	if file, found := dir.files[fileName]; found {
 		dir.files[fileName] = file + content
 	} else {
-		if dir.files == nil {
-			dir.files = make(map[string]string)
-		}
 		dir.files[fileName] = content
-		if dir.fileNames == nil {
-			dir.fileNames = make([]string, 0, 10)
-		}
-		dir.fileNames = append(dir.fileNames, fileName)
-		sort.Strings(dir.fileNames)
 	}
 }
 
@@ -126,6 +106,8 @@ func main() {
 	fmt.Println(fs.Ls("/"))
 	fs.Mkdir("/a/b/c")
 	fmt.Println(fs.Ls("/a/b"))
+	//fmt.Println(fs.Ls("/a/b/"))
+
 	fs.AddContentToFile("/a/b/c/d", "hello")
 	fmt.Println(fs.Ls("/"))
 	fmt.Print(fs.ReadContentFromFile("/a/b/c/d"))

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"bytes"
 )
 
 /**
@@ -102,4 +103,33 @@ func parseNode(str string) *TreeNode {
 func parseNum(str string) int {
 	num, _ := strconv.Atoi(str)
 	return num
+}
+
+func SprintTree(root *TreeNode) string {
+	if root == nil {
+		return "[null]"
+	}
+	var buf bytes.Buffer
+
+	curLevel := make([]*TreeNode, 0)
+	curLevel = append(curLevel, root)
+	for len(curLevel) > 0 {
+		nextLevel := make([]*TreeNode, 0)
+		for _, node := range curLevel {
+			if node == nil {
+				buf.WriteString("null,")
+			} else {
+				buf.WriteString(strconv.Itoa(node.Val))
+				buf.WriteString(",")
+				nextLevel = append(nextLevel, node.Left)
+				nextLevel = append(nextLevel, node.Right)
+			}
+		}
+		curLevel = nextLevel
+	}
+	if buf.Len() > 0 {
+		buf.Truncate(buf.Len() - 1)
+	}
+
+	return buf.String()
 }

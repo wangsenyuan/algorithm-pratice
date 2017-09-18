@@ -4,55 +4,78 @@ import "fmt"
 
 func judgePoint24(nums []int) bool {
 
-	var process func(count int, flag int, res []float64) bool
+	var process func(nums []float64) bool
 
-	process = func(count int, flag int, res []float64) bool {
-		if count == 1 {
-			for i, one := range res {
-				if flag&(1<<uint(i)) > 0 && one == 24.0 {
-					return true
-				}
+	cal := func(nums []float64, i, j int, op func(a, b float64) float64) bool {
+		xs := make([]float64, len(nums)-1)
+		xs[0] = op(nums[i], nums[j])
+		x := 1
+		for k := 0; k < len(nums); k++ {
+			if i == k || j == k {
+				continue
 			}
+			xs[x] = nums[k]
+			x++
+		}
+		return process(xs)
+	}
+
+	add := func(nums []float64, i, j int) bool {
+		return cal(nums, i, j, func(a, b float64) float64 {
+			return a + b
+		})
+	}
+
+	mul := func(nums []float64, i, j int) bool {
+		return cal(nums, i, j, func(a, b float64) float64 {
+			return a * b
+		})
+	}
+
+	sub := func(nums []float64, i, j int) bool {
+		return cal(nums, i, j, func(a, b float64) float64 {
+			return a - b
+		})
+	}
+
+	div := func(nums []float64, i, j int) bool {
+		if nums[j] == 0.0 {
+			return false
+		}
+		return cal(nums, i, j, func(a, b float64) float64 {
+			return a / b
+		})
+	}
+	process = func(nums []float64) bool {
+		if len(nums) == 0 {
 			return false
 		}
 
-		for i := 0; i < 4; i++ {
-			if flag&(1<<uint(i)) == 0 {
-				continue
-			}
+		if len(nums) == 1 {
+			return nums[0] <= 24.0+1e-6 && nums[0] >= 24.0-1e-6
+		}
 
-			a := res[i]
-
-			for j := 0; j < 4; j++ {
-				if i == j || flag&(1<<uint(j)) == 0 {
+		n := len(nums)
+		for i := 0; i < n; i++ {
+			for j := 0; j < n; j++ {
+				if i == j {
 					continue
 				}
 
-				if i < j {
-					res[i] += res[j]
-					if process(count-1, flag^(1<<uint(j)), res) {
+				if i > j {
+					if add(nums, i, j) {
 						return true
 					}
-					res[i] = a
-					res[i] *= res[j]
-					if process(count-1, flag^(1<<uint(j)), res) {
+					if mul(nums, i, j) {
 						return true
 					}
-					res[i] = a
 				}
-
-				res[i] -= res[j]
-				if process(count-1, flag^(1<<uint(j)), res) {
+				if sub(nums, i, j) {
 					return true
 				}
-				res[i] = a
 
-				if res[j] != 0 {
-					res[i] /= res[j]
-					if process(count-1, flag^(1<<uint(j)), res) {
-						return true
-					}
-					res[i] = a
+				if div(nums, i, j) {
+					return true
 				}
 			}
 		}
@@ -64,11 +87,13 @@ func judgePoint24(nums []int) bool {
 		res[i] = float64(nums[i])
 	}
 
-	return process(4, 1<<4-1, res)
+	return process(res)
 }
 
 func main() {
 	fmt.Println(judgePoint24([]int{4, 1, 8, 7}))
 	fmt.Println(judgePoint24([]int{1, 2, 1, 2}))
 	fmt.Println(judgePoint24([]int{1, 2, 3, 4}))
+	fmt.Println(judgePoint24([]int{3, 3, 8, 8}))
+
 }

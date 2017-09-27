@@ -85,7 +85,7 @@ func findRedundantDirectedConnection(edges [][]int) []int {
 	//find loop
 	slow, fast := 1, 1
 
-	for slow != fast {
+	for {
 		slow = parent[slow]
 		if slow == 0 {
 			break
@@ -97,6 +97,9 @@ func findRedundantDirectedConnection(edges [][]int) []int {
 		}
 		fast = parent[fast]
 		if fast == 0 {
+			break
+		}
+		if slow == fast {
 			break
 		}
 	}

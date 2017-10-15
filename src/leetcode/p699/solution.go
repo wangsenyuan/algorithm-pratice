@@ -2,28 +2,33 @@ package main
 
 import "fmt"
 
+type interval struct {
+	start  int
+	end    int
+	height int
+}
+
 func fallingSquares(positions [][]int) []int {
 	n := len(positions)
 	res := make([]int, n)
-
-	prev := make(map[int][]int)
-
+	intervals := make([]interval, 0, n)
 	best := 0
 
 	for i := 0; i < n; i++ {
 		cur := positions[i]
 		left, side := cur[0], cur[1]
 		height := side
-		for pos, sq := range prev {
-			a, b := sq[0], sq[1]
-			if pos+a <= left || pos >= left+side {
+
+		for _, inter := range intervals {
+			if inter.end <= left || left+side <= inter.start {
 				continue
 			}
-			if b+side > height {
-				height = b + side
+			if inter.height+side > height {
+				height = inter.height + side
 			}
 		}
-		prev[left] = []int{side, height}
+
+		intervals = append(intervals, interval{left, left + side, height})
 
 		if height > best {
 			best = height

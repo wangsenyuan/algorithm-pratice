@@ -15,10 +15,9 @@ func smallestDistancePair(nums []int, k int) int {
 	count := func(dist int) int {
 		cnt := 0
 		for i := 0; i < n; i++ {
-			j := i;
-			for j < n && nums[j]-nums[i] <= dist {
-				j++
-			}
+			j := sort.Search(n, func(j int) bool {
+				return nums[j] > nums[i]+dist
+			})
 			cnt += j - i - 1
 		}
 
@@ -33,6 +32,6 @@ func smallestDistancePair(nums []int, k int) int {
 }
 
 func main() {
-	//fmt.Println(smallestDistancePair([]int{1, 3, 1}, 1))
+	fmt.Println(smallestDistancePair([]int{1, 3, 1}, 1))
 	fmt.Println(smallestDistancePair([]int{1, 6, 1}, 3))
 }

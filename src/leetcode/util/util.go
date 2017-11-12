@@ -1,10 +1,10 @@
 package util
 
 import (
+	"bytes"
 	"fmt"
 	"strconv"
 	"strings"
-	"bytes"
 )
 
 /**
@@ -16,10 +16,20 @@ type ListNode struct {
 }
 
 func (list *ListNode) String() string {
-	if list == nil {
-		return "nil"
+	var buf bytes.Buffer
+	buf.WriteString("[")
+
+	for tmp := list; tmp != nil; tmp = tmp.Next {
+		buf.WriteString(strconv.Itoa(tmp.Val))
+		buf.WriteString(",")
 	}
-	return fmt.Sprintf("%d -> %v", list.Val, list.Next)
+
+	if buf.Len() > 0 {
+		buf.Truncate(buf.Len() - 1)
+	}
+
+	buf.WriteString("]")
+	return buf.String()
 }
 
 func ParseAsList(str string) *ListNode {
@@ -33,7 +43,7 @@ func ParseAsList(str string) *ListNode {
 
 	head := &ListNode{Val: parseNum(nodes[0])}
 	prev := head
-	for i := range nodes {
+	for i := 1; i < len(nodes); i++ {
 		cur := &ListNode{Val: parseNum(nodes[i])}
 		prev.Next = cur
 		prev = cur

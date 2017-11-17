@@ -6,3 +6,5 @@ pkg/
 .idea/
 /**/debug
 /**/debug.test
+/**/*.out
+/**/*.in

@@ -5,8 +5,8 @@ type Scope struct {
 	current map[string]int
 }
 
-func newScope(parent *Scope) Scope {
-	return Scope{parent, make(map[string]int)}
+func newScope(parent *Scope) *Scope {
+	return &Scope{parent, make(map[string]int)}
 }
 
 func (scope Scope) find(vn string) (int, bool) {
@@ -23,6 +23,107 @@ func (scope Scope) find(vn string) (int, bool) {
 func (scope *Scope) add(vn string, vv int) {
 	scope.current[vn] = vv
 }
+
+func evaluate(expression string) int {
+	return eval(expression, nil)
+}
+
+func eval(expr string, scope *Scope) int {
+	if expr[0] == '(' {
+		return expression(expr, newScope(scope))
+	}
+
+	if expr[0] >= 'a' && expr[0] <= 'z' {
+		res, _ := scope.find(expr)
+		return res
+	}
+
+	var tmp int
+	sign := 1
+	if expr[0] == '-' {
+		sign = -1
+		expr = expr[1:]
+	}
+	for i := 0; i < len(expr); i++ {
+		tmp = tmp*10 + int(expr[i]-'0')
+	}
+	return tmp * sign
+}
+
+func expression(expr string, scope *Scope) int {
+	n := len(expr)
+	tokens := tokenize(expr[1 : n-1])
+	switch tokens[0] {
+	case "add":
+		return add(tokens, scope)
+	case "mult":
+		return mult(tokens, scope)
+	case "let":
+		return let(tokens, scope)
+	}
+	return -1
+}
+
+func tokenize(expr string) []string {
+	res := make([]string, 0, 10)
+	i := 0
+	for i < len(expr) {
+		if expr[i] == '(' {
+			j := pair(expr, i)
+			res = append(res, expr[i:j+1])
+			i = j + 2
+			continue
+		}
+		j := i
+		for j < len(expr) && expr[j] != ' ' {
+			j++
+		}
+		res = append(res, expr[i:j])
+		i = j + 1
+	}
+	return res
+}
+
+func pair(expr string, start int) int {
+	level := 0
+	for i := start; i < len(expr); i++ {
+		if expr[i] == '(' {
+			level++
+		} else if expr[i] == ')' {
+			level--
+		}
+		if level == 0 {
+			return i
+		}
+	}
+	return -1
+}
+
+func add(tokens []string, scope *Scope) int {
+	left, right := tokens[1], tokens[2]
+	x, y := eval(left, scope), eval(right, scope)
+	return x + y
+}
+
+func mult(tokens []string, scope *Scope) int {
+	left, right := tokens[1], tokens[2]
+	x, y := eval(left, scope), eval(right, scope)
+	return x * y
+}
+
+func let(tokens []string, scope *Scope) int {
+	n := len(tokens)
+
+	for i := 1; i < n-1; i += 2 {
+		vn := tokens[i]
+		ve := tokens[i+1]
+		scope.add(vn, eval(ve, scope))
+	}
+
+	return eval(tokens[n-1], scope)
+}
+
+/*
 
 func process(expr string, parent *Scope) int {
 	n := len(expr)
@@ -143,6 +244,4 @@ func mul(expr string, scope Scope) int {
 	return calc(expr, scope, func(left int, right int) int { return left * right })
 }
 
-func evaluate(expression string) int {
-	return process(expression, nil)
-}
+*/

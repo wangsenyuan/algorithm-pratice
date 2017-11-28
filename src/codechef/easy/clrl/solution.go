@@ -47,16 +47,23 @@ func main() {
 }
 
 func solve(n int, reziba int, scores []int) bool {
-	left, right := 0, 1000000001
+	if n == 1 || n == 2 {
+		return true
+	}
+	left, right := 0, 0
+
+	for i := 0; i < n; i++ {
+		if scores[i] > right {
+			right = scores[i]
+		}
+	}
 
 	for i := 0; i < n-1; i++ {
 		x := scores[i]
-		if x <= left || x >= right {
+		if x < left || x > right {
 			return false
 		}
-		if x == reziba {
-			return false
-		}
+
 		if x < reziba {
 			left = x
 		} else {
@@ -64,5 +71,5 @@ func solve(n int, reziba int, scores []int) bool {
 		}
 	}
 
-	return left < reziba && reziba < right
+	return true
 }

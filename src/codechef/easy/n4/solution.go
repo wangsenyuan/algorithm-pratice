@@ -68,7 +68,7 @@ func preCompute() (map[string]int, map[string]string, map[string]string) {
 	start := "0001001011000"
 	ds[start] = 0
 
-	que := make([]string, n+1)
+	que := make([]string, n)
 	head, tail := 0, 0
 	que[tail] = start
 	tail++

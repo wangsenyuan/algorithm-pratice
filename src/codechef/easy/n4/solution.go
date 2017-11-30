@@ -42,10 +42,7 @@ func preCompute() (map[string]int, map[string]string, map[string]string) {
 	}
 
 	rotate := func(src string, x int, r int) string {
-		res := make([]byte, 13)
-		for i := 0; i < 13; i++ {
-			res[i] = src[i]
-		}
+		res := []byte(src)
 
 		if r == 0 {
 			tmp := res[m[x][0]]

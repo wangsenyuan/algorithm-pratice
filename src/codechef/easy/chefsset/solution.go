@@ -20,13 +20,6 @@ func init() {
 			for j := i + i; j < N; j += i {
 				primes[j] = 1
 			}
-		}
-	}
-
-	// fmt.Println(primes[:20])
-
-	for i := 2; i < N; i++ {
-		if primes[i] == 0 {
 
 			for j := i; j < N; j += i {
 				val := j
@@ -35,7 +28,7 @@ func init() {
 					val /= i
 					cnt++
 				}
-				if cnt&1 == 1 {
+				if cnt%2 == 1 {
 					if primeFactors[j] == nil {
 						primeFactors[j] = make([]int, 0, 5)
 					}
@@ -48,6 +41,11 @@ func init() {
 
 func readInt(bytes []byte, from int, val *int) int {
 	i := from
+
+	for i < len(bytes) && bytes[i] == ' ' {
+		i++
+	}
+
 	tmp := 0
 	for i < len(bytes) && bytes[i] != ' ' {
 		tmp = tmp*10 + int(bytes[i]-'0')

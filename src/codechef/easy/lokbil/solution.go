@@ -46,6 +46,43 @@ func main() {
 }
 
 func solve(n int, friends [][]int) (int, float64) {
+	f := make([][]int, n)
+	INF := 1 << 30
+
+	for i := 0; i < n; i++ {
+		f[i] = make([]int, n)
+		for j := 0; j < n; j++ {
+			if friends[i][j] == 1 {
+				f[i][j] = 1
+			} else if i != j {
+				f[i][j] = INF
+			}
+		}
+	}
+
+	for k := 0; k < n; k++ {
+		for i := 0; i < n; i++ {
+			for j := 0; j < n; j++ {
+				if f[i][j] > f[i][k]+f[k][j] {
+					f[i][j] = f[i][k] + f[k][j]
+				}
+			}
+		}
+	}
+	x, y := -1, 0
+	for i := 0; i < n; i++ {
+		var tmp int
+		for j := 0; j < n; j++ {
+			tmp += f[i][j]
+		}
+		if x == -1 || y > tmp {
+			x, y = i, tmp
+		}
+	}
+	return x, float64(y) / float64(n)
+}
+
+func solve1(n int, friends [][]int) (int, float64) {
 
 	bfs := func(x int) int {
 		ds := make([]int, n)

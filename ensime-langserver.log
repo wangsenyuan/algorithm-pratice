@@ -47,3 +47,29 @@ Content-Length: 52
 [2017-12-15 21:28:35,604] DEBUG langserver.core.Connection - Received {"jsonrpc":"2.0","method":"initialized","params":{}}
 [2017-12-15 21:28:35,622] ERROR org.github.dragos.vscode.EnsimeLanguageServer - Unknown notification Initialized()
 [2017-12-15 21:28:35,622] ERROR org.github.dragos.vscode.EnsimeLanguageServer - Unknown notification Initialized()
+[2017-12-18 10:05:40,214] DEBUG langserver.core.MessageReader - Received headers:
+Content-Length: 58
+[2017-12-18 10:05:40,214] DEBUG langserver.core.MessageReader - Received headers:
+Content-Length: 58
+[2017-12-18 10:05:40,272] DEBUG langserver.core.Connection - Received {"jsonrpc":"2.0","id":1,"method":"shutdown","params":null}
+[2017-12-18 10:05:40,272] DEBUG langserver.core.Connection - Received {"jsonrpc":"2.0","id":1,"method":"shutdown","params":null}
+[2017-12-18 10:05:40,726] DEBUG langserver.core.MessageWriter - Content-Length: 198
+
+
+
+{"jsonrpc":"2.0","error":{"code":-32602,"message":"Invalid params","data":{"meaning":"Invalid method parameter(s).","error":{"obj":[{"msg":["command parameters must be given"],"args":[]}]}}},"id":1}
+[2017-12-18 10:05:40,726] DEBUG langserver.core.MessageWriter - Content-Length: 198
+
+
+
+{"jsonrpc":"2.0","error":{"code":-32602,"message":"Invalid params","data":{"meaning":"Invalid method parameter(s).","error":{"obj":[{"msg":["command parameters must be given"],"args":[]}]}}},"id":1}
+[2017-12-18 10:05:40,727] DEBUG langserver.core.MessageWriter - payload: {"jsonrpc":"2.0","error":{"code":-32602,"message":"Invalid params","data":{"meaning":"Invalid method parameter(s).","error":{"obj":[{"msg":["command parameters must be given"],"args":[]}]}}},"id":1}
+[2017-12-18 10:05:40,727] DEBUG langserver.core.MessageWriter - payload: {"jsonrpc":"2.0","error":{"code":-32602,"message":"Invalid params","data":{"meaning":"Invalid method parameter(s).","error":{"obj":[{"msg":["command parameters must be given"],"args":[]}]}}},"id":1}
+[2017-12-18 10:05:41,126] INFO langserver.core.MessageReader - End of stream, terminating thread
+[2017-12-18 10:05:41,126] INFO langserver.core.MessageReader - End of stream, terminating thread
+[2017-12-18 10:05:41,128] INFO org.github.dragos.vscode.EnsimeLanguageServer - Shutdown request
+[2017-12-18 10:05:41,128] INFO org.github.dragos.vscode.EnsimeLanguageServer - Shutdown request
+[2017-12-18 10:05:41,135] INFO org.github.dragos.vscode.EnsimeLanguageServer - Shutting down actor system.
+[2017-12-18 10:05:41,135] INFO org.github.dragos.vscode.EnsimeLanguageServer - Shutting down actor system.
+[2017-12-18 10:05:41,260] INFO org.github.dragos.vscode.EnsimeLanguageServer - Actor system down.
+[2017-12-18 10:05:41,260] INFO org.github.dragos.vscode.EnsimeLanguageServer - Actor system down.

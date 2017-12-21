@@ -69,11 +69,90 @@ func main() {
 				}
 			}
 		}
-		scanner.Scan()
+		if i < t-1 {
+			scanner.Scan()
+		}
 	}
 }
 
 func solve(m, n, k int, grid [][]int) [][]int {
+	rows := make([][][]int, m)
+	for i := 0; i < m; i++ {
+		rows[i] = make([][]int, n)
+		for j := 0; j < n; j++ {
+			rows[i][j] = make([]int, 2)
+		}
+	}
+	// rows[i][j][0] = max element from (i, j) to (i, j + k - 1)
+	// rows[i][j][0] = count of the max elements
+	stack := make([][]int, n)
+	for i := 0; i < n; i++ {
+		stack[i] = make([]int, 2)
+	}
+	for i := 0; i < m; i++ {
+		head, tail := 0, 0
+		for j := 0; j < n; j++ {
+			for tail > 0 && stack[tail-1][0] < grid[i][j] {
+				tail--
+			}
+			if tail > 0 && stack[tail-1][0] == grid[i][j] {
+				stack[tail-1][1]++
+			} else {
+				stack[tail][0] = grid[i][j]
+				stack[tail][1] = 1
+				tail++
+			}
+			if j+1 >= k {
+				rows[i][j+1-k][0] = stack[head][0]
+				rows[i][j+1-k][1] = stack[head][1]
+				if grid[i][j+1-k] == stack[head][0] {
+					stack[head][1]--
+					if stack[head][1] == 0 {
+						head++
+					}
+				}
+			}
+		}
+	}
+	stack = make([][]int, m)
+	for i := 0; i < m; i++ {
+		stack[i] = make([]int, 2)
+	}
+
+	cnts := make([][]int, m)
+	for i := 0; i < m; i++ {
+		cnts[i] = make([]int, n)
+	}
+
+	for j := 0; j < n-k+1; j++ {
+		head, tail := 0, 0
+		for i := 0; i < m; i++ {
+			for tail > 0 && stack[tail-1][0] < rows[i][j][0] {
+				tail--
+			}
+			if tail > 0 && stack[tail-1][0] == rows[i][j][0] {
+				stack[tail-1][1] += rows[i][j][1]
+			} else {
+				stack[tail][0] = rows[i][j][0]
+				stack[tail][1] = rows[i][j][1]
+				tail++
+			}
+			if i+1 >= k {
+				grid[i+1-k][j] = stack[head][0]
+				cnts[i+1-k][j] = stack[head][1]
+				if rows[i+1-k][j][0] == stack[head][0] {
+					stack[head][1] -= rows[i+1-k][j][1]
+					if stack[head][1] == 0 {
+						head++
+					}
+				}
+			}
+		}
+	}
+	return cnts
+}
+
+func solve1(m, n, k int, grid [][]int) [][]int {
 	cnts := make([][]int, m)
 	for i := 0; i < m; i++ {
 		cnts[i] = make([]int, n)

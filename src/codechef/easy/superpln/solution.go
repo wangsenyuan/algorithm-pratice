@@ -72,7 +72,7 @@ func solve(n int, flights [][]int, from int, begin int, end int, birthday int) (
 		}
 		i := sort.Search(n, func(j int) bool {
 			x := flights[j]
-			return x[0] >= city || (x[0] == city && x[1] >= time)
+			return x[0] >= city || (x[0] == city && x[1] > time)
 		})
 
 		if i == n || mark[i] {

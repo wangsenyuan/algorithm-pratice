@@ -54,6 +54,38 @@ func main() {
 }
 
 func solve(r, R int, n int, cones [][]int) float64 {
+	d := make([]float64, n+1)
+	done := make([]bool, n+1)
+	for i := 0; i < n; i++ {
+		x, y := cones[i][0], cones[i][1]
+		d[i] = math.Sqrt(float64(x*x+y*y)) - float64(r)
+	}
+	d[n] = float64(R - r)
+	for {
+		id := -1
+		for i := 0; i <= n; i++ {
+			if !done[i] && (id == -1 || d[i] < d[id]) {
+				id = i
+			}
+		}
+		if id == n {
+			break
+		}
+		done[id] = true
+		for i := 0; i < n; i++ {
+			if !done[i] {
+				dx := cones[i][0] - cones[id][0]
+				dy := cones[i][1] - cones[id][1]
+				d[i] = math.Min(d[i], math.Max(d[id], math.Sqrt(float64(dx*dx+dy+dy))))
+			}
+		}
+		x, y := cones[id][0], cones[id][1]
+		d[n] = math.Min(d[n], math.Max(d[id], float64(R)-math.Sqrt(float64(x*x+y*y))))
+	}
+	return d[n]
+}
+
+func solve1(r, R int, n int, cones [][]int) float64 {
 	m := n + 2
 	grid := make([][]float64, m)
 	for i := 0; i < m; i++ {

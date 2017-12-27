@@ -56,11 +56,11 @@ func solve(n, m, r, k int) int64 {
 	}
 
 	a := pow(r+1, n)
-	b := pow(r, n)
+	b := ( MOD - pow(r, n)*2%MOD) % MOD
 	c := pow(r-1, n)
 	d := int64(m - r)
 
-	return (d * (a - 2*b + c)) % MOD
+	return (d * (a + b + c)) % MOD
 }
 
 func pow(a, b int) int64 {

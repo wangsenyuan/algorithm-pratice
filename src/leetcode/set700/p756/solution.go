@@ -40,33 +40,27 @@ func pyramidTransition(bottom string, allowed []string) bool {
 		return res
 	}
 
-	cache := make(map[string]int)
+	// cache := make(map[string]int)
 
 	var process func(bottom string) bool
 
 	process = func(bottom string) bool {
+		// fmt.Printf("[debug] process %s\n", bottom)
 		if len(bottom) == 1 {
 			return true
 		}
 
-		if cache[bottom] == 1 {
-			return true
-		}
-		if cache[bottom] == -1 {
-			return false
-		}
-		ans := -1
+		var ans bool
 		strs := generate(bottom)
 		if len(strs) > 0 {
 			for _, str := range strs {
 				if process(str) {
-					ans = 1
+					ans = true
 					break
 				}
 			}
 		}
-		cache[bottom] = ans
-		return ans > 0
+		return ans
 	}
 
 	return process(bottom)

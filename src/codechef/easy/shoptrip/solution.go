@@ -119,9 +119,9 @@ func solve(n int, coord [][]int, s []string, K int) float64 {
 				if i == j {
 					continue
 				}
-				tmp := state | flags[j]
-				if f[tmp][j] == -1 || f[tmp][j] > f[state][i]+dist[i][j] {
-					f[tmp][j] = f[state][i] + dist[i][j]
+				next := state | flags[j]
+				if f[next][j] == -1 || f[next][j] > f[state][i]+dist[i][j] {
+					f[next][j] = f[state][i] + dist[i][j]
 				}
 			}
 		}
@@ -134,9 +134,7 @@ func solve(n int, coord [][]int, s []string, K int) float64 {
 			best = f[goal][i] + dist[i][n]
 		}
 	}
-	if best == math.MaxFloat64 {
-		return -1.0
-	}
+
 	return best
 }
 

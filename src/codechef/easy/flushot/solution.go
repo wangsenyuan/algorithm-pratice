@@ -70,7 +70,7 @@ func main() {
 			scanner.Scan()
 			readFloat(scanner.Bytes(), 0, &x[j])
 		}
-		fmt.Println(solve(n, x, T))
+		fmt.Printf("%.4f\n", solve(n, x, T))
 	}
 }
 

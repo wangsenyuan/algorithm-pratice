@@ -88,10 +88,8 @@ func init() {
 	F = make([]int, N+1)
 	for i := 1; i <= N; i++ {
 		F[i] = F[i-1]
-		if squareFree[i] {
-			if set[primeFactorsCnt[sum[i]]] {
-				F[i] += sum[i]
-			}
+		if squareFree[i] && set[primeFactorsCnt[sum[i]]] {
+			F[i] += sum[i]
 		}
 	}
 	// fmt.Println(maxSum)

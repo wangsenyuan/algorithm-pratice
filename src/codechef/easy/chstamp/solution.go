@@ -84,11 +84,7 @@ func solve(n int, stamps []int, m int, offers [][]int) int64 {
 		return set[x]
 	}
 
-	var process func(i int)
-	process = func(i int) {
-		if i < 0 {
-			return
-		}
+	for i := m - 1; i >= 0; {
 		set := make(map[int]int)
 		j := i
 		tps := make(map[int]bool)
@@ -115,10 +111,8 @@ func solve(n int, stamps []int, m int, offers [][]int) int64 {
 			px := find(x, set)
 			maxType[x] = max[px]
 		}
-
-		process(j)
+		i = j
 	}
-	process(m - 1)
 
 	var ans int64
 	for i := 0; i < n; i++ {
@@ -140,19 +134,5 @@ func (this oo) Less(i, j int) bool {
 }
 
 func (this oo) Swap(i, j int) {
-	this[i], this[j] = this[j], this[i]
-}
-
-type OFS [][]int
-
-func (this OFS) Len() int {
-	return len(this)
-}
-
-func (this OFS) Less(i, j int) bool {
-	return this[i][1] < this[j][1] || (this[i][1] == this[j][1] && this[i][0] < this[j][0])
-}
-
-func (this OFS) Swap(i, j int) {
 	this[i], this[j] = this[j], this[i]
 }

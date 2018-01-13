@@ -17,21 +17,21 @@ func main() {
 }
 
 func rotate(matrix [][]int) {
-	doRotate(matrix, len(matrix), 0)
-}
+	var fn func(width int, i int)
+	fn = func(width int, i int) {
+		if width < 2 {
+			return
+		}
+		fn(width-2, i+1)
 
-func doRotate(matrix [][]int, width int, i int) {
-	if width < 2 {
-		return
+		for k := 0; k < width-1; k++ {
+			j := i + k
+			x := matrix[i][j]
+			matrix[i][j] = matrix[i+width-1-k][i]
+			matrix[i+width-1-k][i] = matrix[i+width-1][i+width-1-k]
+			matrix[i+width-1][i+width-1-k] = matrix[j][i+width-1]
+			matrix[j][i+width-1] = x
+		}
 	}
-	doRotate(matrix, width-2, i+1)
-
-	for k := 0; k < width-1; k++ {
-		j := i + k
-		x := matrix[i][j]
-		matrix[i][j] = matrix[i+width-1-k][i]
-		matrix[i+width-1-k][i] = matrix[i+width-1][i+width-1-k]
-		matrix[i+width-1][i+width-1-k] = matrix[j][i+width-1]
-		matrix[j][i+width-1] = x
-	}
+	fn(len(matrix), 0)
 }

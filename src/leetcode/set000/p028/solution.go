@@ -10,10 +10,47 @@ func strStr(haystack string, needle string) int {
 	if len(needle) == 0 {
 		return 0
 	}
-	return search(haystack, needle)
+	return searchByKMP(haystack, needle)
 }
 
-func search(str, pat string) int {
+func searchByKMP(str, pat string) int {
+	m := len(pat)
+	lps := make([]int, m)
+	for l, i := 0, 1; i < m; {
+		if pat[l] == pat[i] {
+			l++
+			lps[i] = l
+			i++
+		} else {
+			if l > 0 {
+				l = lps[l-1]
+			} else {
+				lps[i] = 0
+				i++
+			}
+		}
+	}
+
+	n := len(str)
+	for i, j := 0, 0; i < n; {
+		if str[i] == pat[j] {
+			i++
+			j++
+		}
+		if j == m {
+			return i - m
+		} else if i < n && str[i] != pat[j] {
+			if j > 0 {
+				j = lps[j-1]
+			} else {
+				i++
+			}
+		}
+	}
+	return -1
+}
+
+func searchByZ(str, pat string) int {
 	concat := pat + "$" + str
 	n := len(concat)
 	z := make([]int, n)

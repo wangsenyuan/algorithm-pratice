@@ -126,6 +126,7 @@ func process(n int, hs []int, ms []int, firstHigh bool) []int {
 				from = 0
 				end = INF
 			} else {
+				// hs[i-1] > hs[i]
 				if prevHigh {
 					from = 0
 					end = floorDiv((hs[i-1] - hs[i]), (ms[i] - ms[i-1]))

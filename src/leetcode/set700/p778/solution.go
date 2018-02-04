@@ -14,7 +14,7 @@ func swimInWater(grid [][]int) int {
 		for i := 0; i < n*n; i++ {
 			dist[i] = -1
 		}
-		dist[0] = min(time, grid[0][0])
+		dist[0] = grid[0][0]
 		head, tail := 0, 0
 		que[tail] = 0
 		tail++
@@ -51,11 +51,4 @@ func swimInWater(grid [][]int) int {
 		}
 	}
 	return left
-}
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
 }

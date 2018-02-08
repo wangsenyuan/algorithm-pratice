@@ -64,15 +64,15 @@ func solve(n int, m int, edges [][]int) int {
 	check := func(k int) bool {
 		v := 1<<uint(k) - 1
 		for v < N {
-			informed := make(map[int]bool)
+			var informed int
 			for i := 0; i < n; i++ {
 				if v&(1<<uint(i)) > 0 {
 					// inform
-					informed[i] = true
+					informed |= 1 << uint(i)
 					for _, v := range graph[i] {
-						informed[v] = true
+						informed |= 1 << uint(v)
 					}
-					if len(informed) == n {
+					if informed == N-1 {
 						return true
 					}
 				}

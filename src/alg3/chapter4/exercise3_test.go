@@ -71,25 +71,43 @@ func TestJohnsonTrotter4(t *testing.T) {
 	runJohnsonTrotter(t, 4, expect)
 }
 
-func runLexicographicPermute(t *testing.T, n int, expect [][]int) {
-	res := LexicographicPermute(n)
+func runLexicographicPermute(t *testing.T, nums []int, expect [][]int) {
+	res := LexicographicPermute(nums)
 
 	if !reflect.DeepEqual(res, expect) {
-		t.Errorf("JohnsonTrotter sample %d, expect %v, but got %v", n, expect, res)
+		t.Errorf("JohnsonTrotter sample %v, expect %v, but got %v", nums, expect, res)
 	}
 }
 
 func TestLexicographicPermute1(t *testing.T) {
 	expect := [][]int{{1}}
-	runLexicographicPermute(t, 1, expect)
+	runLexicographicPermute(t, []int{1}, expect)
 }
 
 func TestLexicographicPermute2(t *testing.T) {
 	expect := [][]int{{1, 2}, {2, 1}}
-	runLexicographicPermute(t, 2, expect)
+	runLexicographicPermute(t, []int{1, 2}, expect)
 }
 
 func TestLexicographicPermute3(t *testing.T) {
 	expect := [][]int{{1, 2, 3}, {1, 3, 2}, {2, 1, 3}, {2, 3, 1}, {3, 1, 2}, {3, 2, 1}}
-	runLexicographicPermute(t, 3, expect)
+	runLexicographicPermute(t, []int{1, 2, 3}, expect)
+}
+
+func TestLexicographicPermute4(t *testing.T) {
+	expect := [][]int{
+		{1, 2, 2, 3},
+		{1, 2, 3, 2},
+		{1, 3, 2, 2},
+		{2, 1, 2, 3},
+		{2, 1, 3, 2},
+		{2, 2, 1, 3},
+		{2, 2, 3, 1},
+		{2, 3, 1, 2},
+		{2, 3, 2, 1},
+		{3, 1, 2, 2},
+		{3, 2, 1, 2},
+		{3, 2, 2, 1},
+	}
+	runLexicographicPermute(t, []int{1, 2, 2, 3}, expect)
 }

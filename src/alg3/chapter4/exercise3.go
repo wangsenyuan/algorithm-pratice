@@ -1,5 +1,7 @@
 package chapter4
 
+import "sort"
+
 func BottomUpMinimalChange(nums []int) [][]int {
 	var process func(nums []int) [][]int
 
@@ -84,13 +86,11 @@ func makeCopy(nums []int) []int {
 	return tmp
 }
 
-func LexicographicPermute(n int) [][]int {
+func LexicographicPermute(nums []int) [][]int {
 	res := make([][]int, 0, 100)
 
-	nums := make([]int, n)
-	for i := 0; i < n; i++ {
-		nums[i] = i + 1
-	}
+	sort.Ints(nums)
+	n := len(nums)
 	res = append(res, makeCopy(nums))
 	for {
 		i := n - 2

@@ -64,18 +64,20 @@ func solve(s []byte) (bool, []int) {
 	left, prev := 0, 0
 
 	for x := 0; x < 26; x++ {
-		for i := 0; i < n; i++ {
-			if s[i] == byte(x+'a') {
-				if cnt[x]%2 == 1 {
-					res[n/2] = i
-					cnt[x] = 0
-				} else if left == 0 {
-					res[prev] = i
-					left = 1
-					prev++
-				} else {
-					res[n-prev] = i
-					left = 0
+		if cnt[x] > 0 {
+			for i := 0; i < n; i++ {
+				if s[i] == byte(x+'a') {
+					if cnt[x]%2 == 1 {
+						res[n/2] = i
+						cnt[x] = 0
+					} else if left == 0 {
+						res[prev] = i
+						left = 1
+						prev++
+					} else {
+						res[n-prev] = i
+						left = 0
+					}
 				}
 			}
 		}

@@ -15,11 +15,6 @@ func validTicTacToe(board []string) bool {
 	if x-o > 1 || o > x {
 		return false
 	}
-
-	if board[1][1] != ' ' && board[0][0] == board[1][1] && board[2][2] == board[1][1] && board[0][2] == board[1][1] && board[2][0] == board[1][1] {
-		return false
-	}
-
 	winTimes := func(t byte) (cnt int) {
 		for i := 0; i < 3; i++ {
 			if board[i][0] == t && board[i][1] == t && board[i][2] == t {

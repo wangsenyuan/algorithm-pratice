@@ -27,6 +27,27 @@ func main() {
 }
 
 func solve(n int, k uint64) uint64 {
+	arr := make([]uint64, n)
+
+	for i := n - 1; i >= 0; i-- {
+		arr[i] = k & 1
+		k >>= 1
+	}
+
+	for i, j := 0, n-1; i < j; i, j = i+1, j-1 {
+		arr[i], arr[j] = arr[j], arr[i]
+	}
+
+	var res uint64
+
+	for i := 0; i < n; i++ {
+		res = res*2 + arr[i]
+	}
+
+	return res
+}
+
+func solve1(n int, k uint64) uint64 {
 	k++
 	var res uint64
 	for i := n - 1; i >= 0; i-- {

@@ -16,7 +16,7 @@ func expressiveWords(S string, words []string) int {
 			if b[i] < d[i] {
 				return false
 			}
-			if b[i] < 3 {
+			if b[i] != d[i] && b[i] < 3 {
 				return false
 			}
 		}

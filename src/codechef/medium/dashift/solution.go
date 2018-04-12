@@ -43,17 +43,14 @@ func readNNums(scanner *bufio.Scanner, n int) []int {
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 
-	t := readNum(scanner)
+	readNum(scanner)
 
-	for i := 0; i < t; i++ {
-		scanner.Scan()
-		A := scanner.Bytes()
-		scanner.Scan()
-		B := scanner.Bytes()
-		res := solve(len(A), A, B)
-		fmt.Println(res)
-	}
-
+	scanner.Scan()
+	A := scanner.Bytes()
+	scanner.Scan()
+	B := scanner.Bytes()
+	res := solve(len(A), A, B)
+	fmt.Println(res)
 }
 
 func solve(n int, A, B []byte) int {

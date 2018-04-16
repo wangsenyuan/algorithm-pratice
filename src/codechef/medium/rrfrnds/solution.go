@@ -37,10 +37,10 @@ func main() {
 }
 
 func solve(n int, friendship [][]byte) int {
-	adj := make([][]int, n)
+	adj := make([][]int64, n)
 
 	for i := 0; i < n; i++ {
-		adj[i] = make([]int, n)
+		adj[i] = make([]int64, n)
 	}
 
 	for i := 0; i < n; i++ {
@@ -48,12 +48,12 @@ func solve(n int, friendship [][]byte) int {
 			if friendship[i][j] == '0' {
 				continue
 			}
-			x, y := j/32, j%32
+			x, y := j/63, j%63
 			adj[i][x] |= 1 << uint(y)
 		}
 	}
 
-	p := (n + 31) / 32
+	p := (n + 62) / 63
 
 	var ans int
 
@@ -63,7 +63,7 @@ func solve(n int, friendship [][]byte) int {
 				continue
 			}
 
-			x, y := j/32, j%32
+			x, y := j/63, j%63
 			if adj[i][x]&(1<<uint(y)) > 0 {
 				continue
 			}

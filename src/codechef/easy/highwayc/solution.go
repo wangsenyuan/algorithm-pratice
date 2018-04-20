@@ -78,14 +78,14 @@ func solve(N int, S int, Y int, V []int, D []int, P []int, C []int) float64 {
 
 		for i := 0; i < N; i++ {
 			v, d, p, c := V[i], D[i], P[i], C[i]
-			front := travel(v, d, p, curr)
+			front := drive(v, d, p, curr)
 			if d > 0 {
 				// forward
 				tail := front - float64(c)
 				if tail <= 0 {
 					if front < 0 {
 						dt := distance(0, front) / float64(v)
-						if dt <= tt {
+						if dt < tt || math.Abs(dt-tt) < delta {
 							curr += distance(0, tail) / float64(v)
 						}
 					} else {
@@ -98,7 +98,7 @@ func solve(N int, S int, Y int, V []int, D []int, P []int, C []int) float64 {
 				if tail >= 0 {
 					if front > 0 {
 						dt := distance(0, front) / float64(v)
-						if dt <= tt {
+						if dt < tt || math.Abs(dt-tt) < delta {
 							curr += distance(0, tail) / float64(v)
 						}
 					} else {
@@ -128,7 +128,7 @@ func solve(N int, S int, Y int, V []int, D []int, P []int, C []int) float64 {
 	return left
 }
 
-func travel(v, d, p int, t float64) float64 {
+func drive(v, d, p int, t float64) float64 {
 	if d == 0 {
 		d = -1
 	}

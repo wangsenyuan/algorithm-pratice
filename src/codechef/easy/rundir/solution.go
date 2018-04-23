@@ -86,33 +86,28 @@ func solve(n int, X []int, V []int) float64 {
 
 	sort.Sort(ps)
 
-	f := make([][]float64, n)
-	for i := 0; i < n; i++ {
-		f[i] = make([]float64, 4)
-		// 0 goes left, 1 goes right
-		for j := 0; j < 2; j++ {
-			f[i][j] = INF
-		}
-	}
+	var left float64 = INF
+	var right float64 = INF
 
 	for i := 1; i < n; i++ {
 		a := time(ps[i].x-ps[i-1].x, ps[i].v-ps[i-1].v)
 		// i goes left, i - 1 goes left
-		a = math.Min(a, f[i-1][0])
+		a = math.Min(a, left)
 		b := time(ps[i].x-ps[i-1].x, ps[i].v+ps[i-1].v)
 		// i goes left, i - 1 goes right
-		b = math.Min(b, f[i-1][1])
-		f[i][0] = math.Max(a, b)
+		b = math.Min(b, right)
+		x := math.Max(a, b)
 
 		// i goes right, i - 1 goes left
-		c := f[i-1][0]
+		c := left
 		// i goes right i - 1 goes right
 		d := time(ps[i].x-ps[i-1].x, ps[i-1].v-ps[i].v)
-		d = math.Min(d, f[i-1][1])
-		f[i][1] = math.Max(c, d)
+		d = math.Min(d, right)
+		y := math.Max(c, d)
+		left, right = x, y
 	}
 
-	return math.Max(f[n-1][0], f[n-1][1])
+	return math.Max(left, right)
 }
 
 type Pair struct {

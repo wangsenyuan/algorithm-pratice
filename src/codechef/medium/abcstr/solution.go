@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"bufio"
 	"os"
+	"math/big"
 )
 
 func readInt(bytes []byte, from int, val *int) int {
@@ -48,12 +49,12 @@ func main() {
 
 }
 
-func solve(S []byte) int64 {
+func solve(S []byte) *big.Int {
 	var a, b, c int
-	var ans int64
+	ans := big.NewInt(0)
 	n := len(S)
-	cnt := make(map[Pair]int64)
-	cnt[Pair{0, 0}] = 1
+	cnt := make(map[Pair]*big.Int)
+	cnt[Pair{0, 0}] = big.NewInt(1)
 	for i := 0; i < n; i++ {
 		if S[i] == 'A' {
 			a++
@@ -65,8 +66,14 @@ func solve(S []byte) int64 {
 		x := a - b
 		y := b - c
 		key := Pair{x, y}
-		ans += cnt[key]
-		cnt[key]++
+
+		if v, found := cnt[key]; found {
+			ans.Add(ans, v)
+			v.Add(v, big.NewInt(1))
+		} else {
+			cnt[key] = big.NewInt(1)
+		}
+
 	}
 
 	return ans

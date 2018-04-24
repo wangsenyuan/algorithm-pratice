@@ -4,7 +4,7 @@ import "testing"
 
 func runSample(t *testing.T, S string, expect int64) {
 	res := solve([]byte(S))
-	if res != expect {
+	if res.Int64() != expect {
 		t.Errorf("sample %s, expect %d, but got %d", S, expect, res)
 	}
 }

@@ -40,3 +40,16 @@ func TestSample3(t *testing.T) {
 	}
 	runSample(t, n, pairs, 5)
 }
+
+
+
+func TestSample4(t *testing.T) {
+	n := 4
+	pairs := [][]int{
+		{4, 10},
+		{1, 1},
+		{2, 2},
+		{3, 5},
+	}
+	runSample(t, n, pairs, 0)
+}

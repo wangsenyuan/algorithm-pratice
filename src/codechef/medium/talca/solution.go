@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"os"
 	"fmt"
+	"math"
 )
 
 func readInt(bytes []byte, from int, val *int) int {
@@ -72,83 +73,48 @@ func solve(n int, pairs [][]int, queries [][]int) []int {
 		neighbors[v][u] = true
 	}
 
-	var eularTour func(p, u int, level int)
+	var eulerTour func(p, u int, level int)
+	E := make([]int, 2*n-1)
+	L := make([]int, 2*n-1)
+	H := make([]int, n)
 
-	first := make([]int, n)
 	for i := 0; i < n; i++ {
-		first[i] = -1
+		H[i] = -1
 	}
 
 	var index int
 
-	nodes := make([]Node, 0, 3*n)
-
-	eularTour = func(p, u int, level int) {
+	eulerTour = func(p, u int, level int) {
 		index++
-		if first[u] < 0 {
-			first[u] = index - 1
+		E[index-1] = u
+		L[index-1] = level
+
+		if H[u] < 0 {
+			H[u] = index - 1
 		}
-		nodes = append(nodes, Node{u, level})
+
 		for v := range neighbors[u] {
-			if v == p {
+			if p == v {
 				continue
 			}
-			eularTour(u, v, level+1)
-			level++
-			nodes = append(nodes, Node{u, level})
+			eulerTour(u, v, level+1)
+			index++
+			E[index-1] = u
+			L[index-1] = level
 		}
 	}
 
-	N := len(nodes)
-	trees := make([]int, 4*N)
+	eulerTour(-1, 0, 0)
 
-	var construct func(i int, left, right int)
-	construct = func(i int, left, right int) {
-		if left+1 == right {
-			trees[i] = left
-			return
-		}
-		mid := (left + right) / 2
-		construct(2*i+1, left, mid)
-		construct(2*i+2, mid, right)
-		a := nodes[trees[2*i+1]]
-		b := nodes[trees[2*i+2]]
-		if a.level < b.level {
-			trees[i] = trees[2*i+1]
-		} else {
-			trees[i] = trees[2*i+2]
-		}
-	}
-
-	construct(0, 0, N)
-
-	var query func(i int, s, e int, left, right int) int
-	query = func(i int, s, e int, left, right int) int {
-		if e <= left || s >= right {
-			return -1
-		}
-		if s >= left && e <= right {
-			return trees[i]
-		}
-
-		mid := (s + e) / 2
-		a := query(2*i+1, s, mid, left, right)
-		b := query(2*i+2, mid, e, left, right)
-		if a < 0 {
-			return b
-		}
-		if b < 0 {
-			return a
-		}
-		c, d := nodes[a], nodes[b]
-		if c.level < d.level {
-			return a
-		}
-		return b
-	}
+	rmq := Construct(L)
 
 	lca := func(u, v int) int {
-		return query(0, 0, N, first[u], first[v])
+		a, b := H[u], H[v]
+		if a > b {
+			a, b = b, a
+		}
+		res := rmq.Query(a, b)
+		return E[res]
 	}
 
 	res := make([]int, len(queries))
@@ -176,8 +142,171 @@ func solve(n int, pairs [][]int, queries [][]int) []int {
 	return res
 }
 
-type Node struct {
-	index, level int
+type RMQ struct {
+	size int
+	tree []int
+	arr  []int
+}
+
+func Construct(arr []int) *RMQ {
+	size := len(arr)
+
+	var rec func(i int, left, right int)
+
+	tree := make([]int, 4*size)
+	rec = func(i int, left, right int) {
+		if left == right {
+			tree[i] = left
+			return
+		}
+		mid := (left + right) / 2
+		rec(2*i+1, left, mid)
+		rec(2*i+2, mid+1, right)
+		if arr[tree[2*i+1]] < arr[tree[2*i+2]] {
+			tree[i] = tree[2*i+1]
+		} else {
+			tree[i] = tree[2*i+2]
+		}
+	}
+
+	rec(0, 0, size-1)
+	return &RMQ{size, tree, arr}
+}
+
+func (rmq *RMQ) Query(left, right int) int {
+	var rec func(i int, s, e int) int
+
+	rec = func(i int, s, e int) int {
+		if s > right || e < left {
+			return -1
+		}
+		if s >= left && e <= right {
+			return rmq.tree[i]
+		}
+		mid := (s + e) / 2
+		q1 := rec(2*i+1, s, mid)
+		q2 := rec(2*i+2, mid+1, e)
+		if q1 < 0 {
+			return q2
+		}
+		if q2 < 0 {
+			return q1
+		}
+		if rmq.arr[q1] < rmq.arr[q2] {
+			return q1
+		}
+		return q2
+	}
+
+	return rec(0, 0, rmq.size-1)
+}
+
+func solve2(n int, pairs [][]int, queries [][]int) []int {
+	neighbors := make([]map[int]bool, n)
+
+	for i := 0; i < n; i++ {
+		neighbors[i] = make(map[int]bool)
+	}
+
+	for _, pair := range pairs {
+		u, v := pair[0]-1, pair[1]-1
+		neighbors[u][v] = true
+		neighbors[v][u] = true
+	}
+
+	level := make([]int, n)
+	parent := make([]int, n)
+
+	var height func(p, u, l int) int
+
+	height = func(p, u, l int) int {
+		ans := 0
+		level[u] = l
+		for v := range neighbors[u] {
+			if v == p {
+				continue
+			}
+			parent[v] = u
+			tmp := height(u, v, l+1)
+			if tmp > ans {
+				ans = tmp
+			}
+		}
+
+		return ans + 1
+	}
+
+	maxHeight := height(-1, 0, 0)
+
+	nr := int(math.Sqrt(float64(maxHeight)))
+
+	var dfs func(p, u int)
+
+	P := make([]int, n)
+
+	dfs = func(p, u int) {
+		if level[u] < nr {
+			P[u] = 0
+		} else {
+			if level[u]%nr == 0 {
+				P[u] = parent[u]
+			} else {
+				P[u] = P[parent[u]]
+			}
+		}
+
+		for v := range neighbors[u] {
+			if p == v {
+				continue
+			}
+			dfs(u, v)
+		}
+	}
+
+	dfs(-1, 0)
+
+	lca := func(u, v int) int {
+		for P[u] != P[v] {
+			if level[u] > level[v] {
+				u = P[u]
+			} else {
+				v = P[v]
+			}
+		}
+
+		for u != v {
+			if level[u] > level[v] {
+				u = parent[u]
+			} else {
+				v = parent[v]
+			}
+		}
+		return u
+	}
+
+	res := make([]int, len(queries))
+
+	for i, query := range queries {
+		r, u, v := query[0]-1, query[1]-1, query[2]-1
+		uv := lca(u, v)
+		ru := lca(r, u)
+		rv := lca(r, v)
+		ruv := lca(r, uv)
+
+		if ruv != uv {
+			res[i] = uv + 1
+		} else {
+			if ru == uv && rv == uv {
+				res[i] = uv + 1
+			} else if rv == uv {
+				res[i] = ru + 1
+			} else {
+				res[i] = rv + 1
+			}
+		}
+	}
+
+	return res
 }
 
 func solve1(n int, pairs [][]int, queries [][]int) []int {

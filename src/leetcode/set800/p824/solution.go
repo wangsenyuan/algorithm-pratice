@@ -8,6 +8,7 @@ import (
 func toGoatLatin(S string) string {
 	words := strings.Split(S, " ")
 
+	a := "a"
 	for i, word := range words {
 		var buf bytes.Buffer
 		if isVowel(word[0]) {
@@ -19,9 +20,8 @@ func toGoatLatin(S string) string {
 		}
 		buf.WriteString("ma")
 
-		for j := 0; j <= i; j++ {
-			buf.WriteByte('a')
-		}
+		buf.WriteString(a)
+		a += "a"
 		words[i] = buf.String()
 	}
 

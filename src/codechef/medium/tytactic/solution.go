@@ -70,15 +70,15 @@ func main() {
 }
 
 func solve(n int, m int, skills []int, edges [][]int, queries [][]byte) []int {
-	neigbhors := make([]map[int]bool, n)
+	neighbours := make([]map[int]bool, n)
 	for i := 0; i < n; i++ {
-		neigbhors[i] = make(map[int]bool)
+		neighbours[i] = make(map[int]bool)
 	}
 
 	for _, edge := range edges {
 		a, b := edge[0]-1, edge[1]-1
-		neigbhors[a][b] = true
-		neigbhors[b][a] = true
+		neighbours[a][b] = true
+		neighbours[b][a] = true
 	}
 
 	begin := make([]int, n)
@@ -88,7 +88,7 @@ func solve(n int, m int, skills []int, edges [][]int, queries [][]byte) []int {
 	dfs = func(p, u int, open int) int {
 		begin[u] = open
 		close := open
-		for v := range neigbhors[u] {
+		for v := range neighbours[u] {
 			if p == v {
 				continue
 			}

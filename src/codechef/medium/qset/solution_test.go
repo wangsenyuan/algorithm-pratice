@@ -5,7 +5,7 @@ import (
 	"reflect"
 )
 
-func runSample(t *testing.T, n int, S string, queries [][]int, expect []int) {
+func runSample(t *testing.T, n int, S string, queries [][]int, expect []int64) {
 	res := solve(n, []byte(S), queries)
 
 	if !reflect.DeepEqual(res, expect) {
@@ -21,6 +21,6 @@ func TestSample(t *testing.T) {
 		{1, 4, 5},
 		{2, 3, 5},
 	}
-	expect := []int{3, 1}
+	expect := []int64{3, 1}
 	runSample(t, n, S, queries, expect)
 }

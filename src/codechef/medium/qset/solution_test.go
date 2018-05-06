@@ -24,3 +24,16 @@ func TestSample(t *testing.T) {
 	expect := []int64{3, 1}
 	runSample(t, n, S, queries, expect)
 }
+
+func TestSample1(t *testing.T) {
+	n := 6
+	S := "012345"
+	queries := [][]int{
+		{2, 1, 3},
+		{2, 1, 4},
+		{1, 4, 5},
+		{2, 1, 4},
+	}
+	expect := []int64{3, 6, 3}
+	runSample(t, n, S, queries, expect)
+}

@@ -5,7 +5,7 @@ import "testing"
 func runSample(t *testing.T, n int, A []int, expect int64) {
 	res := solve(n, A)
 
-	if res != expect {
+	if res != int(expect) {
 		t.Errorf("sample %d %v, expect %d, but got %v", n, A, expect, res)
 	}
 }

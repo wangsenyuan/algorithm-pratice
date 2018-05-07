@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"sort"
 )
 
 func readInt(bytes []byte, from int, val *int) int {
@@ -43,46 +44,47 @@ func readNNums(scanner *bufio.Scanner, n int) []int {
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 
-	t := readNum(scanner)
-
-	for t > 0 {
-		n := readNum(scanner)
-		A := readNNums(scanner, n)
-
-		fmt.Println(solve(n, A))
-
-		t--
+	n := readNum(scanner)
+	events := make([][]int, n)
+	for i := 0; i < n; i++ {
+		events[i] = readNNums(scanner, 2)
 	}
+
+	fmt.Println(solve(n, events))
 }
 
-func solve(n int, A []int) int64 {
-	C := make([][]int, 30)
-	for i := 0; i < 30; i++ {
-		C[i] = make([]int, 2)
-		C[i][0] = 1
-	}
-	var S int
-	var res int64
+func solve(n int, events [][]int) int {
+	evts := make(Events, n)
 	for i := 0; i < n; i++ {
-		S ^= A[i]
+		evts[i] = Event{events[i][0], events[i][0] + events[i][1]}
+	}
+	sort.Sort(evts)
 
-		for j := 0; j < 30; j++ {
-			p := 1 << uint(j)
-			if (S>>uint(j))&1 == 1 {
-				res += int64(p) * int64(C[j][0])
-			} else {
-				res += int64(p) * int64(C[j][1])
-			}
-		}
-
-		for j := 0; j < 30; j++ {
-			if (S>>uint(j))&1 == 1 {
-				C[j][1]++
-			} else {
-				C[j][0]++
-			}
+	var ans int
+	last := -1
+	for i := 0; i < n; i++ {
+		if evts[i].start > last {
+			ans++
+			last = evts[i].end
 		}
 	}
+	return ans
+}
 
-	return res
+type Event struct {
+	start, end int
+}
+
+type Events []Event
+
+func (events Events) Len() int {
+	return len(events)
+}
+
+func (events Events) Less(i, j int) bool {
+	return events[i].end < events[j].end
+}
+
+func (events Events) Swap(i, j int) {
+	events[i], events[j] = events[j], events[i]
 }

@@ -6,7 +6,7 @@ func runSample(t *testing.T, s1, s2 string, expect string) {
 	length, begin := solve([]byte(s1), []byte(s2))
 
 	if len(expect) != length {
-		t.Errorf("Sample %s %s, expect empty string, but got length %d", s1, s2, length)
+		t.Errorf("Sample %s %s, expect %s, but got length %d", s1, s2, expect, length)
 	} else if len(expect) > 0 && string(s2[begin:begin+length]) != expect {
 		t.Errorf("Sample %s %s, expect %s, but got %s", s1, s2, expect, string(s2[begin:begin+length]))
 	}
@@ -30,5 +30,12 @@ func TestSample3(t *testing.T) {
 	s1 := "abcdef"
 	s2 := "defabc"
 	expect := "def"
+	runSample(t, s1, s2, expect)
+}
+
+func TestSample4(t *testing.T) {
+	s1 := "abcddffed"
+	s2 := "afdfedefabc"
+	expect := "fed"
 	runSample(t, s1, s2, expect)
 }

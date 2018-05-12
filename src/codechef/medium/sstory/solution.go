@@ -1,10 +1,10 @@
 package main
 
 import (
-	"sort"
 	"bufio"
-	"os"
 	"fmt"
+	"os"
+	"sort"
 )
 
 func readInt(bytes []byte, from int, val *int) int {
@@ -52,10 +52,72 @@ func main() {
 		fmt.Println(0)
 	} else {
 		fmt.Println(string(s2[start : start+length]))
+		fmt.Println(length)
 	}
 }
 
 func solve(s1, s2 []byte) (length, start int) {
+	n1 := len(s1)
+	st := make([]*State, 2*n1+1)
+	st[0] = &State{0, -1, make([]int, 26)}
+	last, size := 0, 1
+	for i := 0; i < n1; i++ {
+		c := int(s1[i] - 'a')
+		cur := size
+		st[cur] = &State{st[last].length + 1, 0, make([]int, 26)}
+		size++
+		p := last
+		for p >= 0 && st[p].next[c] == 0 {
+			st[p].next[c] = cur
+			p = st[p].link
+		}
+
+		if p >= 0 {
+			q := st[p].next[c]
+			if st[p].length+1 == st[q].length {
+				st[cur].link = q
+			} else {
+				r := size
+				st[r] = &State{st[p].length + 1, st[q].link, make([]int, 26)}
+				size++
+				copy(st[r].next, st[q].next)
+				for p >= 0 && st[p].next[c] == q {
+					st[p].next[c] = r
+					p = st[p].link
+				}
+				st[cur].link = r
+				st[q].link = r
+			}
+		}
+		last = cur
+	}
+
+	var v, cur int
+	for i := 0; i < len(s2); i++ {
+		x := int(s2[i] - 'a')
+		for v > 0 && st[v].next[x] == 0 {
+			v = st[v].link
+			cur = st[v].length
+		}
+		if st[v].next[x] > 0 {
+			v = st[v].next[x]
+			cur++
+		}
+		if cur > length {
+			length = cur
+			start = i - cur + 1
+		}
+	}
+	return
+}
+
+type State struct {
+	length int
+	link   int
+	next   []int
+}
+
+func solve1(s1, s2 []byte) (length, start int) {
 	var mod int64 = 34369934
 	var magic int64 = 9584612342
 
@@ -118,7 +180,7 @@ func solve(s1, s2 []byte) (length, start int) {
 	return
 }
 
-func solve1(s1, s2 []byte) (length int, start int) {
+func solve2(s1, s2 []byte) (length int, start int) {
 	items := make(Items, len(s1)+len(s2))
 
 	for i := 0; i < len(s1)+len(s2); i++ {

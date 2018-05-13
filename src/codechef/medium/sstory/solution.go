@@ -253,3 +253,205 @@ func (items Items) Less(i, j int) bool {
 func (items Items) Swap(i, j int) {
 	items[i], items[j] = items[j], items[i]
 }
+
+func solve3(s1, s2 []byte) string {
+	s3 := make([]byte, len(s1)+len(s2)+2)
+	copy(s3, s2)
+	s3[len(s2)] = '$'
+	copy(s3[len(s2)+1:], s1)
+	s3[len(s1)+1+len(s2)] = '#'
+	st := BuildSuffixTree(string(s3))
+	return LCS(st, len(s2))
+}
+
+type SuffixTreeNode struct {
+	children    []*SuffixTreeNode
+	link        *SuffixTreeNode
+	start       int
+	end         *int
+	suffixIndex int
+}
+
+type SuffixTree struct {
+	root                 *SuffixTreeNode
+	active               *SuffixTreeNode
+	activeEdge           int
+	activeLength         int
+	remainingSuffixCount int
+	leafEnd              int
+	str                  string
+}
+
+func (st *SuffixTree) newNode(start int, end *int) *SuffixTreeNode {
+	node := &SuffixTreeNode{}
+	// 26 + 2
+	node.children = make([]*SuffixTreeNode, 28)
+	node.link = st.root
+	node.end = end
+	node.start = start
+	node.suffixIndex = -1
+	return node
+}
+
+func (stn SuffixTreeNode) edgeLength() int {
+	return *(stn.end) - stn.start + 1;
+}
+
+func (st *SuffixTree) walkDown(current *SuffixTreeNode) bool {
+	if st.activeLength >= current.edgeLength() {
+		st.activeEdge += current.edgeLength()
+		st.activeLength -= current.edgeLength()
+		st.active = current
+		return true
+	}
+	return false
+}
+
+func indexOfLetter(b byte) int {
+	if b == '$' {
+		return 26
+	} else if b == '#' {
+		return 27
+	}
+	return int(b - 'a')
+}
+
+func (st *SuffixTree) extendSuffixTree(pos int) {
+	st.leafEnd = pos
+	st.remainingSuffixCount++
+	var last *SuffixTreeNode
+
+	for st.remainingSuffixCount > 0 {
+		if st.activeLength == 0 {
+			st.activeEdge = pos
+		}
+		if st.active.children[indexOfLetter(st.str[st.activeEdge])] == nil {
+			st.active.children[indexOfLetter(st.str[st.activeEdge])] = st.newNode(pos, &st.leafEnd)
+			if last != nil {
+				last.link = st.active
+				last = nil
+			}
+		} else {
+			next := st.active.children[indexOfLetter(st.str[st.activeEdge])]
+			if st.walkDown(next) {
+				continue
+			}
+			if st.str[next.start+st.activeLength] == st.str[pos] {
+				if last != nil && st.active != st.root {
+					last.link = st.active
+					last = nil
+				}
+				st.activeLength++
+				break
+			}
+			splitEnd := next.start + st.activeLength - 1
+			split := st.newNode(next.start, &splitEnd)
+			st.active.children[indexOfLetter(st.str[st.activeEdge])] = split
+
+			split.children[indexOfLetter(st.str[pos])] = st.newNode(pos, &st.leafEnd)
+			next.start += st.activeLength
+			split.children[indexOfLetter(st.str[pos])] = next
+
+			if last != nil {
+				last.link = split
+			}
+			last = split
+		}
+
+		st.remainingSuffixCount--
+
+		if st.active == st.root && st.activeLength > 0 {
+			st.activeLength--
+			st.activeEdge = pos - st.remainingSuffixCount + 1
+		} else if st.active != st.root {
+			st.active = st.active.link
+		}
+	}
+}
+
+func (st *SuffixTree) setSuffixIndex() {
+	var process func(node *SuffixTreeNode, labelHeight int)
+
+	process = func(node *SuffixTreeNode, labelHeight int) {
+		if node == nil {
+			return
+		}
+		leaf := true
+		for i := 0; i < 28; i++ {
+			if node.children[i] != nil {
+				leaf = false
+				process(node.children[i], labelHeight+node.children[i].edgeLength())
+			}
+		}
+		if leaf {
+			for i := node.start; i <= *(node.end); i++ {
+				if st.str[i] == '$' {
+					j := i
+					node.end = &j
+				}
+			}
+			node.suffixIndex = len(st.str) - labelHeight
+		}
+	}
+
+	process(st.root, 0)
+}
+
+func BuildSuffixTree(str string) *SuffixTree {
+	st := &SuffixTree{}
+	rootEnd := -1
+	st.root = st.newNode(-1, &rootEnd)
+	st.active = st.root
+	st.str = str
+	for i := 0; i < len(str); i++ {
+		st.extendSuffixTree(i)
+	}
+	st.setSuffixIndex()
+	return st
+}
+
+func LCS(st *SuffixTree, size1 int) string {
+	var dfs func(node *SuffixTreeNode, labelHeight int) int
+	var maxHeight, start int
+
+	dfs = func(node *SuffixTreeNode, labelHeight int) int {
+		if node == nil {
+			return 0
+		}
+
+		if node.suffixIndex < 0 {
+			for i := 0; i < 28; i++ {
+				if node.children[i] != nil {
+					ret := dfs(node.children[i], labelHeight+node.children[i].edgeLength())
+					if node.suffixIndex == -1 {
+						node.suffixIndex = ret
+					} else if (node.suffixIndex == -2 && ret == -3) || (node.suffixIndex == -3 && ret == -2) || node.suffixIndex == -4 {
+						node.suffixIndex = -4
+						nodeStart := *(node.end) - labelHeight + 1
+						if maxHeight < labelHeight {
+							maxHeight = labelHeight
+							start = nodeStart
+						} else if maxHeight == labelHeight && nodeStart < start {
+							maxHeight = labelHeight
+							start = nodeStart
+						}
+					}
+				}
+			}
+		}
+
+		if node.suffixIndex > -1 && node.suffixIndex < size1 {
+			return -2
+		} else if node.suffixIndex > -1 && node.suffixIndex >= size1 {
+			return -3
+		}
+		return node.suffixIndex
+	}
+
+	dfs(st.root, 0)
+
+	if maxHeight > 0 {
+		return st.str[start : start+maxHeight]
+	}
+	return ""
+}

@@ -1,6 +1,10 @@
 package main
 
-import "testing"
+import (
+	"testing"
+	"sort"
+	"reflect"
+)
 
 func runSample1(t *testing.T, s1, s2 string, expect string) {
 	length, begin := solve([]byte(s1), []byte(s2))
@@ -46,4 +50,23 @@ func TestSample4(t *testing.T) {
 	s2 := "afdfedefabc"
 	expect := "fed"
 	runSample(t, s1, s2, expect)
+}
+
+func TestSuffixTree(t *testing.T) {
+	str := "abcdefabcd$";
+	st := BuildSuffixTree(str)
+	res := st.GetSuffixStrings()
+
+	expect := make([]string, 0, len(str))
+
+	for i := 0; i < len(str)-1; i++ {
+		expect = append(expect, str[i:])
+	}
+
+	sort.Strings(res)
+	sort.Strings(expect)
+
+	if !reflect.DeepEqual(res, expect) {
+		t.Errorf("sample %s, expect %v, but got %v", str, expect, res)
+	}
 }

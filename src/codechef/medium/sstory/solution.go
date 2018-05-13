@@ -455,3 +455,31 @@ func LCS(st *SuffixTree, size1 int) string {
 	}
 	return ""
 }
+
+func (st SuffixTree) GetSuffixStrings() []string {
+	var dfs func(node *SuffixTreeNode, path string)
+	res := make([]string, 0, len(st.str))
+
+	dfs = func(node *SuffixTreeNode, path string) {
+		if node == nil {
+			return
+		}
+		if node.start >= 0 {
+			path += st.str[node.start : *(node.end)+1]
+		}
+		if node.suffixIndex >= 0 {
+			// leaf node
+			res = append(res, path)
+			return
+		}
+
+		for i := 0; i < 28; i++ {
+			if node.children[i] != nil {
+				dfs(node.children[i], path)
+			}
+		}
+	}
+	dfs(st.root, "")
+
+	return res
+}

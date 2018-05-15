@@ -85,11 +85,11 @@ func solve(n int, A []int64, K int64) int {
 		var u int
 		for i := 0; i < M; i++ {
 			var prod int64 = 1
-			for j := 0; j < m && prod > 0; j++ {
+			for j := 0; j < m; j++ {
 				if i&(1<<uint(j)) > 0 {
 					prod *= arr[j]
 				}
-				if prod > K {
+				if prod > K || prod < 0 {
 					break
 				}
 			}

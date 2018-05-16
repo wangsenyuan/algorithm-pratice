@@ -99,7 +99,7 @@ func solve(n int, A []int, queries [][]int) []int64 {
 func findPerimeter(A []int) int64 {
 	for i := 0; i+3 <= len(A); i++ {
 		a, b, c := A[i], A[i+1], A[i+2]
-		if int64(a) < int64(b)+int64(c) {
+		if a-c < b {
 			return int64(a) + int64(b) + int64(c)
 		}
 	}

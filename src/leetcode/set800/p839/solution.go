@@ -1,11 +1,6 @@
 package p839
 
 func numSimilarGroups(A []string) int {
-	idxs := make(map[string]int)
-
-	for i, s := range A {
-		idxs[s] = i
-	}
 	n := len(A)
 	set := make([]int, n)
 	for i := 0; i < n; i++ {
@@ -31,7 +26,7 @@ func numSimilarGroups(A []string) int {
 	for i := 0; i < n; i++ {
 		for j := i + 1; j < n; j++ {
 			if similar(A[i], A[j]) {
-				union(idxs[A[i]], idxs[A[j]])
+				union(i, j)
 			}
 		}
 	}

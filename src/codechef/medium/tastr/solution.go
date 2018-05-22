@@ -65,19 +65,26 @@ func solve(a, b []byte) int64 {
 func uniqueSubStrCount(s []byte) int64 {
 	n := len(s)
 
-	x := buildSuffixArray(n, s)
+	x, p, step := buildSuffixArray(n, s)
+
+	compute := func(i int) int {
+		var res int
+		a, b := x[i-1], x[i]
+		for k := step - 1; k >= 0 && a < n && b < n; k-- {
+			if p[k][a] == p[k][b] {
+				a += 1 << uint(k)
+				b += 1 << uint(k)
+				res += 1 << uint(k)
+			}
+		}
+
+		return res
+	}
 
 	lca := make([]int, n)
 
 	for i := 1; i < n; i++ {
-		a, b := x[i], x[i-1]
-		var cnt int
-		for a < n && b < n && s[a] == s[b] {
-			a++
-			b++
-			cnt++
-		}
-		lca[i] = cnt
+		lca[i] = compute(i)
 	}
 
 	ans := int64(n - x[0])
@@ -89,56 +96,49 @@ func uniqueSubStrCount(s []byte) int64 {
 	return ans
 }
 
-func buildSuffixArray(n int, S []byte) []int {
+func buildSuffixArray(n int, S []byte) ([]int, [][]int, int) {
 	ss := make(suffixes, n)
+	for i := 0; i < n; i++ {
+		ss[i] = suffix{i, make([]int, 2)}
+	}
+	m := sort.Search(30, func(i int) bool {
+		return 1<<uint(i) > 2*n
+	})
+
+	p := make([][]int, m+1)
+	for i := 0; i <= m; i++ {
+		p[i] = make([]int, n)
+	}
 
 	for i := 0; i < n; i++ {
-		rank := make([]int, 2)
-		rank[0] = int(S[i] - 'a')
-		if i < n-1 {
-			rank[1] = int(S[i+1] - 'a')
-		} else {
-			rank[1] = -1
-		}
-		ss[i] = suffix{i, rank}
+		p[0][i] = int(S[i] - 'a')
 	}
-
-	sort.Sort(ss)
-
-	x := make([]int, n)
-
-	for k := 4; k < 2*n; k *= 2 {
-		var rank int
-		prevRank := ss[0].rank[0]
-		x[ss[0].index] = rank
-
-		for i := 1; i < n; i++ {
-			if ss[i].rank[0] == prevRank && ss[i].rank[1] == ss[i-1].rank[1] {
-				prevRank = ss[i].rank[0]
-				ss[i].rank[0] = rank
-			} else {
-				prevRank = ss[i].rank[0]
-				ss[i].rank[0] = rank + 1
-				rank++
-			}
-			x[ss[i].index] = i
-		}
+	stp := 1
+	for cnt := 1; cnt < 2*n; stp, cnt = stp+1, cnt<<1 {
 		for i := 0; i < n; i++ {
-			next := ss[i].index + k/2
-			if next < n {
-				ss[i].rank[1] = ss[x[next]].rank[0]
-			} else {
-				ss[i].rank[1] = -1
+			ss[i].rank[0] = p[stp-1][i]
+			ss[i].rank[1] = -1
+			if i+cnt < n {
+				ss[i].rank[1] = p[stp-1][i+cnt]
 			}
+			ss[i].index = i
 		}
 		sort.Sort(ss)
+		for i := 0; i < n; i++ {
+			p[stp][ss[i].index] = i
+			if i > 0 && ss[i].rank[0] == ss[i-1].rank[0] && ss[i].rank[1] == ss[i-1].rank[1] {
+				p[stp][ss[i].index] = p[stp][ss[i-1].index]
+			}
+		}
 	}
+
+	x := make([]int, n)
 
 	for i := 0; i < n; i++ {
 		x[i] = ss[i].index
 	}
 
-	return x
+	return x, p, stp
 }
 
 type suffix struct {

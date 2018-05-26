@@ -1,13 +1,28 @@
 package main
 
 import (
-	"reflect"
 	"testing"
 )
 
 func runSample(t *testing.T, n int, A []int, expect []int) {
 	res := solve(n, A)
-	if !reflect.DeepEqual(res, expect) {
+
+	var sum1, sum2 int64
+	var cnt1, cnt2 int
+
+	for i := 0; i < n; i++ {
+		sum1 += int64(expect[i])
+		sum2 += int64(res[i])
+
+		if expect[i] != A[i] {
+			cnt1++
+		}
+		if res[i] != A[i] {
+			cnt2++
+		}
+	}
+
+	if cnt1 != cnt2 || sum1 != sum2 {
 		t.Errorf("Sample %d %v, expect %v, but got %v", n, A, expect, res)
 	}
 }

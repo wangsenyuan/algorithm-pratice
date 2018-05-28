@@ -3,7 +3,7 @@ package p843
 import "testing"
 
 func runSample(t *testing.T, words []string, master *Master) {
-	findSecretWord(words, *master)
+	findSecretWord(words, master)
 
 	if master.cnt > 10 || !master.found {
 		t.Errorf("Sample %v, not found", words)

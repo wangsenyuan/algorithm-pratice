@@ -150,7 +150,7 @@ func solve(n int, src, dst [][]int) (bool, []int, []int) {
 		return true, compact(rows0), compact(cols0)
 	}
 
-	if row0Flip <= row0NotFlip {
+	if row0Flip+1 <= row0NotFlip {
 		return true, compact(rows1), compact(cols1)
 	}
 

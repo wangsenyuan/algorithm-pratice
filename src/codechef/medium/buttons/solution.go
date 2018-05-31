@@ -55,7 +55,7 @@ func main() {
 		for i := 0; i < n; i++ {
 			dst[i] = readNNums(scanner, n)
 		}
-		can, row, col := solve(n, src, dst)
+		can, row, col := solve1(n, src, dst)
 		if !can {
 			fmt.Println(-1)
 		} else if len(row) == 0 && len(col) == 0 {
@@ -141,45 +141,26 @@ func solve(n int, src, dst [][]int) (bool, []int, []int) {
 
 func solve1(n int, src, dst [][]int) (bool, []int, []int) {
 
-	find := func(flippedCols []bool, rows []bool) int {
+	find := func(cols []bool, rows []bool) int {
 		var ans int
 
 		for j := 0; j < n; j++ {
-			if flippedCols[j] {
+			if cols[j] {
 				ans++
 			}
 		}
-		for i := 1; i < n; i++ {
-			var j int
-			for j < n {
-				x := src[i][j]
-				if flippedCols[j] {
-					x = 1 - x
+		for i := 0; i < n; i++ {
+			rowFlip := src[i][0] == dst[i][0] && cols[0] || src[i][0] != dst[i][0] && !cols[0]
+			for j := 0; j < n; j++ {
+				flip := rowFlip != cols[j]
+				if flip && src[i][j] == dst[i][j] || !flip && src[i][j] != dst[i][j] {
+					return -1
 				}
-				if x != dst[i][j] {
-					break
-				}
-				j++
 			}
-			if j == n {
-				continue
+			rows[i] = rowFlip
+			if rowFlip {
+				ans++
 			}
-			j = 0
-			for j < n {
-				x := 1 - src[i][j]
-				if flippedCols[j] {
-					x = 1 - x
-				}
-				if x != dst[i][j] {
-					break
-				}
-				j++
-			}
-			if j < n {
-				return -1
-			}
-			rows[i] = true
-			ans++
 		}
 
 		return ans
@@ -188,20 +169,16 @@ func solve1(n int, src, dst [][]int) (bool, []int, []int) {
 	cols0 := make([]bool, n)
 	rows0 := make([]bool, n)
 	for j := 0; j < n; j++ {
-		if src[0][j] != dst[0][j] {
-			cols0[j] = true
-		}
+		cols0[j] = src[0][j] != dst[0][j]
 	}
 	row0NotFlip := find(cols0, rows0)
 
 	rows1 := make([]bool, n)
 	cols1 := make([]bool, n)
 	for j := 0; j < n; j++ {
-		if src[0][j] == dst[0][j] {
-			cols1[j] = true
-		}
+		cols1[j] = src[0][j] == dst[0][j]
 	}
-	rows1[0] = true
+	//rows1[0] = true
 	row0Flip := find(cols1, rows1)
 
 	if row0NotFlip < 0 && row0Flip < 0 {
@@ -215,7 +192,7 @@ func solve1(n int, src, dst [][]int) (bool, []int, []int) {
 		return true, compact(rows0), compact(cols0)
 	}
 
-	if row0Flip+1 <= row0NotFlip {
+	if row0Flip <= row0NotFlip {
 		return true, compact(rows1), compact(cols1)
 	}
 

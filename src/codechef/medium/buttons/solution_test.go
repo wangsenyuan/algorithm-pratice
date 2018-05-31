@@ -6,7 +6,7 @@ import (
 )
 
 func runSample(t *testing.T, n int, src [][]int, dst [][]int, expect bool, row []int, col []int) {
-	res, a, b := solve(n, src, dst)
+	res, a, b := solve1(n, src, dst)
 
 	if res != expect || !reflect.DeepEqual(row, a) || !reflect.DeepEqual(col, b) {
 		t.Errorf("Sample %d %v %v, expect %t %v %v, but got %t %v %v", n, src, dst, expect, row, col, res, a, b)

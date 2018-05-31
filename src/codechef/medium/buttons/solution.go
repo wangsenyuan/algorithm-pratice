@@ -150,10 +150,10 @@ func solve1(n int, src, dst [][]int) (bool, []int, []int) {
 			}
 		}
 		for i := 0; i < n; i++ {
-			rowFlip := src[i][0] == dst[i][0] && cols[0] || src[i][0] != dst[i][0] && !cols[0]
+			rowFlip := (src[i][0] != dst[i][0]) != cols[0]
 			for j := 0; j < n; j++ {
 				flip := rowFlip != cols[j]
-				if flip == (src[i][j] == dst[i][j]) {
+				if flip != (src[i][j] != dst[i][j]) {
 					return -1
 				}
 			}
@@ -181,18 +181,11 @@ func solve1(n int, src, dst [][]int) (bool, []int, []int) {
 	//rows1[0] = true
 	row0Flip := find(cols1, rows1)
 
-	if row0NotFlip < 0 && row0Flip < 0 {
+	if row0NotFlip < 0 || row0Flip < 0 {
 		return false, nil, nil
 	}
-	if row0NotFlip < 0 {
-		return true, compact(rows1), compact(cols1)
-	}
 
-	if row0Flip < 0 {
-		return true, compact(rows0), compact(cols0)
-	}
-
-	if row0Flip <= row0NotFlip {
+	if row0Flip < row0NotFlip {
 		return true, compact(rows1), compact(cols1)
 	}
 
@@ -208,12 +201,8 @@ func compact(row []bool) []int {
 			j++
 		}
 	}
-	return res[:j]
-}
-
-func min(a, b int) int {
-	if a < b {
-		return a
+	if j == 0 {
+		return nil
 	}
-	return b
+	return res[:j]
 }

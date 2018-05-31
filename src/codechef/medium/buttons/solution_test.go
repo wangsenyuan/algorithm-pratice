@@ -50,3 +50,18 @@ func TestSample2(t *testing.T) {
 	col := []int{0}
 	runSample(t, n, src, dst, true, row, col)
 }
+
+func TestSample3(t *testing.T) {
+	n := 3
+	src := [][]int{
+		{1, 1, 0},
+		{1, 1, 1},
+		{1, 1, 1},
+	}
+	dst := [][]int{
+		{1, 1, 0},
+		{1, 1, 1},
+		{1, 1, 1},
+	}
+	runSample(t, n, src, dst, true, nil, nil)
+}

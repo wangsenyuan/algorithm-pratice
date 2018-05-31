@@ -29,3 +29,24 @@ func TestSample1(t *testing.T) {
 	col := []int{2}
 	runSample(t, n, src, dst, true, row, col)
 }
+
+func TestSample2(t *testing.T) {
+	n := 5
+	src := [][]int{
+		{0, 1, 1, 1, 1},
+		{1, 0, 0, 0, 0},
+		{1, 0, 0, 0, 0},
+		{1, 0, 0, 0, 0},
+		{0, 1, 1, 1, 1},
+	}
+	dst := [][]int{
+		{0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0},
+	}
+	row := []int{0, 4}
+	col := []int{0}
+	runSample(t, n, src, dst, true, row, col)
+}

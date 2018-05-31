@@ -153,7 +153,7 @@ func solve1(n int, src, dst [][]int) (bool, []int, []int) {
 			rowFlip := src[i][0] == dst[i][0] && cols[0] || src[i][0] != dst[i][0] && !cols[0]
 			for j := 0; j < n; j++ {
 				flip := rowFlip != cols[j]
-				if flip && src[i][j] == dst[i][j] || !flip && src[i][j] != dst[i][j] {
+				if flip == (src[i][j] == dst[i][j]) {
 					return -1
 				}
 			}

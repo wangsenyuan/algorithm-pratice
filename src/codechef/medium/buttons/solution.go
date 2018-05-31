@@ -78,28 +78,43 @@ func solve(n int, src, dst [][]int) (bool, []int, []int) {
 
 	find := func(flippedCols []bool, rows []bool) int {
 		var ans int
-		for i := 1; i < n; i++ {
-			var rowFliped bool
 
-			for j := 0; j < n; j++ {
+		for j := 0; j < n; j++ {
+			if flippedCols[j] {
+				ans++
+			}
+		}
+		for i := 1; i < n; i++ {
+			var j int
+			for j < n {
 				x := src[i][j]
 				if flippedCols[j] {
 					x = 1 - x
 				}
-				if rowFliped {
+				if x != dst[i][j] {
+					break
+				}
+				j++
+			}
+			if j == n {
+				continue
+			}
+			j = 0
+			for j < n {
+				x := 1 - src[i][j]
+				if flippedCols[j] {
 					x = 1 - x
 				}
 				if x != dst[i][j] {
-					if rowFliped {
-						return -1
-					}
-					rowFliped = true
+					break
 				}
+				j++
 			}
-			if rowFliped {
-				rows[i] = true
-				ans++
+			if j < n {
+				return -1
 			}
+			rows[i] = true
+			ans++
 		}
 
 		return ans
@@ -108,7 +123,6 @@ func solve(n int, src, dst [][]int) (bool, []int, []int) {
 	cols0 := make([]bool, n)
 	rows0 := make([]bool, n)
 	for j := 0; j < n; j++ {
-		cols0[j] = false
 		if src[0][j] != dst[0][j] {
 			cols0[j] = true
 		}
@@ -118,7 +132,6 @@ func solve(n int, src, dst [][]int) (bool, []int, []int) {
 	rows1 := make([]bool, n)
 	cols1 := make([]bool, n)
 	for j := 0; j < n; j++ {
-		cols1[j] = false
 		if src[0][j] == dst[0][j] {
 			cols1[j] = true
 		}
@@ -137,7 +150,7 @@ func solve(n int, src, dst [][]int) (bool, []int, []int) {
 		return true, compact(rows0), compact(cols0)
 	}
 
-	if row0Flip+1 <= row0NotFlip {
+	if row0Flip <= row0NotFlip {
 		return true, compact(rows1), compact(cols1)
 	}
 

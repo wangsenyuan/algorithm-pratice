@@ -60,6 +60,77 @@ func solve(N, M, K int, special []int, edges [][]int) int {
 		graph[i] = make(map[int]int)
 	}
 
+	for _, edge := range edges {
+		u, v, w := edge[0]-1, edge[1]-1, edge[2]
+		graph[u][v] = w
+		graph[v][u] = w
+	}
+
+	dists := make([]int, N)
+
+	for i := 0; i < N; i++ {
+		dists[i] = -1
+	}
+
+	pq := make(PriorityQueue, 0, N)
+	parent := make([]int, N)
+
+	for i := 0; i < K; i++ {
+		parent[special[i]-1] = special[i] - 1
+		dists[special[i]-1] = 0
+		heap.Push(&pq, &Item{value: special[i] - 1, priority: 0})
+	}
+
+	seen := make([]bool, N)
+
+	for pq.Len() > 0 {
+		head := heap.Pop(&pq).(*Item)
+		u, d := head.value, head.priority
+		if seen[u] {
+			continue
+		}
+		seen[u] = true
+
+		for v, w := range graph[u] {
+			if dists[v] < 0 || dists[v] > d+w {
+				dists[v] = d + w
+				parent[v] = u
+				heap.Push(&pq, &Item{value: v, priority: dists[v]})
+			}
+		}
+	}
+
+	var boss func(u int) int
+	boss = func(u int) int {
+		if parent[u] == u {
+			return u
+		}
+		parent[u] = boss(parent[u])
+		return parent[u]
+	}
+
+	best := -1
+	for u := 0; u < N; u++ {
+		for v, w := range graph[u] {
+			if boss(u) == boss(v) {
+				continue
+			}
+			tmp := dists[u] + dists[v] + w
+			if best < 0 || best > tmp {
+				best = tmp
+			}
+		}
+	}
+	return best
+}
+
+func solve1(N, M, K int, special []int, edges [][]int) int {
+	graph := make([]map[int]int, N)
+
+	for i := 0; i < N; i++ {
+		graph[i] = make(map[int]int)
+	}
+
 	specialFlag := make([]bool, N)
 
 	for i := 0; i < K; i++ {

@@ -1,7 +1,56 @@
 package main
 
-func main() {
+import (
+	"container/heap"
+	"bufio"
+	"os"
+	"fmt"
+)
 
+func readInt(bytes []byte, from int, val *int) int {
+	i := from
+	tmp := 0
+	for i < len(bytes) && bytes[i] != ' ' {
+		tmp = tmp*10 + int(bytes[i]-'0')
+		i++
+	}
+	*val = tmp
+	return i
+}
+
+func readNum(scanner *bufio.Scanner) (a int) {
+	scanner.Scan()
+	readInt(scanner.Bytes(), 0, &a)
+	return
+}
+
+func readTwoNums(scanner *bufio.Scanner) (a int, b int) {
+	scanner.Scan()
+	x := readInt(scanner.Bytes(), 0, &a)
+	readInt(scanner.Bytes(), x+1, &b)
+	return
+}
+
+func readNNums(scanner *bufio.Scanner, n int) []int {
+	res := make([]int, n)
+	x := -1
+	scanner.Scan()
+	for i := 0; i < n; i++ {
+		x = readInt(scanner.Bytes(), x+1, &res[i])
+	}
+	return res
+}
+
+func main() {
+	scanner := bufio.NewScanner(os.Stdin)
+	firstLine := readNNums(scanner, 3)
+	N, M, K := firstLine[0], firstLine[1], firstLine[2]
+	special := readNNums(scanner, K)
+	edges := make([][]int, M)
+	for i := 0; i < M; i++ {
+		edges[i] = readNNums(scanner, 3)
+	}
+	fmt.Println(solve(N, M, K, special, edges))
 }
 
 func solve(N, M, K int, special []int, edges [][]int) int {
@@ -11,41 +60,99 @@ func solve(N, M, K int, special []int, edges [][]int) int {
 		graph[i] = make(map[int]int)
 	}
 
+	specialFlag := make([]bool, N)
+
+	for i := 0; i < K; i++ {
+		specialFlag[special[i]-1] = true
+	}
+
 	for _, edge := range edges {
 		u, v, w := edge[0]-1, edge[1]-1, edge[2]
 		graph[u][v] = w
 		graph[v][u] = w
 	}
 
-	INF := 1 << 30
+	INF := 1 << 25
 
-	DD := make([][]int, N)
-	for i := 0; i < N; i++ {
-		DD[i] = make([]int, N)
-		for j := 0; j < N; j++ {
-			DD[i][j] = INF
+	dists := make([]int, N)
+
+	best := INF
+
+	pq := make(PriorityQueue, 0, N)
+
+	seen := make([]bool, N)
+
+	bfs := func(x int) {
+		for i := 0; i < N; i++ {
+			dists[i] = INF
+			seen[i] = false
 		}
-		DD[i][i] = 0
-	}
+		dists[x] = 0
+		heap.Push(&pq, &Item{value: x, priority: 0})
 
-	dd := make([]int, N)
+		for pq.Len() > 0 {
+			hd := heap.Pop(&pq).(*Item)
+			u, d := hd.value, hd.priority
+			if seen[u] {
+				continue
+			}
+			seen[u] = true
 
-	que := make([]int, N)
-	bfs := func(x int, label int) {
-		front, tail := 0, 0
-		que[tail] = x
-		tail++
+			if u != x && specialFlag[u] && d < best {
+				best = d
+			}
 
-		for front < tail {
-			tt := tail
-
-			for front < tt {
-				u := que[front]
-				front++
-				for v, w := range graph[u] {
-
+			for v, w := range graph[u] {
+				if dists[v] > d+w {
+					dists[v] = d + w
+					heap.Push(&pq, &Item{value: v, priority: dists[v]})
 				}
 			}
 		}
 	}
+
+	for i := 0; i < K; i++ {
+		bfs(special[i] - 1)
+	}
+
+	return best
+}
+
+// An Item is something we manage in a priority queue.
+type Item struct {
+	value    int // The value of the item; arbitrary.
+	priority int // The priority of the item in the queue.
+	// The index is needed by update and is maintained by the heap.Interface methods.
+	index int // The index of the item in the heap.
+}
+
+// A PriorityQueue implements heap.Interface and holds Items.
+type PriorityQueue []*Item
+
+func (pq PriorityQueue) Len() int { return len(pq) }
+
+func (pq PriorityQueue) Less(i, j int) bool {
+	return pq[i].priority < pq[j].priority
+}
+
+func (pq PriorityQueue) Swap(i, j int) {
+	pq[i], pq[j] = pq[j], pq[i]
+	pq[i].index = i
+	pq[j].index = j
+}
+
+func (pq *PriorityQueue) Push(x interface{}) {
+	n := len(*pq)
+	item := x.(*Item)
+	item.index = n
+	*pq = append(*pq, item)
+}
+
+func (pq *PriorityQueue) Pop() interface{} {
+	old := *pq
+	n := len(old)
+	item := old[n-1]
+	item.index = -1 // for safety
+	*pq = old[0 : n-1]
+	return item
 }

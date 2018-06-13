@@ -71,17 +71,16 @@ func solve(n int, A []int, K int) bool {
 		return true
 	}
 
-	h := g
 	maxPrime := 1
 	for x := 2; x*x <= g; x++ {
-		for h%x == 0 {
-			h /= x
+		for g%x == 0 {
+			g /= x
 			maxPrime = x
 		}
 	}
 
-	if h > maxPrime {
-		maxPrime = h
+	if g > maxPrime {
+		maxPrime = g
 	}
 
 	if maxPrime > K {

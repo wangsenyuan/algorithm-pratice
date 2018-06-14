@@ -67,7 +67,7 @@ const MaxN = 100334
 var sg = make([]int, MaxN)
 
 func init() {
-	deg := make([]int, 123)
+	deg := make([]int, 8)
 	for i := 1; i <= 7; i++ {
 		deg[i] = 1
 		for j := 1; j <= i; j++ {
@@ -95,7 +95,7 @@ func solve(n int, A []int) bool {
 	var res int
 
 	for i := 0; i < n; i++ {
-		res ^= A[i]
+		res ^= sg[A[i]]
 	}
 
 	return res > 0

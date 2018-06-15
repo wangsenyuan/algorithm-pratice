@@ -113,40 +113,9 @@ func solve(n, k, p int, A [][]int, P [][]int) bool {
 		return false
 	}
 
-	if ii > 0 {
-		zs := make(PRS, k)
-		copy(zs, xs[ii:])
-		copy(zs[k-ii:], xs[:ii])
-		xs = zs
-	}
-	if jj > 0 {
-		zs := make(PRS, p)
-		copy(zs, ys[jj:])
-		copy(zs[p-jj:], ys[:jj])
-		ys = zs
-	}
+	xs = process(xs, ii, k, n)
 
-	for i := 0; i < k; i++ {
-		if i > 0 {
-			if xs[i].from < xs[i-1].end {
-				xs[i].from += n
-			}
-		}
-		if xs[i].end < xs[i].from {
-			xs[i].end += n
-		}
-	}
-
-	for i := 0; i < p; i++ {
-		if i > 0 {
-			if ys[i].from < ys[i-1].end {
-				ys[i].from += n
-			}
-		}
-		if ys[i].end < ys[i].from {
-			ys[i].end += n
-		}
-	}
+	ys = process(ys, jj, p, n)
 
 	ii, jj = 0, 0
 	for ii < k && jj < p {
@@ -159,6 +128,26 @@ func solve(n, k, p int, A [][]int, P [][]int) bool {
 		ii++
 	}
 	return ii == k && jj == p
+}
+
+func process(xs PRS, ii int, k int, n int) PRS {
+	if ii > 0 {
+		zs := make(PRS, k)
+		copy(zs, xs[ii:])
+		copy(zs[k-ii:], xs[:ii])
+		xs = zs
+	}
+	for i := 0; i < k; i++ {
+		if i > 0 {
+			if xs[i].from < xs[i-1].end {
+				xs[i].from += n
+			}
+		}
+		if xs[i].end < xs[i].from {
+			xs[i].end += n
+		}
+	}
+	return xs
 }
 
 type PR struct {

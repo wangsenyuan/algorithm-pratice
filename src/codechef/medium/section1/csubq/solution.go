@@ -1,64 +1,195 @@
 package main
 
+import (
+	"bufio"
+	"fmt"
+	"os"
+)
+
+func readInt(bytes []byte, from int, val *int) int {
+	i := from
+	tmp := 0
+	for i < len(bytes) && bytes[i] != ' ' {
+		tmp = tmp*10 + int(bytes[i]-'0')
+		i++
+	}
+	*val = tmp
+	return i
+}
+
+func readNum(scanner *bufio.Scanner) (a int) {
+	scanner.Scan()
+	readInt(scanner.Bytes(), 0, &a)
+	return
+}
+
+func readTwoNums(scanner *bufio.Scanner) (a int, b int) {
+	scanner.Scan()
+	x := readInt(scanner.Bytes(), 0, &a)
+	readInt(scanner.Bytes(), x+1, &b)
+	return
+}
+
+func readNNums(scanner *bufio.Scanner, n int) []int {
+	res := make([]int, n)
+	x := -1
+	scanner.Scan()
+	for i := 0; i < n; i++ {
+		x = readInt(scanner.Bytes(), x+1, &res[i])
+	}
+	return res
+}
+
 func main() {
+	scanner := bufio.NewScanner(os.Stdin)
 
+	firstLine := readNNums(scanner, 4)
+	N, Q, L, R := firstLine[0], firstLine[1], firstLine[2], firstLine[3]
+	queries := make([][]int, Q)
+	for i := 0; i < Q; i++ {
+		queries[i] = readNNums(scanner, 3)
+	}
+	res := solve(N, Q, L, R, queries)
+
+	for _, ans := range res {
+		fmt.Println(ans)
+	}
 }
 
-func solve(N, Q, L, R int, queries [][]int) []int {
-	return nil
+func solve(N, Q, L, R int, queries [][]int) []uint64 {
+	A := createSegTree(N, L)
+	B := createSegTree(N, R+1)
+
+	res := make([]uint64, Q)
+	var j int
+
+	for i := 0; i < Q; i++ {
+		query := queries[i]
+		if query[0] == 1 {
+			x, y := query[1]-1, query[2]
+			A.Update(x, y)
+			B.Update(x, y)
+		} else {
+			l, r := query[1]-1, query[2]-1
+			res[j] = B.Query(l, r) - A.Query(l, r)
+			j++
+		}
+	}
+
+	return res[:j]
 }
 
-type SegTree struct {
-	start, end  int   // the range covered
-	total       int64 // total number of sub array in [start:end] staisfy the condition
-	A, B        int   // A left-most value out of [L:R] or start, B right-most value out of [L:R] or end
-	hasHole     bool
-	left, right *SegTree
+type Node struct {
+	num_ones_subarrays                 uint64
+	len, len_ones_left, len_ones_right int
+	left, right                        *Node
 }
 
-func createNode(start, end int) *SegTree {
-	node := new(SegTree)
-	node.start = start
-	node.end = end
+func leafNode(pos int, val int) *Node {
+	node := new(Node)
+	node.len = 1
+	node.num_ones_subarrays = uint64(val)
+	node.len_ones_left = val
+	node.len_ones_right = val
 	return node
 }
 
-func (root *SegTree) Query(l, r int, L, R int) int64 {
-	var loop func(node *SegTree) int64
-	loop = func(node *SegTree) int64 {
-		if node == nil {
-			return 0
-		}
-		if node.start < l || node.end > r {
-			return 0
-		}
-		if l <= node.start && node.end <= r {
-			return node.total
-		}
+func copyNode(dst, src *Node) {
+	dst.len = src.len
+	dst.num_ones_subarrays = src.num_ones_subarrays
+	dst.len_ones_left = src.len_ones_left
+	dst.len_ones_right = src.len_ones_right
+	dst.num_ones_subarrays = src.num_ones_subarrays
+}
 
-		res := loop(node.left) + loop(node.right)
-
-		if node.left == nil || node.right == nil {
-			return res
-		}
-		var A, B int
-		if node.left.hasHole {
-			A = max(node.left.B, l-1)
-		} else {
-			// start need to be included
-			A = max(node.start-1, l-1)
-		}
-
-		if node.right.hasHole {
-			B = min(node.right.A, r+1)
-		} else {
-			B = min(node.end+1, r+1)
-		}
-
-		tmp := int64(node.left.end-A) * int64(B-node.right.start)
-		return res + tmp
+func merge(res, a, b *Node) {
+	if a == nil {
+		a = new(Node)
 	}
-	return loop(root)
+
+	if b == nil {
+		b = new(Node)
+	}
+
+	res.len = a.len + b.len
+	res.len_ones_left = a.len_ones_left
+	if a.len_ones_left == a.len {
+		res.len_ones_left += b.len_ones_left
+	}
+	res.len_ones_right = b.len_ones_right
+	if b.len_ones_right == b.len {
+		res.len_ones_right += a.len_ones_right
+	}
+
+	res.num_ones_subarrays = a.num_ones_subarrays +
+		b.num_ones_subarrays +
+		uint64(a.len_ones_right)*uint64(b.len_ones_left)
+
+}
+
+type SegTree struct {
+	maxBound int
+	root     *Node
+	size     int
+}
+
+func createSegTree(n int, bound int) *SegTree {
+	st := new(SegTree)
+	st.maxBound = bound
+	st.size = n
+
+	for i := 0; i < n; i++ {
+		st.Update(i, 0)
+	}
+
+	return st
+}
+
+func (st *SegTree) Update(pos int, num int) {
+	val := 0
+	if num < st.maxBound {
+		val = 1
+	}
+	var loop func(node *Node, left, right int) *Node
+	loop = func(node *Node, left, right int) *Node {
+		if node == nil {
+			node = new(Node)
+		}
+		if left == right {
+			node = leafNode(left, val)
+			return node
+		}
+		mid := (left + right) / 2
+		if pos <= mid {
+			node.left = loop(node.left, left, mid)
+		} else {
+			node.right = loop(node.right, mid+1, right)
+		}
+
+		merge(node, node.left, node.right)
+		return node
+	}
+
+	st.root = loop(st.root, 0, st.size-1)
+}
+
+func (st *SegTree) Query(l, r int) uint64 {
+	var loop func(node *Node, start, end int) *Node
+	loop = func(node *Node, start, end int) *Node {
+		if end < l || r < start {
+			return new(Node)
+		}
+
+		if l <= start && end <= r {
+			return node
+		}
+		mid := (start + end) / 2
+		res := new(Node)
+		merge(res, loop(node.left, start, mid), loop(node.right, mid+1, end))
+		return res
+	}
+	res := loop(st.root, 0, st.size-1)
+	return res.num_ones_subarrays
 }
 
 func min(a, b int) int {
@@ -73,63 +204,4 @@ func max(a, b int) int {
 		return a
 	}
 	return b
-}
-
-func (root *SegTree) Update(pos int, val, L, R int) {
-
-	var loop func(node *SegTree, start, end int) *SegTree
-	loop = func(node *SegTree, start, end int) *SegTree {
-		if node == nil {
-			node = createNode(start, end)
-		}
-
-		if start == end {
-			if val >= L && val <= R {
-				node.total = 1
-			} else {
-				node.hasHole = true
-				node.A = start
-				node.B = end
-			}
-			return node
-		}
-
-		mid := (start + end) / 2
-		if pos <= mid {
-			node.left = loop(node.left, start, mid)
-		} else {
-			node.right = loop(node.right, mid+1, end)
-		}
-
-		if node.right == nil {
-			node.total = node.left.total
-			node.hasHole = node.left.hasHole
-			node.A = node.left.A
-			node.B = node.left.B
-		} else if node.left == nil {
-			node.total = node.right.total
-			node.hasHole = node.right.hasHole
-			node.A = node.right.A
-			node.B = node.right.B
-		} else {
-			node.hasHole = node.left.hasHole || node.right.hasHole
-			node.total = node.left.total + node.right.total
-			if node.left.hasHole && !node.right.hasHole {
-				node.A = node.left.A
-				node.B = node.left.B
-				node.total += int64(mid-node.left.B) * int64(end-mid)
-			} else if !node.left.hasHole && node.right.hasHole {
-				node.A = node.right.A
-				node.B = node.right.B
-				node.total += int64(mid-start+1) * int64(node.right.B-mid-1)
-			} else {
-				node.A = node.left.A
-				node.B = node.right.B
-				node.total += int64(mid-node.left.B) * int64(node.right.B-mid-1)
-			}
-		}
-		return node
-	}
-
-	loop(root, root.start, root.end)
 }

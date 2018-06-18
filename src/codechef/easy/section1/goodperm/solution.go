@@ -74,6 +74,10 @@ func solve(N, K int, A []int) int {
 	var ans int
 
 	dfs = func(i int, flag int, cnt int) {
+		if cnt+N-i < K {
+			return
+		}
+
 		if i == N {
 			if cnt == K {
 				ans++

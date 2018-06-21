@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"reflect"
 )
 
 func readInt(bytes []byte, from int, val *int) int {
@@ -58,51 +59,67 @@ func main() {
 }
 
 func solve(s, t []byte, a, b, k int) int {
-	INF := k + 1
-
+	if a == 0 {
+		return 0
+	}
 	m := len(s)
 	n := len(t)
 
-	cache := make(map[int]map[int]int)
-
-	var dfs func(x, y, c int) int
-	dfs = func(x, y, c int) int {
-		if tmp, foundx := cache[x]; foundx {
-			if res, foundy := tmp[y]; foundy {
-				return res
-			}
-		} else {
-			cache[x] = make(map[int]int)
+	if b == 0 {
+		res := abs(m-n) * a
+		if res > k {
+			return -1
 		}
-
-		if x == 0 {
-			return a*y + c
-		}
-		if y == 0 {
-			return a*x + c
-		}
-		if c > k {
-			// no need to process any more
-			return INF
-		}
-		//same
-		res := INF
-		if s[x-1] == t[y-1] {
-			res = dfs(x-1, y-1, c)
-		} else {
-			res = dfs(x-1, y, c+a)
-			res = min(res, dfs(x, y-1, c+a))
-			res = min(res, dfs(x-1, y-1, b))
-		}
-		cache[x][y] = res
 		return res
 	}
 
-	res := dfs(m, n, 0)
-	if res >= INF {
+	if k == 0 {
+		eq := reflect.DeepEqual(s, t)
+		if eq {
+			return 0
+		}
+		return -1
+	}
+	matrixPrev := make([]int, n+1)
+	for i := 0; i <= n; i++ {
+		matrixPrev[i] = i * a
+	}
+
+	k1 := k + 2
+	matrixCurr := make([]int, n+1)
+	for i := 0; i < m; i++ {
+		matrixCurr[i] = (i + 1) * a
+		if i-k1 > 0 {
+			// out of range
+			matrixCurr[i-k1] = k1
+		}
+
+		for j := max(0, i-k1); j < min(n, i+k1); j++ {
+			var cost int
+			if s[i] != t[j] {
+				cost = b
+			}
+			matrixCurr[j+1] = min3(matrixCurr[j]+a, matrixPrev[j+1]+a, matrixPrev[j]+cost)
+		}
+
+		for j := max(0, i-k1); j < min(n, i+k1); j++ {
+			matrixPrev[j] = matrixCurr[j]
+		}
+		matrixPrev[min(n, i+k1)] = k1
+	}
+
+	res := matrixCurr[min(m-1+k1, n)]
+	if res > k {
 		return -1
 	}
 	return res
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
 }
 
 func min(a, b int) int {
@@ -110,4 +127,20 @@ func min(a, b int) int {
 		return a
 	}
 	return b
+}
+
+func min3(a, b, c int) int {
+	if a <= b && a <= c {
+		return a
+	}
+	if b <= a && b <= c {
+		return b
+	}
+	return c
+}
+func abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
 }

@@ -200,6 +200,8 @@ func (root *Node) Query(left, right int, size int) (int, int) {
 		a := loop(node.left, start, mid)
 		b := loop(node.right, mid+1, end)
 		c := new(Node)
+		c.maxVal = -1
+		c.cnt = -1
 		return merge(c, a, b)
 	}
 

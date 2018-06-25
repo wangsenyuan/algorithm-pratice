@@ -81,7 +81,7 @@ func init() {
 			primes[i] = x
 			i++
 			factors[x] = append(factors[x], i-1)
-			for y := x * x; y < MAX_N; y += x {
+			for y := 2 * x; y < MAX_N; y += x {
 				set[y] = true
 				factors[y] = append(factors[y], i-1)
 			}

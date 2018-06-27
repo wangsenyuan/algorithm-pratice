@@ -1,6 +1,23 @@
 package p856
 
 func scoreOfParentheses(S string) int {
+	var ans, balance int
+
+	for i := 0; i < len(S); i++ {
+		if S[i] == '(' {
+			balance++
+		} else {
+			balance--
+			if i > 0 && S[i-1] == '(' {
+				ans += 1 << uint(balance)
+			}
+		}
+	}
+
+	return ans
+}
+
+func scoreOfParentheses1(S string) int {
 	n := len(S)
 	if n == 2 {
 		return 1

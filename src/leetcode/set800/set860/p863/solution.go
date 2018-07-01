@@ -66,8 +66,10 @@ func distanceK(root *TreeNode, target *TreeNode, K int) []int {
 			ld++
 			if ld == K {
 				res = append(res, node.Val)
+			} else {
+				dfs2(node.Right, K-ld-1)
 			}
-			dfs2(node.Right, K-ld-1)
+
 			return ld
 		}
 		rd := dfs(node.Right)
@@ -76,8 +78,10 @@ func distanceK(root *TreeNode, target *TreeNode, K int) []int {
 			rd++
 			if rd == K {
 				res = append(res, node.Val)
+			} else {
+				dfs2(node.Left, K-rd-1)
 			}
-			dfs2(node.Left, K-rd-1)
+
 			return rd
 		}
 		return -1

@@ -45,7 +45,7 @@ func solve(n, m int, edges [][]int, tickets [][]int, Q int, friends []int) []int
 			ans := INF
 
 			for k, w := range T[v] {
-				tmp := st.Get(max(0, h-k), h) + w
+				tmp := st.Get(max(0, h+1-k), h) + w
 				ans = min(tmp, tmp)
 			}
 			F[v] = ans

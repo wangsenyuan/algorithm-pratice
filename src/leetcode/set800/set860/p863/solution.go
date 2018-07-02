@@ -88,7 +88,7 @@ func distanceK(root *TreeNode, target *TreeNode, K int) []int {
 	}
 
 	dfs2 = func(node *TreeNode, dist int) {
-		if node == nil {
+		if node == nil || dist < 0 {
 			return
 		}
 		if dist == 0 {

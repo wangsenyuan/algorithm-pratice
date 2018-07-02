@@ -1,9 +1,72 @@
 package main
 
-import "math"
+import (
+	"math"
+	"bufio"
+	"os"
+	"fmt"
+)
 
 func main() {
+	scanner := bufio.NewScanner(os.Stdin)
 
+	n, m := readTwoNums(scanner)
+
+	edges := make([][]int, n-1)
+	for i := 0; i < n-1; i++ {
+		edges[i] = readNNums(scanner, 2)
+	}
+	tickets := make([][]int, m)
+	for i := 0; i < m; i++ {
+		tickets[i] = readNNums(scanner, 3)
+	}
+	Q := readNum(scanner)
+	friends := make([]int, Q)
+
+	for i := 0; i < Q; i++ {
+		friends[i] = readNum(scanner)
+	}
+
+	res := solve(n, m, edges, tickets, Q, friends)
+	for _, ans := range res {
+		fmt.Println(ans)
+	}
+}
+
+func readInt(bytes []byte, from int, val *int) int {
+	i := from
+	tmp := 0
+	for i < len(bytes) && bytes[i] != ' ' {
+		tmp = tmp*10 + int(bytes[i]-'0')
+		i++
+	}
+	*val = tmp
+	return i
+}
+
+func readNum(scanner *bufio.Scanner) (a int) {
+	scanner.Scan()
+	readInt(scanner.Bytes(), 0, &a)
+	return
+}
+
+func readTwoNums(scanner *bufio.Scanner) (a int, b int) {
+	res := readNNums(scanner, 2)
+	a, b = res[0], res[1]
+	return
+}
+
+func readNNums(scanner *bufio.Scanner, n int) []int {
+	res := make([]int, n)
+	x := 0
+	scanner.Scan()
+	for i := 0; i < n; i++ {
+		for x < len(scanner.Bytes()) && scanner.Bytes()[x] == ' ' {
+			x++
+		}
+		x = readInt(scanner.Bytes(), x, &res[i])
+	}
+	return res
 }
 
 const INF = math.MaxInt32
@@ -46,7 +109,7 @@ func solve(n, m int, edges [][]int, tickets [][]int, Q int, friends []int) []int
 
 			for k, w := range T[v] {
 				tmp := st.Get(max(0, h+1-k), h) + w
-				ans = min(tmp, tmp)
+				ans = min(ans, tmp)
 			}
 			F[v] = ans
 			dfs(v, h+1)

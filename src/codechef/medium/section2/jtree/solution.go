@@ -1,10 +1,10 @@
 package main
 
 import (
-	"math"
 	"bufio"
-	"os"
 	"fmt"
+	"math"
+	"os"
 )
 
 func main() {

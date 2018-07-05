@@ -158,12 +158,6 @@ func (root *Node) Get(left, right int, size int) *Node {
 		mid := (start + end) >> 1
 		a := loop(node.left, start, mid)
 		b := loop(node.right, mid+1, end)
-		if a == nil {
-			return b
-		}
-		if b == nil {
-			return a
-		}
 		c := new(Node)
 		c.minVal = findMinVal(a, b)
 		c.maxVal = findMaxVal(a, b)

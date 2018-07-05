@@ -173,11 +173,11 @@ func (root *Node) Update(pos int, val int64, size int) *Node {
 	loop = func(node *Node, start, end int) *Node {
 		if node == nil {
 			node = new(Node)
-			node.minVal = val
-			node.maxVal = val
 		}
 
 		if start == end {
+			node.minVal = val
+			node.maxVal = val
 			return node
 		}
 		mid := (start + end) >> 1

@@ -55,12 +55,17 @@ func main() {
 
 func readInt(bytes []byte, from int, val *int) int {
 	i := from
+	sign := 1
+	if bytes[i] == '-' {
+		sign = -1
+		i++
+	}
 	tmp := 0
 	for i < len(bytes) && bytes[i] != ' ' {
 		tmp = tmp*10 + int(bytes[i]-'0')
 		i++
 	}
-	*val = tmp
+	*val = tmp * sign
 	return i
 }
 

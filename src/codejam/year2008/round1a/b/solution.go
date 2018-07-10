@@ -90,9 +90,7 @@ func solve(n int, m int, flavors [][]int) []int {
 			return nil
 		}
 		res[malteFlavor[u]] = 1
-		for _, j := range needToCheck[malteFlavor[u]] {
-			stack = append(stack, j)
-		}
+		stack = append(stack, needToCheck[malteFlavor[u]]...)
 		needToCheck[malteFlavor[u]] = needToCheck[malteFlavor[u]][0:0]
 	}
 

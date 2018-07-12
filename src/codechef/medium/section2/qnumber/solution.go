@@ -73,117 +73,83 @@ func readNNums(scanner *bufio.Scanner, n int) []int {
 	return res
 }
 
-const MAX_N = 1000007
-
-var primes []int
-
-func init() {
-	set := make([]bool, MAX_N+1)
-	primes = make([]int, 0, 10000)
-	for x := 2; x <= MAX_N; x++ {
-		if !set[x] {
-			primes = append(primes, x)
-			for y := x * x; y > x && y <= MAX_N; y += x {
-				set[y] = true
-			}
-		}
-	}
-}
-
-func primeFactors(X int64) [][]int {
-	res := make([][]int, 0, 32)
-	for i := 0; i < len(primes) && X > int64(primes[i]); i++ {
-		p := int64(primes[i])
-		if X%p == 0 {
-			var cnt int
-			for X%p == 0 {
-				cnt++
-				X /= p
-			}
-			res = append(res, []int{primes[i], cnt})
-		}
-	}
-	if X > 1 {
-		res = append(res, []int{int(X), 1})
-	}
-
-	return res
-}
-
 func solve(N int64, Q int, queries [][]int64) []int64 {
-	P := primeFactors(N)
+	// at most 64
+	p := make([]int64, 64)
+	np := make([]int, 64)
+	var ps int
+	var cnt int
 
-	cal1 := func(S [][]int) int64 {
-		var res int64 = 1
-		for i, j := 0, 0; i < len(P) && j < len(S); {
-			a, b := P[i], S[j]
-			if a[0] < b[0] {
-				i++
-			} else if a[0] > b[0] {
-				j++
-			} else {
-				x := min(a[1], b[1])
-				res *= int64(x + 1)
-				i++
-				j++
-			}
-		}
-		return res
+	for N&1 == 0 {
+		cnt++
+		N >>= 1
+	}
+	if cnt > 0 {
+		p[ps] = 2
+		np[ps] = cnt
+		ps++
 	}
 
-	cal2 := func(S [][]int) int64 {
-		var res int64 = 1
-		var i, j int
-		for i < len(P) && j < len(S) {
-			a, b := P[i], S[j]
-			if a[0] < b[0] {
-				// it is ok
-				res *= int64(a[1] + 1)
-				i++
-			} else if a[0] > b[0] {
-				// not ok, S has something P don't have
-				return 0
-			} else {
-				if a[1] < b[1] {
-					return 0
-				}
-				res *= int64(a[1] - b[1] + 1)
-				i++
-				j++
-			}
+	for i := int64(3); i*i <= N; i += 2 {
+		cnt = 0
+		for N%i == 0 {
+			cnt++
+			N /= i
 		}
-		if j < len(S) {
-			return 0
+		if cnt > 0 {
+			p[ps] = i
+			np[ps] = cnt
+			ps++
 		}
-		if i < len(P) {
-			res *= int64(P[i][1] + 1)
-			i++
-		}
-		return res
+	}
+	if N > 1 {
+		p[ps] = N
+		np[ps] = 1
+		ps++
 	}
 
 	var X int64 = 1
-	for i := 0; i < len(P); i++ {
-		X *= int64(P[i][1] + 1)
-	}
-
-	cal3 := func(S [][]int) int64 {
-		Y := cal2(S)
-		return X - Y
+	for i := 0; i < ps; i++ {
+		X *= int64(np[i] + 1)
 	}
 
 	res := make([]int64, Q)
 
+	kp := make([]int, 64)
+
 	for i := 0; i < Q; i++ {
 		query := queries[i]
-		S := primeFactors(query[1])
-		if query[0] == 1 {
-			res[i] = cal1(S)
-		} else if query[0] == 2 {
-			res[i] = cal2(S)
-		} else {
-			res[i] = cal3(S)
+		T := query[0]
+		K := query[1]
+
+		for j := 0; j < ps; j++ {
+			kp[j] = 0
+			for kp[j] < np[j] && K%p[j] == 0 {
+				kp[j]++
+				K /= p[j]
+			}
 		}
+		if T == 1 {
+			res[i] = 1
+			for j := 0; j < ps; j++ {
+				res[i] *= int64(kp[j] + 1)
+			}
+			continue
+		}
+
+		var ans int64
+		if K == 1 {
+			// K divides N
+			ans = 1
+			for j := 0; j < ps; j++ {
+				ans *= int64(np[j] - kp[j] + 1)
+			}
+		}
+
+		if T == 3 {
+			ans = X - ans
+		}
+		res[i] = ans
 	}
 
 	return res

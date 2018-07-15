@@ -1,53 +1,144 @@
-package p870
+package main
 
-import "sort"
+import (
+	"fmt"
+	"math/rand"
+)
+
+func main() {
+	A := []int{15777, 7355, 6475, 15448, 18412}
+	B := []int{986, 13574, 14234, 18412, 19893}
+	res := advantageCount(A, B)
+	fmt.Printf("%v", res)
+}
 
 func advantageCount(A []int, B []int) []int {
 	n := len(A)
-	bps := make(PS, n)
+
+	var root *Treap
+
 	for i := 0; i < n; i++ {
-		bps[i] = P{B[i], i}
+		root = root.Insert(A[i])
 	}
-	sort.Sort(bps)
-	sort.Ints(A)
+
+	// sort.Sort(BB)
 
 	res := make([]int, n)
 
 	for i := 0; i < n; i++ {
-		b := bps[i].val
-		j := sort.Search(len(A), func(j int) bool {
-			return A[j] > b
-		})
-		if j == len(A) {
-			// no one can beat b
-			// just take the first one for b
-			res[bps[i].idx] = A[0]
-			A = A[1:]
-		} else {
-			res[bps[i].idx] = A[j]
-			copy(A[j:], A[j+1:])
-			A = A[0 : len(A)-1]
+		b := B[i]
+		at := root.Find(b)
+		if at == nil {
+			at = root.FindMin()
 		}
+		res[i] = at.val
+		root = root.Remove(at)
 	}
 
 	return res
 }
 
-type P struct {
-	val int
-	idx int
+type Treap struct {
+	val         int
+	priority    int
+	left, right *Treap
 }
 
-type PS []P
+func (root *Treap) Insert(val int) *Treap {
+	priotiry := rand.Intn(100000)
+	var loop func(node *Treap) *Treap
 
-func (ps PS) Len() int {
-	return len(ps)
+	loop = func(node *Treap) *Treap {
+		if node == nil {
+			node = new(Treap)
+			node.val = val
+			node.priority = priotiry
+			return node
+		}
+		if val <= node.val {
+			node.left = loop(node.left)
+		} else {
+			node.right = loop(node.right)
+		}
+
+		return balance(node)
+	}
+
+	return loop(root)
 }
 
-func (ps PS) Less(i, j int) bool {
-	return ps[i].val < ps[j].val
+func (root *Treap) Find(val int) *Treap {
+	var loop func(node *Treap)
+	var res *Treap
+	loop = func(node *Treap) {
+		if node == nil {
+			return
+		}
+		if val < node.val {
+			res = node
+			loop(node.left)
+			return
+		}
+		loop(node.right)
+	}
+	loop(root)
+	return res
 }
 
-func (ps PS) Swap(i, j int) {
-	ps[i], ps[j] = ps[j], ps[i]
+func (root *Treap) FindMin() *Treap {
+	node := root
+	for node.left != nil {
+		node = node.left
+	}
+	return node
+}
+
+func (root *Treap) Remove(at *Treap) *Treap {
+	var loop func(node *Treap) *Treap
+	loop = func(node *Treap) *Treap {
+		if at.val < node.val {
+			node.left = loop(node.left)
+		} else if at.val > node.val {
+			node.right = loop(node.right)
+		} else if node.left == nil {
+			node = node.right
+		} else if node.right == nil {
+			node = node.left
+		} else if node.left.priority > node.right.priority {
+			node = rotateRight(node)
+			node.right = loop(node.right)
+		} else {
+			node = rotateLeft(node)
+			node.left = loop(node.left)
+		}
+
+		return node
+	}
+
+	return loop(root)
+}
+
+func balance(node *Treap) *Treap {
+	if node.left != nil && node.left.priority > node.priority {
+		node = rotateRight(node)
+	}
+
+	if node.right != nil && node.right.priority > node.priority {
+		node = rotateLeft(node)
+	}
+	return node
+}
+
+func rotateRight(node *Treap) *Treap {
+	tmp := node.left
+	node.left = tmp.right
+	tmp.right = node
+	return tmp
+}
+
+func rotateLeft(node *Treap) *Treap {
+	tmp := node.right
+	node.right = tmp.left
+	tmp.left = node
+	return tmp
 }

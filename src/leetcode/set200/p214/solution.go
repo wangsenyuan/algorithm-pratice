@@ -11,28 +11,42 @@ func main() {
 }
 
 func shortestPalindrome(s string) string {
+	n := len(s)
+	N := n<<1 | 1
+	S := make([]byte, N)
 
-	expend := func(a, b int) (int, int) {
-		for a >= 0 && b < len(s) && s[a] == s[b] {
-			a, b = a-1, b+1
-		}
-		return a + 1, b - 1
+	for i := 0; i < n; i++ {
+		S[i<<1] = '|'
+		S[i<<1|1] = s[i]
 	}
-	l := 0
-	for i := 0; i < len(s); i++ {
-		a, b := expend(i, i+1)
-		if a == 0 && b - a + 1 > l {
-			l = b - a + 1
+	S[N-1] = '|'
+	L := make([]int, N)
+	C, R, P := 0, -1, 0
+	for i := 0; i < N; i++ {
+		var rad int
+
+		if R >= i {
+			rad = min(L[2*C-i], R-i)
 		}
-		a, b = expend(i-1, i+1)
-		if a == 0 && b - a + 1 >l {
-			l = b - a + 1
+		for i-rad >= 0 && i+rad < N && S[i-rad] == S[i+rad] {
+			rad++
+		}
+		L[i] = rad
+
+		if rad+i > R {
+			C = i
+			R = rad + i - 1
+		}
+		if rad == i+1 {
+			P = R
 		}
 	}
+
+	P /= 2
 
 	var buf bytes.Buffer
 
-	for i := len(s) - 1; i >= l; i-- {
+	for i := len(s) - 1; i >= P; i-- {
 		buf.WriteByte(s[i])
 	}
 
@@ -40,4 +54,11 @@ func shortestPalindrome(s string) string {
 		buf.WriteByte(s[i])
 	}
 	return buf.String()
+}
+
+func min(a, b int) int {
+	if a <= b {
+		return a
+	}
+	return b
 }

@@ -200,12 +200,12 @@ func (uf *UF) Union(a, b int) bool {
 		uf.set[pa] = pb
 		uf.count[pb] += uf.count[pa]
 		uf.elems[pb] = append(uf.elems[pb], uf.elems[pa]...)
-		uf.elems[pa] = uf.elems[pa][0:0]
+		uf.elems[pa] = nil
 	} else {
 		uf.set[pb] = pa
 		uf.count[pa] += uf.count[pb]
 		uf.elems[pa] = append(uf.elems[pa], uf.elems[pb]...)
-		uf.elems[pb] = uf.elems[pb][0:0]
+		uf.elems[pb] = nil
 	}
 	return true
 }

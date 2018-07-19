@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 )
 
@@ -44,16 +43,17 @@ func shortestPalindrome(s string) string {
 
 	P /= 2
 
-	var buf bytes.Buffer
-
+	res := make([]byte, 2*n-P)
+	// var buf bytes.Buffer
+	var j int
 	for i := len(s) - 1; i >= P; i-- {
-		buf.WriteByte(s[i])
+		res[j] = s[i]
+		j++
 	}
 
-	for i := 0; i < len(s); i++ {
-		buf.WriteByte(s[i])
-	}
-	return buf.String()
+	copy(res[j:], s)
+
+	return string(res)
 }
 
 func min(a, b int) int {

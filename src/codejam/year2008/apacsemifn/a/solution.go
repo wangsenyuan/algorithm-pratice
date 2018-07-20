@@ -89,18 +89,10 @@ func solve(N int, H []int, W []int, S []string, M int, Q [][]int) []string {
 
 	for i := 0; i < N; i++ {
 		if S[i] == "BIRD" {
-			if H[i] < A {
-				A = H[i]
-			}
-			if W[i] < B {
-				B = W[i]
-			}
-			if H[i] > C {
-				C = H[i]
-			}
-			if W[i] > D {
-				D = W[i]
-			}
+			A := min(A, H[i])
+			B := min(B, W[i])
+			C := max(C, H[i])
+			D := max(D, W[i])
 		}
 	}
 

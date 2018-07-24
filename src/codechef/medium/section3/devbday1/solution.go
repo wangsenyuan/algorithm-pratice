@@ -107,22 +107,15 @@ func solve(n int, gift []int, friend []int) int64 {
 
 		for j := 0; j < len(outs[x]); j++ {
 			if in[outs[x][j]] < in[x] {
-				tmp := dfs2(outs[x][j])
-				if tmp > 0 {
-					ans += tmp
-				}
+				ans += dfs2(outs[x][j])
 			}
-
 		}
 
 		for i := friend[x]; i != x; i = friend[i] {
 			ans += int64(gift[i])
 			for j := 0; j < len(outs[i]); j++ {
 				if in[outs[i][j]] < in[x] {
-					tmp := dfs2(outs[i][j])
-					if tmp > 0 {
-						ans += tmp
-					}
+					ans += dfs2(outs[i][j])
 				}
 
 			}

@@ -84,17 +84,10 @@ func solve(n int, gift []int, friend []int) int64 {
 
 	dfs2 = func(x int) int64 {
 		vis[x] = true
-		if len(outs[x]) == 0 {
-			return max(0, int64(gift[x]))
-		}
-
 		ans := int64(gift[x])
 
 		for _, v := range outs[x] {
-			tmp := dfs2(v)
-			if tmp > 0 {
-				ans += tmp
-			}
+			ans += dfs2(v)
 		}
 		return max(0, ans)
 	}

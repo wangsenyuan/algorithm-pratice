@@ -100,6 +100,9 @@ func solve(n int, A []int64, B []int64) int {
 		if k == 0 {
 			return true
 		}
+		if k > n {
+			return false
+		}
 		que := make(Q, 0, n)
 
 		var sum int64
@@ -125,7 +128,7 @@ func solve(n int, A []int64, B []int64) int {
 		return false
 	}
 
-	left, right, ans := 0, n, 0
+	left, right, ans := 0, n+1, 0
 	for left < right {
 		mid := (left + right) >> 1
 		if !check(mid) {

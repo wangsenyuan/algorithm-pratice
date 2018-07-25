@@ -33,3 +33,11 @@ func TestSample3(t *testing.T) {
 	expect := 11
 	runSample(t, n, A, B, expect)
 }
+
+func TestSample4(t *testing.T) {
+	n := 2
+	A := []int64{1, 1}
+	B := []int64{1, 1}
+	expect := 2
+	runSample(t, n, A, B, expect)
+}

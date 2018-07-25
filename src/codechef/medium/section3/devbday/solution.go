@@ -84,64 +84,53 @@ func solve(n int, gift []int, friend []int) int64 {
 
 	dfs2 = func(x int) int64 {
 		vis[x] = true
-		if len(outs[x]) == 0 {
-			return max(0, int64(gift[x]))
-		}
-
-		var ans int64
+		ans := int64(gift[x])
 
 		for _, v := range outs[x] {
-			tmp := dfs2(v)
-			if tmp > 0 {
-				ans += tmp
-			}
+			ans += dfs2(v)
 		}
 		return max(0, ans)
 	}
+
+	in := make([]int, n)
 
 	bfs := func(x int) int64 {
 		var ans int64
 		ans += int64(gift[x])
 
 		for j := 0; j < len(outs[x]); j++ {
-			if outs[x][j] == friend[x] {
-				continue
-			}
-			tmp := dfs2(outs[x][j])
-			if tmp > 0 {
-				ans += tmp
+			if in[outs[x][j]] < in[x] {
+				ans += dfs2(outs[x][j])
 			}
 		}
 
 		for i := friend[x]; i != x; i = friend[i] {
 			ans += int64(gift[i])
 			for j := 0; j < len(outs[i]); j++ {
-				if outs[i][j] == friend[i] {
-					continue
+				if in[outs[i][j]] < in[x] {
+					ans += dfs2(outs[i][j])
 				}
-				tmp := dfs2(outs[i][j])
-				if tmp > 0 {
-					ans += tmp
-				}
+
 			}
 		}
 		return max(0, ans)
 	}
 
-	var dfs func(u int) int64
-	dfs = func(u int) int64 {
+	var dfs func(u int, time *int) int64
+	dfs = func(u int, time *int) int64 {
 		if vis[u] {
 			//a loop
 			return bfs(u)
 		}
-
+		*time++
+		in[u] = *time
 		vis[u] = true
-		return dfs(friend[u])
+		return dfs(friend[u], time)
 	}
 	var ans int64
 	for i := 0; i < n; i++ {
 		if !vis[i] {
-			ans += dfs(i)
+			ans += dfs(i, new(int))
 		}
 	}
 	return ans

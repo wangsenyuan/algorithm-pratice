@@ -96,10 +96,10 @@ func solve1(n int, C []string, L []int, R []int) int {
 		colorMap[C[i]] = true
 	}
 
-	find := func(colors map[string]bool) int {
+	find := func(a, b, c string) int {
 		arr := make(OfferSlice, 0, n)
 		for i := 0; i < n; i++ {
-			if colors[os[i].color] {
+			if a == os[i].color || b == os[i].color || c == os[i].color {
 				arr = append(arr, os[i])
 			}
 		}
@@ -135,8 +135,8 @@ func solve1(n int, C []string, L []int, R []int) int {
 		return cnt
 	}
 
-	findAndUpdateRes := func(colors map[string]bool, res *int) {
-		tmp := find(colors)
+	findAndUpdateRes := func(a, b, c string, res *int) {
+		tmp := find(a, b, c)
 		if tmp > 0 && (*res < 0 || *res > tmp) {
 			*res = tmp
 		}
@@ -146,12 +146,7 @@ func solve1(n int, C []string, L []int, R []int) int {
 	for i := 0; i < len(colorArr); i++ {
 		for j := i; j < len(colorArr); j++ {
 			for k := j; k < len(colorArr); k++ {
-				colors := make(map[string]bool)
-				colors[colorArr[i]] = true
-				colors[colorArr[j]] = true
-				colors[colorArr[k]] = true
-
-				findAndUpdateRes(colors, &best)
+				findAndUpdateRes(colorArr[i], colorArr[j], colorArr[k], &best)
 			}
 		}
 	}

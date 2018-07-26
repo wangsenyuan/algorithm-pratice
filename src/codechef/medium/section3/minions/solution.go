@@ -212,7 +212,8 @@ func solve1(n int, A []int64, B []int64) int {
 				return c[root]
 			}
 			return 0
-		} else if (t[root] + cur) <= int64(c[root]+cnt)*val {
+		}
+		if (t[root] + cur) <= int64(c[root]+cnt)*val {
 			return c[root] + query(root|1, val, cur+t[root], cnt+c[root])
 		}
 		return query(root<<1, val, cur, cnt)

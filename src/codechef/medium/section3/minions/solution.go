@@ -128,17 +128,16 @@ func solve(n int, A []int64, B []int64) int {
 		return false
 	}
 
-	left, right, ans := 0, n+1, 0
+	left, right := 1, n+1
 	for left < right {
 		mid := (left + right) >> 1
 		if !check(mid) {
 			right = mid
 		} else {
-			ans = mid
 			left = mid + 1
 		}
 	}
-	return ans
+	return left - 1
 }
 
 type Q []int64
@@ -202,21 +201,46 @@ func solve1(n int, A []int64, B []int64) int {
 			r >>= 1
 		}
 	}
+	/*
+		var query func(root int, val int64, cur int64, cnt int) int
 
-	var query func(root int, val int64, cur int64, cnt int) int
-
-	query = func(root int, val int64, cur int64, cnt int) int {
-		if root >= sz {
-			// a leaf
-			if (t[root] + cur) <= int64(c[root]+cnt)*val {
-				return c[root]
+		query = func(root int, val int64, cur int64, cnt int) int {
+			if root >= sz {
+				// a leaf
+				if (t[root] + cur) <= int64(c[root]+cnt)*val {
+					return c[root]
+				}
+				return 0
 			}
-			return 0
+			root <<= 1
+			if (t[root] + cur) <= int64(c[root]+cnt)*val {
+				return c[root] + query(root|1, val, cur+t[root], cnt+c[root])
+			}
+			return query(root, val, cur, cnt)
+		}*/
+
+	query := func(val int64) int {
+		var cur int64
+		var cnt int
+
+		root := 1
+
+		for {
+			if root >= sz {
+				if (t[root] + cur) <= int64(c[root]+cnt)*val {
+					cnt += c[root]
+				}
+				break
+			}
+			root <<= 1
+			if (t[root] + cur) <= int64(c[root]+cnt)*val {
+				cnt += c[root]
+				cur += t[root]
+				root |= 1
+			}
 		}
-		if (t[root] + cur) <= int64(c[root]+cnt)*val {
-			return c[root] + query(root|1, val, cur+t[root], cnt+c[root])
-		}
-		return query(root<<1, val, cur, cnt)
+
+		return cnt
 	}
 
 	var ans int
@@ -231,12 +255,12 @@ func solve1(n int, A []int64, B []int64) int {
 		// j has to be valid
 		update(j, ps[i].second)
 
-		if t[1] <= int64(c[1])*ps[i].first {
-			ans = max(ans, c[1])
-			continue
-		}
-
-		ans = max(ans, query(1, ps[i].first, 0, 0))
+		/*		if t[1] <= int64(c[1])*ps[i].first {
+					ans = max(ans, c[1])
+					continue
+				}
+		*/
+		ans = max(ans, query(ps[i].first))
 	}
 	return ans
 }

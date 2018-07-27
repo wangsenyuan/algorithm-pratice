@@ -72,6 +72,9 @@ func solve(n int, edges [][]int, m int, conditions [][]int) int {
 
 	for _, condition := range conditions {
 		u, v, x := condition[0]-1, condition[1]-1, condition[2]
+		if y, found := conn[u][v]; found && y != x {
+			return 0
+		}
 		conn[u][v] = x
 		conn[v][u] = x
 	}

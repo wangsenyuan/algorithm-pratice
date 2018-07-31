@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"bufio"
-	"os"
+	"fmt"
 	"math"
+	"os"
 )
 
 func readInt(bytes []byte, from int, val *int) int {
@@ -84,40 +84,46 @@ func solve(N int, M int, G []string) int {
 	}
 
 	que := make([]int, N*M)
-	dist := make([]int, N*M)
+	// dist := make([]int, N*M)
 	vis := make([]int, N*M)
-	distance := func(x, y int, flag int) int {
+	LL := N * M
+	DD := make([]int, LL*LL)
+
+	bfs := func(start int, flag int) {
 		front, end := 0, 0
-		que[end] = x
+		que[end] = start
 		end++
-		vis[x] = flag
-		dist[x] = 0
+		vis[start] = flag
+		DD[start*LL+start] = 0
+
 		for front < end {
 			u := que[front]
 			front++
-			if u == y {
-				return dist[u]
-			}
 			a, b := u/M, u%M
 			for k := 0; k < 4; k++ {
 				c, d := a+dd[k], b+dd[k+1]
 				if c >= 0 && c < N && d >= 0 && d < M && G[c][d] != '.' && vis[c*M+d] != flag {
-					dist[c*M+d] = dist[u] + 1
+					DD[start*LL+c*M+d] = DD[start*LL+u] + 1
 					vis[c*M+d] = flag
 					que[end] = c*M + d
 					end++
 				}
 			}
 		}
-		return -1
+	}
+
+	distance := func(x, y int) int {
+		return DD[x*LL+y]
 	}
 	ff := make([]int, idx*idx)
 	var flag int
 	for i := 0; i < idx; i++ {
+		flag++
+		bfs(forest[i], flag)
+
 		for j := i + 1; j < idx; j++ {
-			flag++
-			x := distance(forest[i], forest[j], flag)
-			y := x / 2
+			x := distance(forest[i], forest[j])
+			y := x >> 1
 			c := x * (x + 1) / 2
 			c -= y * (y + 1)
 			if x&1 == 0 {
@@ -164,8 +170,7 @@ func solve(N int, M int, G []string) int {
 			if G[i][j] == '#' {
 				d := -1
 				for k := 0; k < idx; k++ {
-					flag++
-					x := distance(forest[k], i*M+j, flag)
+					x := distance(forest[k], i*M+j)
 					if d < 0 || x < d {
 						d = x
 					}

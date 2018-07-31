@@ -172,19 +172,11 @@ func solve(n, m int, G [][]byte) int {
 			if pair[v][0] == u || pair[v][1] == u {
 				continue
 			}
-			if pair[v][0] < 0 {
+			if pair[v][0] < 0 || path(pair[v][0], flag) {
 				pair[v][0] = u
 				return true
 			}
-			if c[v] == 2 && pair[v][1] < 0 {
-				pair[v][1] = u
-				return true
-			}
-			if path(pair[v][0], flag) {
-				pair[v][0] = u
-				return true
-			}
-			if c[v] == 2 && path(pair[v][1], flag) {
+			if c[v] == 2 && (pair[v][1] < 0 || path(pair[v][1], flag)) {
 				pair[v][1] = u
 				return true
 			}

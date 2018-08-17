@@ -8,3 +8,9 @@ pkg/
 /**/debug.test
 /**/*.out
 /**/*.in
+src/github.com/
+src/golang.org/
+src/gopkg.in/
+src/honnef.co/
+src/k8s.io/
+src/sourcegraph.com/

@@ -12,3 +12,11 @@ func runSample(t *testing.T, L, R uint64, expect int) {
 func TestSample1(t *testing.T) {
 	runSample(t, 5, 8, 5)
 }
+
+func TestSample2(t *testing.T) {
+	runSample(t, 7, 10, 6)
+}
+
+func TestSample3(t *testing.T) {
+	runSample(t, 7, 100, 2738)
+}

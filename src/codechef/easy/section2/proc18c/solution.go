@@ -1,11 +1,23 @@
 package main
 
-func main() {
+import "fmt"
 
+func main() {
+	var tc int
+	fmt.Scanf("%d", &tc)
+
+	for tc > 0 {
+		tc--
+
+		var L, R uint64
+		fmt.Scanf("%d %d", &L, &R)
+		fmt.Println(solve(L, R))
+	}
 }
 
 const MOD = 1e9 + 7
-const MAX_SUM = 162 // 18 * 9
+const MAX_SUM = 180
+
 var cop [][]bool
 var cnt1 []uint64
 var cnt2 []uint64
@@ -32,21 +44,20 @@ func init() {
 
 	cnt = make([][]uint64, MAX_SUM+1)
 	for i := 0; i <= MAX_SUM; i++ {
-		cnt[i] = make([]uint64, 19)
+		cnt[i] = make([]uint64, 20)
 	}
 
 	for x := 0; x < 10; x++ {
-		cnt[x][0] = 1
+		cnt[x][1] = 1
 	}
 
-	for k := 1; k < 19; k++ {
+	for k := 2; k <= 19; k++ {
 		for x := 0; x <= MAX_SUM; x++ {
-			for y := 0; y < 10; y++ {
-				z := x - y
-				if z < 0 {
-					break
+			for y := 0; y < 10 && y <= x; y++ {
+				cnt[x][k] += cnt[x-y][k-1]
+				if cnt[x][k] >= MOD {
+					cnt[x][k] -= MOD
 				}
-				cnt[x][k] += cnt[z][k-1]
 			}
 		}
 	}
@@ -63,7 +74,7 @@ func gcd(a, b int) int {
 }
 
 func digits(x uint64) []int {
-	res := make([]int, 18)
+	res := make([]int, 20)
 	var i int
 	for x > 0 {
 		res[i] = int(x % 10)
@@ -79,18 +90,18 @@ func digits(x uint64) []int {
 
 func count(x int, C uint64) uint64 {
 	ds := digits(C)
-	L := len(ds)
-	if L == 1 {
-		if uint64(x) <= C {
-			return cnt[x][L-1]
-		}
-		return 0
-	}
+	sz := len(ds)
 	var ans uint64
-	for y := 0; y <= ds[0]; y++ {
-		z := x - y
-		if z >= 0 {
-			ans += cnt[z][L-2]
+	for i := 0; i < sz && x >= 0; i++ {
+		if i == sz-1 {
+			if x <= ds[i] {
+				ans++
+			}
+		} else {
+			for j := 0; j < ds[i] && j <= x; j++ {
+				ans = (ans + cnt[x-j][sz-1-i]) % MOD
+			}
+			x -= ds[i]
 		}
 	}
 	return ans
@@ -107,19 +118,9 @@ func solve(L, R uint64) int {
 	for x := 1; x <= MAX_SUM; x++ {
 		for y := x + 1; y <= MAX_SUM; y++ {
 			if cop[x][y] {
-				cx1, cy1 := cnt1[x], cnt1[y]
-				tmp1 := (cx1 * cy1) % MOD
-
-				cx2, cy2 := cnt2[x], cnt2[y]
-				tmp2 := (cx2 * cy2) % MOD
-
-				tmp3 := (cx1 * cy2) % MOD
-				tmp4 := (cx2 * cy1) % MOD
-
-				tmp := sub(tmp2, tmp1)
-				tmp = sub(tmp, tmp3)
-				tmp = sub(tmp, tmp4)
-				ans += tmp
+				a := sub(cnt2[x], cnt1[x])
+				b := sub(cnt2[y], cnt1[y])
+				ans = (ans + a*b) % MOD
 			}
 		}
 	}

@@ -22,40 +22,15 @@ func constructFromPrePost(pre []int, post []int) *TreeNode {
 	if n == 1 {
 		return root
 	}
-	a := make(map[int]bool)
-	b := make(map[int]bool)
 
-	for i := 1; i < n; i++ {
-		a[pre[i]] = true
-		b[post[i-1]] = true
-		if diffCount(a, b) == 0 {
-			root.Left = constructFromPrePost(pre[1:i+1], post[:i])
-			root.Right = constructFromPrePost(pre[i+1:], post[i:n-1])
+	for i := 0; i < n-1; i++ {
+		if post[i] == pre[1] {
+			root.Left = constructFromPrePost(pre[1:i+2], post[:i+1])
+			root.Right = constructFromPrePost(pre[i+2:], post[i+1:n-1])
 			break
 		}
 	}
 	return root
-}
-
-func diffCount(a, b map[int]bool) int {
-	if len(a) > len(b) {
-		return len(a) - len(b)
-	}
-	if len(a) < len(b) {
-		return len(b) - len(a)
-	}
-	var cnt int
-	for k := range a {
-		if !b[k] {
-			cnt++
-		}
-	}
-	for k := range b {
-		if !a[k] {
-			cnt++
-		}
-	}
-	return cnt
 }
 
 func preOrderTraversal(root *TreeNode) []int {

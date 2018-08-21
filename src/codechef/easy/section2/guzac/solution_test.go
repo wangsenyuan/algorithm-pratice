@@ -21,3 +21,9 @@ func TestSample2(t *testing.T) {
 	A := []int{3, 6}
 	runSample(t, N, K, x, A, 9)
 }
+
+func TestSample3(t *testing.T) {
+	N, K, x := 10, 3, 49
+	A := []int{1, 43, 44}
+	runSample(t, N, K, x, A, 415)
+}

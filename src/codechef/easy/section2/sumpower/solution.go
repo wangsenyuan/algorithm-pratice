@@ -62,7 +62,7 @@ func init() {
 	A = make([]int, MAX_N)
 }
 
-func solve(N, K int, S string) int {
+func solve(N, K int, S string) int64 {
 	for i := 1; i < N; i++ {
 		if S[i] != S[i-1] {
 			A[i] = 1
@@ -75,11 +75,11 @@ func solve(N, K int, S string) int {
 	for i := 1; i < L+1; i++ {
 		X += A[i]
 	}
-	ans := X
+	ans := int64(X)
 	for i, j := L+1, 1; i < N; i, j = i+1, j+1 {
 		X -= A[j]
 		X += A[i]
-		ans += X
+		ans += int64(X)
 	}
 	return ans
 }

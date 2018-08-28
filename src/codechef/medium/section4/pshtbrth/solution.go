@@ -79,7 +79,7 @@ func main() {
 				scanner.Scan()
 				S[j] = scanner.Text()
 			}
-			A[i] = encode(S)
+			A[i] = dp[encode(S)]
 			scanner.Scan()
 		}
 		queries := make([][]int, M)
@@ -99,7 +99,7 @@ func main() {
 					scanner.Scan()
 					S[j] = scanner.Text()
 				}
-				queries[i][2] = encode(S)
+				queries[i][2] = dp[encode(S)]
 			}
 		}
 		res := solve(N, M, A, queries)

@@ -111,7 +111,7 @@ func SprintTree(root *TreeNode) string {
 		return "[null]"
 	}
 	var buf bytes.Buffer
-
+	buf.WriteByte('[')
 	curLevel := make([]*TreeNode, 0)
 	curLevel = append(curLevel, root)
 	for len(curLevel) > 0 {
@@ -131,6 +131,7 @@ func SprintTree(root *TreeNode) string {
 	if buf.Len() > 0 {
 		buf.Truncate(buf.Len() - 1)
 	}
+	buf.WriteByte(']')
 
 	return buf.String()
 }

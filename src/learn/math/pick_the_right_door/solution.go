@@ -20,8 +20,8 @@ func simulate(change bool, round int) {
 	var count int
 
 	for i := 0; i < round; i++ {
-		winDoor := randomeChoose()
-		pick := randomeChoose()
+		winDoor := randomChoose()
+		pick := randomChoose()
 		res := pick
 		if change {
 			res = changeTheDoor(winDoor, pick)
@@ -37,7 +37,7 @@ func simulate(change bool, round int) {
 	fmt.Printf("O = %.3f\n", o)
 }
 
-func randomeChoose() int {
+func randomChoose() int {
 	num := rand.Intn(90)
 
 	return num % 3

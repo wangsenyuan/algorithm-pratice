@@ -26,18 +26,6 @@ func runSample(t *testing.T, L, R string, expect int) {
 	}
 }
 
-func TestMirror(t *testing.T) {
-	num := []int{1, 23, 234, 56}
-	res := []uint64{11, 2332, 234432, 5665}
-
-	for i, x := range num {
-		y := mirror(x)
-		if y != res[i] {
-			t.Errorf("mirror(%d) should be %d, but %d", x, res[i], y)
-		}
-	}
-}
-
 func TestSample1(t *testing.T) {
 	runSample(t, "4", "1000", 4)
 }

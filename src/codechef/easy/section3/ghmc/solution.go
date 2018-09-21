@@ -90,63 +90,58 @@ func solve(N, K int, x int64, D int64, P []int64) int64 {
 
 	sort.Sort(Int64Slice(P))
 
-	for i := 1; i < K; i++ {
-		if P[i] == P[i-1] {
-			// not distinct
-			return -1
+	var j int
+	var last int64
+	nums := make([]int64, N+10)
+	rem := N - K
+	for i := 0; i < K; i++ {
+		v := P[i]
+		if i == 0 || v-last > D {
+			if i != K-1 && P[i+1]-P[i] <= D {
+				nums[j] = P[i]
+				j++
+				nums[j] = P[i+1]
+				j++
+				last = P[i+1]
+				i++
+				continue
+			}
+			if rem == 0 {
+				return -1
+			}
+			rem--
+			nums[j] = P[i]
+			j++
+			if P[i]+D > x {
+				if x == P[i] {
+					nums[j] = x - 1
+				} else {
+					nums[j] = x
+				}
+				j++
+				break
+			}
+			nums[j] = P[i] + D
+			j++
+			last = P[i] + D
+		} else {
+			nums[j] = v
+			j++
+			last = v
 		}
 	}
 
-	if P[K-1] > x {
+	if j == 0 {
 		return -1
 	}
 
-	nums := make([]int64, N+10)
-	var j int
+	sort.Sort(Int64Slice(nums[:j]))
 
-	nums[j] = P[0]
-	j++
-
-	if K > 1 && P[0]+D < P[1] {
-		nums[j] = P[0] + D
-		j++
-	}
-
-	for i := 1; i < K; i++ {
-		cur := P[i]
-		if cur == nums[j-1] {
-			// already in the list
-			continue
-		}
-		if cur-nums[j-1] <= D {
-			//safe
-			if cur > nums[j-1] {
-				nums[j] = cur
-				j++
-			} else {
-				nums[j-1], nums[j] = cur, nums[j-1]
-				j++
-			}
-		} else {
-			nums[j] = cur
-			j++
-			if cur < x {
-				nums[j] = min(x, cur+D)
-				j++
-			} else {
-				nums[j-1], nums[j] = x-1, x
-				j++
-			}
-		}
-		if j > N {
-			return -1
-		}
-	}
-	if j == N {
+	if rem == 0 {
 		return sum(nums, j)
 	}
 
-	if N-j == 1 {
+	if rem == 1 {
 		return case1(nums, j, N, x, D)
 	}
 

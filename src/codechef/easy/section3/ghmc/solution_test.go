@@ -26,3 +26,39 @@ func TestSample2(t *testing.T) {
 	expect := int64(-1)
 	runSample(t, N, K, x, D, P, expect)
 }
+
+func TestSample3(t *testing.T) {
+	N, K := 3, 2
+	var x int64 = 8
+	var D int64 = 2
+	P := []int64{4, 8}
+	expect := int64(18)
+	runSample(t, N, K, x, D, P, expect)
+}
+
+func TestSample4(t *testing.T) {
+	N, K := 4, 2
+	var x int64 = 8
+	var D int64 = 2
+	P := []int64{4, 8}
+	expect := int64(25)
+	runSample(t, N, K, x, D, P, expect)
+}
+
+func TestSample5(t *testing.T) {
+	N, K := 5, 2
+	var x int64 = 8
+	var D int64 = 2
+	P := []int64{4, 8}
+	expect := int64(30)
+	runSample(t, N, K, x, D, P, expect)
+}
+
+func TestSample6(t *testing.T) {
+	N, K := 6, 2
+	var x int64 = 8
+	var D int64 = 2
+	P := []int64{4, 8}
+	expect := int64(33)
+	runSample(t, N, K, x, D, P, expect)
+}

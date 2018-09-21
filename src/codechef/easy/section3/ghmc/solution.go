@@ -100,34 +100,119 @@ func solve(N, K int, x int64, D int64, P []int64) int64 {
 	if P[K-1] > x {
 		return -1
 	}
-	var prev int64 = -D
-	A := make([]int64, 0, K)
-	for j := 0; j < K; j++ {
-		A = append(A, P[j])
-		if P[j]-prev > D {
-			//can't reach previous one
-			if j+1 == K || P[j]+D < P[j+1] {
-				//can not reach next
-				prev = min(P[j]+D, x)
-				A = append(A, prev)
+
+	nums := make([]int64, N+10)
+	var j int
+
+	nums[j] = P[0]
+	j++
+
+	if K > 1 && P[0]+D < P[1] {
+		nums[j] = P[0] + D
+		j++
+	}
+
+	for i := 1; i < K; i++ {
+		cur := P[i]
+		if cur == nums[j-1] {
+			// already in the list
+			continue
+		}
+		if cur-nums[j-1] <= D {
+			//safe
+			if cur > nums[j-1] {
+				nums[j] = cur
+				j++
 			} else {
-				prev = P[j]
+				nums[j-1], nums[j] = cur, nums[j-1]
+				j++
 			}
 		} else {
-			prev = P[j]
+			nums[j] = cur
+			j++
+			if cur < x {
+				nums[j] = min(x, cur+D)
+				j++
+			} else {
+				nums[j-1], nums[j] = x-1, x
+				j++
+			}
+		}
+		if j > N {
+			return -1
 		}
 	}
-	if len(A) > N {
-		return -1
+	if j == N {
+		return sum(nums, j)
 	}
-	// then add left (N - K) numbers bewteen [1, x]
-	//very least number
-	num := x - int64(N) + 1
-	sum := (num + x) * int64(N) / 2
-	for i := 0; i < len(A) && num > A[i]; i, num = i+1, num+1 {
-		sum -= num - A[i]
+
+	if N-j == 1 {
+		return case1(nums, j, N, x, D)
 	}
-	return sum
+
+	return case2(nums, j, N, x, D)
+}
+
+func case1(nums []int64, j int, N int, x int64, D int64) int64 {
+	y := min(x, nums[j-1]+D)
+	i := j - 1
+	for i >= 0 {
+		if nums[i] != y {
+			break
+		}
+		i--
+		y--
+	}
+	return sum(nums, j) + y
+}
+
+func case2(nums []int64, j int, N int, x int64, D int64) int64 {
+	if nums[j-1] < x {
+		nums[j] = x
+		j++
+	}
+	cnt := N - j
+	res := sum(nums, j)
+
+	for cnt > 0 && j > 1 {
+		a, b := nums[j-1], nums[j-2]
+		c := int(a - b - 1)
+
+		res += sumBetween(b+1, a-1)
+
+		if c > cnt {
+			res -= sumBetween(b+1, b+int64(c-cnt))
+		}
+
+		cnt -= c
+		j--
+	}
+	if j == 1 && cnt > 0 {
+		y := nums[0] - 1
+		if cnt > int(y) {
+			return -1
+		}
+		// a number between [y - cnt + 1, ... y - cnt + cnt]
+		res += sumBetween(y-int64(cnt)+1, y)
+	}
+
+	return res
+}
+
+func sumBetween(a, b int64) int64 {
+	if a > b {
+		return 0
+	}
+	x := b - a + 1
+	return (a + b) * x / 2
+}
+
+func sum(nums []int64, n int) int64 {
+	var res int64
+	for i := 0; i < n; i++ {
+		res += nums[i]
+	}
+	return res
 }
 
 func min(a, b int64) int64 {

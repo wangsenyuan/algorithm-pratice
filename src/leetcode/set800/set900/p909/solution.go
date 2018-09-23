@@ -29,7 +29,8 @@ func snakesAndLadders(board [][]int) int {
 		return x, y
 	}
 
-	que := make([]int, n*n*2)
+	que := make([]int, n*n+1)
+	vis := make([]bool, n*n+1)
 	dist := make([]int, n*n+1)
 	for i := 0; i <= n*n; i++ {
 		dist[i] = math.MaxInt32
@@ -41,11 +42,15 @@ func snakesAndLadders(board [][]int) int {
 	for front < tail {
 		cur := que[front]
 		front++
+		if vis[cur] {
+			continue
+		}
+		vis[cur] = true
 
 		for k := 1; k <= 6 && cur+k <= n*n; k++ {
 			next := cur + k
 			u, v := getXY(next)
-			if bd[u][v] == -1 && dist[next] > dist[cur]+1 {
+			if vis[next] == false && bd[u][v] == -1 && dist[next] > dist[cur]+1 {
 				// just add it
 				dist[next] = dist[cur] + 1
 				que[tail] = next
@@ -53,7 +58,7 @@ func snakesAndLadders(board [][]int) int {
 			} else if bd[u][v] >= 0 {
 				// go to the cell
 				dest := bd[u][v]
-				if dist[dest] > dist[cur]+1 {
+				if vis[dest] == false && dist[dest] > dist[cur]+1 {
 					dist[dest] = dist[cur] + 1
 					que[tail] = dest
 					tail++

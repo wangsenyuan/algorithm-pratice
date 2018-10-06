@@ -2,7 +2,36 @@ package p914
 
 import "sort"
 
+const MAX_NUM = 10000
+
 func hasGroupsSizeX(deck []int) bool {
+	cnt := make([]int, MAX_NUM)
+	for i := 0; i < len(deck); i++ {
+		cnt[deck[i]]++
+	}
+
+	var x int
+	for i := 0; i < MAX_NUM; i++ {
+		if cnt[i] == 0 {
+			continue
+		}
+		if x == 0 {
+			x = cnt[i]
+		} else {
+			x = gcd(x, cnt[i])
+		}
+	}
+	return x > 1
+}
+
+func gcd(a, b int) int {
+	for b > 0 {
+		a, b = b, a%b
+	}
+	return a
+}
+
+func hasGroupsSizeX1(deck []int) bool {
 	if len(deck) == 0 {
 		return false
 	}
@@ -32,11 +61,4 @@ func hasGroupsSizeX(deck []int) bool {
 		j = i
 	}
 	return true
-}
-
-func gcd(a, b int) int {
-	for b > 0 {
-		a, b = b, a%b
-	}
-	return a
 }

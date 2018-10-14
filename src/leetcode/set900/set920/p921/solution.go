@@ -24,6 +24,10 @@ func minAddToMakeValid(S string) int {
 				break
 			}
 		}
+		// skip the balance pairs
+		if dp[i] > i {
+			i = dp[i]
+		}
 	}
 
 	var ans int

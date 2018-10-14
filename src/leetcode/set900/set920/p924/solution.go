@@ -17,29 +17,23 @@ func minMalwareSpread(graph [][]int, initial []int) int {
 	}
 	sort.Ints(initial)
 
-	bags := make([]map[int]bool, n)
-	for i := 0; i < n; i++ {
-		bags[i] = make(map[int]bool)
-	}
+	bags := make([]int, n)
+
 	for i := 0; i < len(initial); i++ {
 		x := initial[i]
 		px := uf.Find(x)
-		bags[px][x] = true
+		bags[px]++
 	}
 	cand := initial[0]
 	save := -1
-	for i := 0; i < n; i++ {
-		p := uf.Find(i)
-		if len(bags[p]) == 1 {
-			var x int
-			for k, _ := range bags[p] {
-				x = k
-			}
-			// can save the nodes
-			sz := uf.Size(p)
-			if sz > save {
+
+	for i := 0; i < len(initial); i++ {
+		x := initial[i]
+		p := uf.Find(x)
+		if bags[p] == 1 {
+			if uf.Size(p) > save {
+				save = uf.Size(p)
 				cand = x
-				save = sz
 			}
 		}
 	}

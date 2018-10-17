@@ -1,6 +1,26 @@
 package p921
 
 func minAddToMakeValid(S string) int {
+	var ans int
+	var cnt int
+
+	n := len(S)
+	for i := 0; i < n; i++ {
+		if S[i] == '(' {
+			cnt++
+		} else if S[i] == ')' {
+			cnt--
+		}
+		if cnt < 0 {
+			ans++
+			cnt = 0
+		}
+	}
+
+	return ans + cnt
+}
+
+func minAddToMakeValid1(S string) int {
 	n := len(S)
 	dp := make([]int, n)
 	for i := 0; i < n; i++ {

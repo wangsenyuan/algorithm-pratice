@@ -21,5 +21,9 @@ func TestSample2(t *testing.T) {
 }
 
 func TestSample3(t *testing.T) {
-	runSample(t, []int{0, 0, 0, 0, 0}, []int{0, 4})
+	runSample(t, []int{0, 0, 0, 0, 0}, []int{0, 2})
+}
+
+func TestSample4(t *testing.T) {
+	runSample(t, []int{1, 0, 1, 1, 0}, []int{-1, -1})
 }

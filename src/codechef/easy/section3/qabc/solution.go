@@ -95,60 +95,17 @@ var A [MAX_N]int
 var B [MAX_N]int
 
 func solve(n int, A []int, B []int) bool {
-	var sa, sb int64
-
 	for i := 0; i < n; i++ {
-		if A[i] > B[i] {
-			return false
-		}
-		sa += int64(A[i])
-		sb += int64(B[i])
-	}
-	diff := sb - sa
-	if diff == 0 {
-		return true
-	}
-	// every time, it will add 6 to the operation
-
-	if n < 3 || diff%6 != 0 {
-		return false
-	}
-
-	m := diff / 6
-
-	if n == 3 {
-		x := int(m)
-		return A[0]+x == B[0] && A[1]+2*x == B[1] && A[2]+3*x == B[2]
-	}
-
-	// a is the count of change starting at i
-	a := B[0] - A[0]
-	m -= int64(a)
-	// b is the count of change starting at i+1
-	b := B[1] - A[1] - 2*a
-
-	if b < 0 {
-		return false
-	}
-	m -= int64(b)
-
-	for i := 2; i < n-2; i++ {
-		c := B[i] - A[i] - 3*a - 2*b
+		c := B[i] - A[i]
 		if c < 0 {
 			return false
 		}
-		m -= int64(c)
-		a, b = b, c
+		if i < n-2 {
+			B[i+1] -= c * 2
+			B[i+2] -= c * 3
+		} else if c > 0 {
+			return false
+		}
 	}
-
-	// b is the count of change at i - 3
-	if A[n-2]+2*b != B[n-2] {
-		return false
-	}
-
-	if A[n-1]+3*b != B[n-1] {
-		return false
-	}
-
-	return m == 0
+	return true
 }

@@ -31,6 +31,6 @@ func TestSample1(t *testing.T) {
 
 func TestSample2(t *testing.T) {
 	stamp := "abca"
-	target := "aabcaca"
+	target := "ababc"
 	runSample(t, stamp, target, true)
 }

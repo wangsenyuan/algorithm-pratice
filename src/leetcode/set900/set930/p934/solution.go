@@ -1,12 +1,10 @@
 package p934
 
-import "math"
-
 func shortestBridge(A [][]int) int {
 	n := len(A)
 	m := len(A[0])
 
-	dd := []int{-1, 0, 1, 0, -1}
+	dd := [...]int{-1, 0, 1, 0, -1}
 
 	dist := make([][]int, n)
 	for i := 0; i < n; i++ {
@@ -17,7 +15,6 @@ func shortestBridge(A [][]int) int {
 	}
 
 	bfs := func(x, y int) int {
-		best := math.MaxInt32
 		dist[x][y] = 0
 		que := make([]int, 2*n*m)
 		front, end := n*m, n*m
@@ -46,14 +43,12 @@ func shortestBridge(A [][]int) int {
 						}
 					} else if A[c][d] == 1 && dist[c][d] == -1 {
 						// another island, no need to put it in the que
-						if best > dist[a][b] {
-							best = dist[a][b]
-						}
+						return dist[a][b]
 					}
 				}
 			}
 		}
-		return best
+		return -1
 	}
 
 	for i := 0; i < n; i++ {

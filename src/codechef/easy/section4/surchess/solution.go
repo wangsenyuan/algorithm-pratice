@@ -94,13 +94,22 @@ func main() {
 func solve(n, m int, A []string, Q int, quries []int) []int {
 	// dp[i][j][0][L] means flips to have width-L, starting at top-left (i, j), color white
 	L := min(n, m)
+
+	xp := make([][][][]int, n)
+	yp := make([][][][]int, n)
 	dp := make([][][][]int, n)
 	for i := 0; i < n; i++ {
 		dp[i] = make([][][]int, m)
+		xp[i] = make([][][]int, m)
+		yp[i] = make([][][]int, m)
 		for j := 0; j < m; j++ {
 			dp[i][j] = make([][]int, 2)
+			xp[i][j] = make([][]int, 2)
+			yp[i][j] = make([][]int, 2)
 			for k := 0; k < 2; k++ {
 				dp[i][j][k] = make([]int, L+1)
+				xp[i][j][k] = make([]int, L+1)
+				yp[i][j][k] = make([]int, L+1)
 			}
 		}
 	}
@@ -110,9 +119,48 @@ func solve(n, m int, A []string, Q int, quries []int) []int {
 			if A[i][j] == '1' {
 				dp[i][j][0][1] = 1
 				dp[i][j][1][1] = 0
+				xp[i][j][0][1] = 1
+				xp[i][j][1][1] = 0
+				yp[i][j][0][1] = 1
+				yp[i][j][1][1] = 0
 			} else {
 				dp[i][j][1][1] = 1
 				dp[i][j][0][1] = 0
+				xp[i][j][1][1] = 1
+				xp[i][j][0][1] = 0
+				yp[i][j][1][1] = 1
+				yp[i][j][0][1] = 0
+			}
+		}
+	}
+
+	for l := 2; l <= L; l++ {
+		for i := 0; i < n; i++ {
+			for j := 0; j < m; j++ {
+				for color := 0; color < 2; color++ {
+					xp[i][j][color][l] = xp[i][j][color][l-1]
+					yp[i][j][color][l] = yp[i][j][color][l-1]
+
+					if l%2 == 0 {
+						// different color
+						if j+l <= m && int(A[i][j+l-1]-'0') != 1-color {
+							// flip
+							xp[i][j][color][l]++
+						}
+						if i+l <= n && int(A[i+l-1][j]-'0') != 1-color {
+							yp[i][j][color][l]++
+						}
+					} else {
+						// same
+						if j+l <= m && int(A[i][j+l-1]-'0') != color {
+							// flip
+							xp[i][j][color][l]++
+						}
+						if i+l <= n && int(A[i+l-1][j]-'0') != color {
+							yp[i][j][color][l]++
+						}
+					}
+				}
 			}
 		}
 	}
@@ -126,39 +174,18 @@ func solve(n, m int, A []string, Q int, quries []int) []int {
 
 	for l := 2; l <= L; l++ {
 		for i := 0; i+l <= n; i++ {
-			r := i + l - 1
 			for j := 0; j+l <= m; j++ {
-				c := j + l - 1
 				for color := 0; color < 2; color++ {
-					var flips int
-
-					newColor := color
+					dp[i][j][color][l] = dp[i][j][color][l-1]
+					k := color
 					if l%2 == 0 {
-						newColor = 1 - color
+						k = 1 - color
 					}
-
-					k := newColor
-
-					for x := j; x < c; x++ {
-						if int(A[r][x]-'0') != k {
-							flips++
-						}
-						k = 1 - k
+					dp[i][j][color][l] += xp[i+l-1][j][k][l-1]
+					dp[i][j][color][l] += yp[i][j+l-1][k][l-1]
+					if int(A[i+l-1][j+l-1]-'0') != color {
+						dp[i][j][color][l]++
 					}
-
-					k = newColor
-
-					for x := i; x < r; x++ {
-						if int(A[x][c]-'0') != k {
-							flips++
-						}
-						k = 1 - k
-					}
-
-					if int(A[r][c]-'0') != color {
-						flips++
-					}
-					dp[i][j][color][l] = flips + dp[i][j][color][l-1]
 					if fp[l] > dp[i][j][color][l] {
 						fp[l] = dp[i][j][color][l]
 					}

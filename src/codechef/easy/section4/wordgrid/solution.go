@@ -96,6 +96,130 @@ func main() {
 const fail = "gridsnotpossible"
 
 func solve(n int, words []string) string {
+	ws := removeDuplicates(words)
+
+	if len(ws) > 8 {
+		return fail
+	}
+
+	res := make([]string, 0, 16)
+	mem := make([]byte, 16)
+
+	fillEmpty := func(rowMask, colMask int) {
+		for i := 0; i < 4; i++ {
+			if rowMask&(1<<uint(i)) == 0 {
+				//this row is not filled
+				for j := 0; j < 4; j++ {
+					if colMask&(1<<uint(j)) == 0 {
+						// this col is not filled
+						mem[i*4+j] = 'A'
+					}
+				}
+			}
+		}
+	}
+
+	canPutInRow := func(word string, row int, colMask int) bool {
+		for j := 0; j < 4; j++ {
+			if colMask&(1<<uint(j)) > 0 {
+				// this col has word
+				k := row*4 + j
+				if mem[k] != word[j] {
+					//confict
+					return false
+				}
+			}
+		}
+		return true
+	}
+
+	putInRow := func(word string, row int) {
+		for j := 0; j < 4; j++ {
+			k := row*4 + j
+			mem[k] = word[j]
+		}
+	}
+
+	canPutInCol := func(word string, col int, rowMask int) bool {
+		for i := 0; i < 4; i++ {
+			if rowMask&(1<<uint(i)) > 0 {
+				k := i*4 + col
+				if mem[k] != word[i] {
+					return false
+				}
+			}
+		}
+		return true
+	}
+
+	putInCol := func(word string, col int) {
+		for i := 0; i < 4; i++ {
+			k := i*4 + col
+			mem[k] = word[i]
+		}
+	}
+	//
+	var loop func(rowMask, colMask int, idx int)
+
+	loop = func(rowMask, colMask int, idx int) {
+		if idx == len(ws) {
+			fillEmpty(rowMask, colMask)
+			res = append(res, string(mem))
+			return
+		}
+
+		if rowMask != 15 {
+			//has empty row to try word[idx]
+			for i := 0; i < 4; i++ {
+				if rowMask&(1<<uint(i)) == 0 {
+					word := ws[idx]
+					if canPutInRow(word, i, colMask) {
+						putInRow(word, i)
+						loop(rowMask|(1<<uint(i)), colMask, idx+1)
+					}
+					rw := reverse(word)
+					if canPutInRow(rw, i, colMask) {
+						putInRow(rw, i)
+						loop(rowMask|(1<<uint(i)), colMask, idx+1)
+					}
+				}
+			}
+		}
+
+		if colMask != 15 {
+			//has empty col to try word[idx]
+			for j := 0; j < 4; j++ {
+				if colMask&(1<<uint(j)) == 0 {
+					word := ws[idx]
+
+					if canPutInCol(word, j, rowMask) {
+						putInCol(word, j)
+						loop(rowMask, colMask|(1<<uint(j)), idx+1)
+					}
+
+					rw := reverse(word)
+
+					if canPutInCol(rw, j, rowMask) {
+						putInCol(rw, j)
+						loop(rowMask, colMask|(1<<uint(j)), idx+1)
+					}
+				}
+			}
+		}
+	}
+
+	loop(0, 0, 0)
+
+	if len(res) == 0 {
+		return fail
+	}
+
+	sort.Strings(res)
+
+	return res[0]
+}
+
+func removeDuplicates(words []string) []string {
 	ss := make(map[string]bool)
 
 	for _, word := range words {
@@ -110,127 +234,12 @@ func solve(n int, words []string) string {
 		ss[s] = true
 	}
 
-	if len(ss) > 8 {
-		// at most 8 words can appear in the grid
-		return fail
+	ws := make([]string, 0, len(ss))
+	for w := range ss {
+		ws = append(ws, w)
 	}
 
-	ws := make([]string, len(ss)+4)
-	var p int
-	for s := range ss {
-		ws[p] = s
-		p++
-	}
-
-	if p <= 4 {
-		j := 4 - p
-		for i := 0; i < j; i++ {
-			ws[p] = "AAAA"
-			p++
-		}
-	}
-	ws = ws[:p]
-
-	// then pick 4 rows, and check left can fit in the cols
-	res := make([]string, 0, 10)
-	var loop func(mask int, cnt int, putInMem func(string, int), find func(string, string) bool)
-
-	check := func(mask int, str string, find func(string, string) bool) bool {
-		for i := 0; i < p; i++ {
-			if mask&(1<<uint(i)) == 0 {
-				// not used
-				if !find(ws[i], str) {
-					return false
-				}
-			}
-		}
-		return true
-	}
-
-	mem := make([]byte, 16)
-
-	loop = func(mask int, cnt int, putInMem func(string, int), find func(string, string) bool) {
-		if cnt == 16 {
-			str := string(mem)
-			if check(mask, str, find) {
-				res = append(res, str)
-			}
-			return
-		}
-
-		for i := 0; i < p; i++ {
-			if mask&(1<<uint(i)) == 0 {
-				putInMem(ws[i], cnt/4)
-				loop(mask|(1<<uint(i)), cnt+4, putInMem, find)
-				putInMem(reverse(ws[i]), cnt/4)
-				loop(mask|(1<<uint(i)), cnt+4, putInMem, find)
-			}
-		}
-	}
-
-	findInCol := func(word, str string) bool {
-		for j := 0; j < 4; j++ {
-			can := true
-			for i := 0; i < 4 && can; i++ {
-				can = word[i] == str[i*4+j]
-			}
-			if can {
-				return true
-			}
-			can = true
-			for i := 0; i < 4 && can; i++ {
-				can = word[3-i] == str[i*4+j]
-			}
-			if can {
-				return true
-			}
-		}
-		return false
-	}
-
-	findInRow := func(word, str string) bool {
-		for i := 0; i < 4; i++ {
-			can := true
-			for j := 0; j < 4 && can; j++ {
-				can = word[j] == str[i*4+j]
-			}
-			if can {
-				return true
-			}
-			can = true
-			for j := 0; j < 4 && can; j++ {
-				can = word[3-j] == str[i*4+j]
-			}
-			if can {
-				return true
-			}
-		}
-		return false
-	}
-
-	putInRow := func(word string, row int) {
-		for j := 0; j < 4; j++ {
-			mem[row*4+j] = word[j]
-		}
-	}
-
-	putInCol := func(word string, col int) {
-		for i := 0; i < 4; i++ {
-			mem[i*4+col] = word[i]
-		}
-	}
-
-	loop(0, 0, putInRow, findInCol)
-
-	loop(0, 0, putInCol, findInRow)
-
-	if len(res) == 0 {
-		return fail
-	}
-
-	sort.Strings(res)
-
-	return res[0]
+	return ws
 }
 
 func reverse(word string) string {

@@ -1,10 +1,4 @@
-package main
-
-import "fmt"
-
-func main() {
-	fmt.Println(longestPalindrome("abb"))
-}
+package manachers
 
 func longestPalindrome(s string) string {
 	if len(s) == 0 {

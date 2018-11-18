@@ -21,6 +21,8 @@ func shortestSuperstring(A []string) string {
 			return dp[unset][i]
 		}
 
+		mask |= 1 << uint(i)
+
 		if mask == total {
 			return A[i]
 		}
@@ -29,7 +31,7 @@ func shortestSuperstring(A []string) string {
 
 		for j := 0; j < n; j++ {
 			if mask&(1<<uint(j)) == 0 {
-				tmp := dfs(mask|(1<<uint(j)), j)
+				tmp := dfs(mask, j)
 				k := mp[i][j]
 				tmp = A[i] + tmp[k:]
 				if len(best) == 0 || len(tmp) < len(best) {

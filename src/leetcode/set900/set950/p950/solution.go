@@ -1,6 +1,29 @@
 package p950
 
+import "sort"
+
 func deckRevealedIncreasing(deck []int) []int {
+	n := len(deck)
+	index := make([]int, n)
+	for i := 0; i < n; i++ {
+		index[i] = i
+	}
+	sort.Ints(deck)
+	res := make([]int, n)
+	front, end := 0, n-1
+	for _, card := range deck {
+		res[index[front]] = card
+		front = (front + 1) % n
+		if front != end {
+			end = (end + 1) % n
+			index[end] = index[front]
+			front = (front + 1) % n
+		}
+	}
+	return res
+}
+
+func deckRevealedIncreasing1(deck []int) []int {
 	var loop func(nums []int) []int
 
 	loop = func(nums []int) []int {

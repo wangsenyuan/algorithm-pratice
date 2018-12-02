@@ -138,15 +138,3 @@ func (uf *UF) Union(a, b int) bool {
 	}
 	return true
 }
-
-func (uf *UF) Keys() []int {
-	res := make([]int, len(uf.set))
-	var j int
-	for i := 0; i < len(uf.set); i++ {
-		if uf.set[i] == i {
-			res[j] = i
-			j++
-		}
-	}
-	return res[:j]
-}

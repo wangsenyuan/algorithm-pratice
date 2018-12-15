@@ -1,4 +1,4 @@
-package main
+package p069
 
 func mySqrt(x int) int {
 	if x == 0 {

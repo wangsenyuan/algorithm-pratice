@@ -17,3 +17,7 @@ func TestSample1(t *testing.T) {
 func TestSample2(t *testing.T) {
 	runSample(t, []int{9, 8, 1, 0, 1, 9, 4, 0, 4, 1}, 7)
 }
+
+func TestSample3(t *testing.T) {
+	runSample(t, []int{10, 10, 10, 7, 1, 6, 2, 1, 7}, 5)
+}

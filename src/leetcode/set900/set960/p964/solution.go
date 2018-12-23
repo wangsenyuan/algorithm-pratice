@@ -1,6 +1,28 @@
 package p964
 
-func leastOpsExpressTarget(x int, target int) int {
+func leastOpsExpressTarget(x int, y int) int {
+	var pos int
+	var neg int
+	var k int
+
+	for y > 0 {
+		cur := y % x
+		y /= x
+		if k > 0 {
+			pos2 := min(cur*k+pos, (cur+1)*k+neg)
+			neg2 := min((x-cur)*k+pos, (x-cur-1)*k+neg)
+			pos, neg = pos2, neg2
+		} else {
+			pos = cur * 2
+			neg = (x - cur) * 2
+		}
+		k++
+	}
+
+	return min(pos, k+neg) - 1
+}
+
+func leastOpsExpressTarget1(x int, target int) int {
 	mem := make(map[int64]int)
 	X := int64(x)
 	var loop func(target int64) int

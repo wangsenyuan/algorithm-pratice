@@ -1,6 +1,61 @@
 package p962
 
+import "sort"
+
 func maxWidthRamp(A []int) int {
+	n := len(A)
+	B := make([]Pair, n)
+	for i := 0; i < n; i++ {
+		B[i] = Pair{A[i], i}
+	}
+	sort.Sort(Pairs(B))
+
+	m := n
+	var ans int
+
+	for _, p := range B {
+		i := p.second
+		ans = max(ans, i-m)
+		m = min(m, i)
+	}
+
+	return ans
+}
+
+type Pair struct {
+	first  int
+	second int
+}
+
+type Pairs []Pair
+
+func (this Pairs) Len() int {
+	return len(this)
+}
+
+func (this Pairs) Less(i, j int) bool {
+	return this[i].first < this[j].first || (this[i].first == this[j].first && this[i].second < this[j].second)
+}
+
+func (this Pairs) Swap(i, j int) {
+	this[i], this[j] = this[j], this[i]
+}
+
+func min(a, b int) int {
+	if a <= b {
+		return a
+	}
+	return b
+}
+
+func max(a, b int) int {
+	if a >= b {
+		return a
+	}
+	return b
+}
+
+func maxWidthRamp1(A []int) int {
 	n := len(A)
 
 	if n <= 1 {
@@ -34,11 +89,4 @@ func maxWidthRamp(A []int) int {
 	}
 
 	return ans
-}
-
-func max(a, b int) int {
-	if a >= b {
-		return a
-	}
-	return b
 }

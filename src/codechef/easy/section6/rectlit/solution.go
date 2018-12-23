@@ -109,85 +109,84 @@ func solve(k int, n int, coords [][]int) bool {
 	if k == 0 {
 		return false
 	}
-
-	if k == 1 {
-		return corner(coords[0], n)
+	all := 1
+	for i := 0; i < k; i++ {
+		all *= 4
 	}
-	if k == 2 {
-		if corner(coords[0], n) || corner(coords[1], n) {
-			return true
+
+	rect := make([][]int, k)
+
+	N := int64(n)
+
+	for mask := 0; mask < all; mask++ {
+		x := mask
+		for i := 0; i < k; i++ {
+			xx := x % 4
+			var p1 int
+			if xx/2 == 1 {
+				p1 = n - 1
+			}
+			var p2 int
+			if xx%2 == 1 {
+				p2 = n - 1
+			}
+			rect[i] = []int{min(p1, coords[i][0]), min(p2, coords[i][1]), max(p1, coords[i][0]), max(p2, coords[i][1])}
+
+			x /= 4
 		}
 
-		return pair(coords, n)
-	}
+		var area int64
 
-	// k == 3
-	if corner(coords[0], n) || corner(coords[1], n) || corner(coords[2], n) {
-		return true
-	}
+		for mask2 := 1; mask2 < (1 << uint(k)); mask2++ {
+			minx, miny := 0, 0
+			maxx, maxy := n-1, n-1
+			for j := 0; j < k; j++ {
+				if mask2&(1<<uint(j)) > 0 {
+					minx = max(minx, rect[j][0])
+					miny = max(miny, rect[j][1])
+					maxx = min(maxx, rect[j][2])
+					maxy = min(maxy, rect[j][3])
+				}
+			}
+			tmp := int64(maxx-minx+1) * int64(maxy-miny+1)
 
-	for i := 0; i < 2; i++ {
-		for j := i + 1; j < 3; j++ {
-			a := coords[i]
-			b := coords[j]
-			if pair([][]int{a, b}, n) {
-				return true
+			if tmp < 0 {
+				tmp = 0
+			}
+
+			if bitCount(mask2)%2 == 0 {
+				area -= tmp
+			} else {
+				area += tmp
 			}
 		}
-	}
-	return false
-}
-
-func corner(point []int, n int) bool {
-	x, y := point[0], point[1]
-	if x == 0 && y == 0 {
-		return true
-	}
-
-	if x == 0 && y == n-1 {
-		return true
-	}
-
-	if x == n-1 && y == 0 {
-		return true
-	}
-
-	return x == n-1 && y == n-1
-}
-
-func pair(coords [][]int, n int) bool {
-	point0, point1 := coords[0], coords[1]
-	a, b := point0[0], point0[1]
-	c, d := point1[0], point1[1]
-	if a == 0 && (c == n-1 || c == 0) {
-		return true
-	}
-
-	if a == n-1 && (c == 0 || c == n-1) {
-		return true
-	}
-
-	if b == 0 && (d == n-1 || d == 0) {
-		return true
-	}
-
-	if b == n-1 && (d == 0 || d == n-1) {
-		return true
+		if area == N*N {
+			return true
+		}
 	}
 
 	return false
 }
 
-type Points [][]int
-
-func (this Points) Len() int {
-	return len(this)
+func bitCount(num int) int {
+	var res int
+	for num > 0 {
+		res += num & 1
+		num >>= 1
+	}
+	return res
 }
 
-func (this Points) Less(i, j int) bool {
-	return this[i][0] < this[j][0]
+func min(a, b int) int {
+	if a <= b {
+		return a
+	}
+	return b
 }
 
-func (this Points) Swap(i, j int) {
-	this[i], this[j] = this[j], this[i]
+func max(a, b int) int {
+	if a >= b {
+		return a
+	}
+	return b
 }

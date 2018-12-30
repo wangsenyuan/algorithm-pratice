@@ -30,7 +30,7 @@ func minCameraCover(root *TreeNode) int {
 
 		a := min(L[1], L[2])
 		b := min(R[1], R[2])
-		d0 := a + b
+		d0 := L[1] + R[1]
 		d1 := min(R[2]+a, L[2]+b)
 		d2 := 1 + min(L[0], a) + min(R[0], b)
 		return []int{d0, d1, d2}

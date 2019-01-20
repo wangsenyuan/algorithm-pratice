@@ -1,27 +1,49 @@
 package p236
 
-import "math"
+const H = 10
 
 func lowestCommonAncestor(root, p, q *TreeNode) *TreeNode {
-	nodes := make(map[int]*TreeNode)
+	indexes := make(map[int]int)
+	nodes := make([]*TreeNode, 0, 10)
 
-	open := make(map[int]int)
-	close := make(map[int]int)
-	PP := make(map[int][]int)
-	D := make(map[int]int)
+	var visit func(node *TreeNode)
+
+	visit = func(node *TreeNode) {
+		nodes = append(nodes, node)
+		i := len(nodes) - 1
+		indexes[node.Val] = i
+		if node.Left != nil {
+			visit(node.Left)
+		}
+		if node.Right != nil {
+			visit(node.Right)
+		}
+	}
+	visit(root)
+
+	n := len(nodes)
+
+	open := make([]int, n)
+	close := make([]int, n)
+	PP := make([][]int, n)
+
+	for i := 0; i < n; i++ {
+		PP[i] = make([]int, H)
+	}
+
+	D := make([]int, n)
 	var dfs func(parent, node *TreeNode, time *int, depth int)
 	dfs = func(parent, node *TreeNode, time *int, depth int) {
 		*time++
-		nodes[node.Val] = node
-		open[node.Val] = *time
-		PP[node.Val] = make([]int, 20)
+		i := indexes[node.Val]
+		open[i] = *time
 		if parent != nil {
-			PP[node.Val][0] = parent.Val
+			PP[i][0] = indexes[parent.Val]
 		} else {
-			PP[node.Val][0] = math.MinInt32
+			PP[i][0] = -1
 		}
 
-		D[node.Val] = depth
+		D[i] = depth
 
 		if node.Left != nil {
 			dfs(node, node.Left, time, depth+1)
@@ -29,18 +51,18 @@ func lowestCommonAncestor(root, p, q *TreeNode) *TreeNode {
 		if node.Right != nil {
 			dfs(node, node.Right, time, depth+1)
 		}
-		close[node.Val] = *time
+		close[i] = *time
 	}
 
 	dfs(nil, root, new(int), 0)
 
-	for i := 1; i < 20; i++ {
-		for k, _ := range nodes {
+	for i := 1; i < H; i++ {
+		for k := 0; k < n; k++ {
 			p := PP[k][i-1]
-			if p > math.MinInt32 {
+			if p >= 0 {
 				PP[k][i] = PP[p][i-1]
 			} else {
-				PP[k][i] = math.MinInt32
+				PP[k][i] = 0
 			}
 		}
 	}
@@ -49,16 +71,8 @@ func lowestCommonAncestor(root, p, q *TreeNode) *TreeNode {
 		return open[u] <= open[v] && close[v] <= close[u]
 	}
 
-	a := p.Val
-	b := q.Val
-
-	if isAncester(a, b) {
-		return nodes[a]
-	}
-
-	if isAncester(b, a) {
-		return nodes[b]
-	}
+	a := indexes[p.Val]
+	b := indexes[q.Val]
 
 	if D[a] < D[b] {
 		a, b = b, a
@@ -66,9 +80,9 @@ func lowestCommonAncestor(root, p, q *TreeNode) *TreeNode {
 
 	//D[a] >= D[b]
 
-	for i := 19; i >= 0; i-- {
+	for i := H - 1; i >= 0; i-- {
 		p := PP[a][i]
-		if p > math.MinInt32 && !isAncester(p, b) {
+		if p >= 0 && !isAncester(p, b) {
 			a = p
 		}
 	}

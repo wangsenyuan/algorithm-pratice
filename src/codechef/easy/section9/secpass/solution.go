@@ -99,7 +99,7 @@ func solve(n int, s string) string {
 
 	for offset < n {
 		var shrink bool
-		for i, _ := range xs {
+		for _, i := range xs {
 			if i+offset == n || cs[i+offset] != cs[offset] {
 				shrink = true
 				break

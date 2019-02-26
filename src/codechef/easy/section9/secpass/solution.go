@@ -88,10 +88,10 @@ func main() {
 func solve(n int, s string) string {
 	cs := []byte(s)
 
-	xs := make(map[int]bool)
+	var xs []int
 	for i := 0; i < n; i++ {
 		if cs[i] == cs[0] {
-			xs[i] = true
+			xs = append(xs, i)
 		}
 	}
 
@@ -101,7 +101,6 @@ func solve(n int, s string) string {
 		var shrink bool
 		for i, _ := range xs {
 			if i+offset == n || cs[i+offset] != cs[offset] {
-				delete(xs, i)
 				shrink = true
 				break
 			}

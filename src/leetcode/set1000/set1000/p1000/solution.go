@@ -1,57 +1,77 @@
 package p1000
 
-import "fmt"
+const INF = 1 << 29
 
-var dd = []int{-1, 0, 1}
+func mergeStones(stones []int, K int) int {
+	n := len(stones)
 
-func gridIllumination(N int, lamps [][]int, queries [][]int) []int {
-	row := make(map[int]int)
-	col := make(map[int]int)
-	dia1 := make(map[int]int)
-	dia2 := make(map[int]int)
+	sum := make([]int, n)
 
-	grid := make(map[string]int)
-
-	cal1 := func(x, y int) int {
-		return x + y
+	for i := 0; i < n; i++ {
+		sum[i] = stones[i]
+		if i > 0 {
+			sum[i] += sum[i-1]
+		}
 	}
 
-	cal2 := func(x, y int) int {
-		return N - 1 - x + y
+	stoneSum := func(i int, j int) int {
+		if i == 0 {
+			return sum[j]
+		}
+		return sum[j] - sum[i-1]
 	}
 
-	for _, lamp := range lamps {
-		x, y := lamp[0], lamp[1]
-		row[x]++
-		col[y]++
-		dia1[cal1(x, y)]++
-		dia2[cal2(x, y)]++
-		grid[fmt.Sprintf("%d %d", x, y)]++
-	}
-
-	ans := make([]int, len(queries))
-
-	for i, query := range queries {
-		x, y := query[0], query[1]
-		if row[x] > 0 || col[y] > 0 || dia1[cal1(x, y)] > 0 || dia2[cal2(x, y)] > 0 {
-			ans[i] = 1
-
-			for j := 0; j < 3; j++ {
-				for k := 0; k < 3; k++ {
-					u, v := x+dd[j], y+dd[k]
-					key := fmt.Sprintf("%d %d", u, v)
-					if grid[key] > 0 {
-						delete(grid, key)
-						row[u]--
-						col[v]--
-						dia1[cal1(u, v)]--
-						dia2[cal2(u, v)]--
-					}
-				}
+	dp := make([][][]int, n)
+	for i := 0; i < n; i++ {
+		dp[i] = make([][]int, n)
+		for j := 0; j < n; j++ {
+			dp[i][j] = make([]int, K+1)
+			for k := 0; k <= K; k++ {
+				dp[i][j][k] = -1
 			}
 		}
-
 	}
 
-	return ans
+	var dfs func(i, j, m int) int
+
+	dfs = func(i, j, m int) int {
+		if (j-i+1-m)%(K-1) != 0 {
+			//can't merge into m piles
+			return INF
+		}
+		if i == j {
+			if m == 1 {
+				return 0
+			}
+			return INF
+		}
+		if dp[i][j][m] >= 0 {
+			return dp[i][j][m]
+		}
+		res := INF
+		if m == 1 {
+			//merge into K piles first, then into one
+			res = dfs(i, j, K) + stoneSum(i, j)
+		} else {
+			for mid := i; mid < j; mid++ {
+				tmp := dfs(i, mid, 1) + dfs(mid+1, j, m-1)
+				res = min(res, tmp)
+			}
+		}
+		dp[i][j][m] = res
+		return res
+	}
+
+	res := dfs(0, n-1, 1)
+	if res >= INF {
+		return -1
+	}
+	return res
+}
+
+func min(a, b int) int {
+	if a <= b {
+		return a
+	}
+	return b
 }

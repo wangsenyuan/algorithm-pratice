@@ -28,7 +28,7 @@ type AllOne struct {
 
 /** Initialize your data structure here. */
 func Constructor() AllOne {
-	return AllOne{kv: make(map[string]int), vk: make(map[int]map[string]bool)}
+	return AllOne{kv: make(map[string]int), vk: make(map[int]map[string]bool), mn: 1 << 30}
 }
 
 /** Inserts a new key <Key> with value 1. Or increments an existing key by 1. */
@@ -36,6 +36,9 @@ func (this *AllOne) Inc(key string) {
 	if v, ok := this.kv[key]; ok {
 		this.kv[key] = v + 1
 		delete(this.vk[v], key)
+		if len(this.vk[v]) == 0 {
+			delete(this.vk, v)
+		}
 		if this.vk[v+1] == nil {
 			this.vk[v+1] = make(map[string]bool)
 		}
@@ -48,9 +51,8 @@ func (this *AllOne) Inc(key string) {
 			if len(this.vk[v]) == 0 {
 				this.mn = v + 1
 			}
-		} else if v < this.mn {
-			this.mn = v
 		}
+
 		return
 	}
 	this.kv[key] = 1
@@ -62,7 +64,7 @@ func (this *AllOne) Inc(key string) {
 		this.mx = 1
 	}
 
-	if this.mn == 0 || 1 < this.mn {
+	if 1 < this.mn {
 		this.mn = 1
 	}
 }
@@ -83,6 +85,7 @@ func (this *AllOne) Dec(key string) {
 		if v == this.mx {
 			if len(this.vk[v]) == 0 {
 				this.mx = v - 1
+				delete(this.vk, v)
 			}
 		}
 	}

@@ -95,13 +95,10 @@ func solve(S []byte, d byte) string {
 	}
 
 	for i := 0; i < n-1; i++ {
-		if S[i] > S[i+1] {
+		if i >= 0 && S[i] > S[i+1] {
 			copy(S[i:], S[i+1:])
 			S[n-1] = d
 			i -= 2
-			if i < -1 {
-				i = -1
-			}
 		}
 	}
 

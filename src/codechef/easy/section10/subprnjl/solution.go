@@ -106,9 +106,7 @@ func solve(n int, k int, A []int) int64 {
 		w := r - l
 		// repeat m times
 		m := (k + w - 1) / w
-		if (dp[r][2000]-dp[l][2000])*m < k {
-			return false
-		}
+
 		x := sort.Search(2000, func(i int) bool {
 			return (dp[r][i]-dp[l][i])*m >= k
 		})

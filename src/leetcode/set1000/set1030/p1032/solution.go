@@ -18,7 +18,7 @@ func Constructor(words []string) StreamChecker {
 func (this *StreamChecker) Query(letter byte) bool {
 	var found bool
 	nodes := this.nodes
-	var ns []*Trie
+	ns := make([]*Trie, 0, len(nodes))
 	for _, node := range nodes {
 		node = node.query(letter)
 		if node != nil {

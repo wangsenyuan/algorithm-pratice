@@ -8,6 +8,43 @@ func numSubmatrixSumTarget(matrix [][]int, target int) int {
 	n := len(matrix[0])
 
 	sum := make([][]int, m)
+	for i := 0; i < m; i++ {
+		sum[i] = make([]int, n)
+		for j := 0; j < n; j++ {
+			sum[i][j] = matrix[i][j]
+			if j > 0 {
+				sum[i][j] += sum[i][j-1]
+			}
+		}
+	}
+	var res int
+	for j := 0; j < n; j++ {
+		for k := j; k < n; k++ {
+			cnt := make(map[int]int)
+			cnt[0] = 1
+			var a int
+			for i := 0; i < m; i++ {
+				a += sum[i][k]
+				if j > 0 {
+					a -= sum[i][j-1]
+				}
+				res += cnt[a-target]
+				cnt[a]++
+			}
+		}
+	}
+
+	return res
+}
+
+func numSubmatrixSumTarget1(matrix [][]int, target int) int {
+	if len(matrix) == 0 || len(matrix[0]) == 0 {
+		return 0
+	}
+	m := len(matrix)
+	n := len(matrix[0])
+
+	sum := make([][]int, m)
 
 	for i := 0; i < m; i++ {
 		sum[i] = make([]int, n)

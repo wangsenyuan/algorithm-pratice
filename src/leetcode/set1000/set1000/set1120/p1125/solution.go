@@ -7,22 +7,14 @@ func smallestSufficientTeam(req_skills []string, people [][]string) []int {
 	m := len(people)
 	N := (1 << uint(n))
 
-	dp := make([][]int, N)
+	dp := make([]int, N)
 	for i := 0; i < N; i++ {
-		dp[i] = make([]int, m+1)
-		for j := 0; j <= m; j++ {
-			dp[i][j] = INF
-		}
+		dp[i] = INF
 	}
-
+	dp[0] = 0
 	pp := make([]int, N)
 	qq := make([]int, N)
 	for j := 0; j < m; j++ {
-		for mask := 0; mask < N; mask++ {
-			dp[mask][j+1] = min(dp[mask][j+1], dp[mask][j])
-		}
-
-		dp[0][j] = 0
 
 		ss := make(map[string]bool)
 		for i := 0; i < len(people[j]); i++ {
@@ -38,14 +30,14 @@ func smallestSufficientTeam(req_skills []string, people [][]string) []int {
 		}
 
 		for mask := 0; mask < N; mask++ {
-			cur := dp[mask][j]
+			cur := dp[mask]
 			if cur >= INF {
 				continue
 			}
 
 			next := mask | bit
-			if dp[next][j+1] > cur+1 {
-				dp[next][j+1] = cur + 1
+			if dp[next] > cur+1 {
+				dp[next] = cur + 1
 				pp[next] = mask
 				qq[next] = j
 			}

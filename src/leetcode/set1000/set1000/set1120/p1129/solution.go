@@ -1,4 +1,4 @@
-package p5132
+package p1129
 
 func shortestAlternatingPaths(n int, red_edges [][]int, blue_edges [][]int) []int {
 	outs := make([][][]int, 2)

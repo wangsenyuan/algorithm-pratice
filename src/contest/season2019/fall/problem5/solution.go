@@ -39,37 +39,46 @@ func bonus(n int, leadership [][]int, operations [][]int) []int {
 			i := op[1] - 1
 			coin := op[2]
 			j := open[i]
-			tree.Update(j, j, coin)
+			tree.Update(j, j, int64(coin))
 		} else if op[0] == 2 {
 			i := op[1] - 1
 			coin := op[2]
 			j := open[i]
 			k := close[i]
-			tree.Update(j, k-1, coin)
+			tree.Update(j, k-1, int64(coin))
 		} else {
 			i := op[1] - 1
 			j := open[i]
 			k := close[i]
-			res = append(res, tree.Get(j, k-1))
+			res = append(res, int(tree.Get(j, k-1)))
 		}
 	}
 
 	return res
 }
 
+const MOD = 1000000007
+
+func modAdd(a *int64, b int64) {
+	*a += b
+	if *a >= MOD {
+		*a -= MOD
+	}
+}
+
 type MergeTree struct {
-	arr  []int
-	lazy []int
+	arr  []int64
+	lazy []int64
 	size int
 }
 
 func NewMergeTree(n int) MergeTree {
-	arr := make([]int, 4*n)
-	lazy := make([]int, 4*n)
+	arr := make([]int64, 4*n)
+	lazy := make([]int64, 4 * n)
 	return MergeTree{arr, lazy, n}
 }
 
-func (tree *MergeTree) Update(left, right int, value int) {
+func (tree *MergeTree) Update(left, right int, value int64) {
 	arr := tree.arr
 	lazy := tree.lazy
 	size := tree.size
@@ -81,47 +90,47 @@ func (tree *MergeTree) Update(left, right int, value int) {
 		}
 		if left <= start && end <= right {
 			// total in the range
-			lazy[i] += value
-			arr[i] += lazy[i] * (end - start + 1)
-			if 2*i+1 < len(lazy) {
-				lazy[2*i+1] += value
-			}
-			if 2*i+2 < len(lazy) {
-				lazy[2*i+2] += value
-			}
-			lazy[i] = 0
+			modAdd(&arr[i], int64(end - start + 1) * value % MOD)
+			modAdd(&lazy[i], value)
 			return
 		}
 		mid := (start + end) / 2
 		loop(2*i+1, start, mid)
 		loop(2*i+2, mid+1, end)
-		arr[i] = arr[2*i+1] + arr[2*i+2]
+		arr[i] = 0
+		modAdd(&arr[i], arr[2 * i + 1])
+		modAdd(&arr[i], arr[2 * i + 2])
+		modAdd(&arr[i], int64(end - start + 1) * lazy[i] % MOD)
 	}
 	loop(0, 0, size-1)
 }
 
-func (tree *MergeTree) Get(left, right int) int {
+func (tree *MergeTree) Get(left, right int) int64 {
 	arr := tree.arr
 	lazy := tree.lazy
 	size := tree.size
-	var loop func(i int, start int, end int) int
-	loop = func(i int, start int, end int) int {
+	var loop func(i int, start int, end int, v int64) int64
+	loop = func(i int, start int, end int, v int64) int64 {
 		if start > right || end < left {
 			return 0
 		}
+		var res int64
 		if left <= start && end <= right {
-			if 2*i+1 < len(lazy) {
-				lazy[2*i+1] += lazy[i]
-			}
-			if 2*i+2 < len(lazy) {
-				lazy[2*i+2] += lazy[i]
-			}
-			lazy[i] = 0
-			return arr[i]
+			modAdd(&res, arr[i])
+			modAdd(&res, int64(end - start + 1) * v % MOD)	
+			return res		
+		}
+		v += lazy[i]
+		if v >= MOD {
+			v -= MOD
 		}
 		mid := (start + end) / 2
-		return loop(2*i+1, start, mid) + loop(2*i+2, mid+1, end)
+		a := loop(2 * i + 1, start, mid, v)
+		b := loop(2 * i + 2, mid + 1, end, v)
+		modAdd(&res, a)
+		modAdd(&res, b)
+		return res
 	}
 
-	return loop(0, 0, size-1)
+	return loop(0, 0, size-1, 0)
 }

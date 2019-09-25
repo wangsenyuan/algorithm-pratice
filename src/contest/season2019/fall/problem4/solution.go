@@ -3,7 +3,7 @@ package problem4
 import "math/bits"
 
 func domino(n int, m int, broken [][]int) int {
-	M := 1 << m
+	M := 1 << uint(m)
 
 	mp := make([]int, n+1)
 	dp := make([][]int, n+1)
@@ -13,7 +13,7 @@ func domino(n int, m int, broken [][]int) int {
 
 	for _, brk := range broken {
 		a, b := brk[0], brk[1]
-		mp[a] |= 1 << b
+		mp[a] |= 1 << uint(b)
 	}
 
 	mp[n] = M - 1
@@ -29,8 +29,8 @@ func domino(n int, m int, broken [][]int) int {
 				update(&ans, dp[i][state])
 			}
 			for j := 0; j < m-1; j++ {
-				if state&(1<<j) == 0 && state&(1<<(j+1)) == 0 {
-					update(&dp[i][state|(1<<j)|(1<<(j+1))], dp[i][state]+1)
+				if state&(1<<uint(j)) == 0 && state&(1<<uint(j+1)) == 0 {
+					update(&dp[i][state|(1<<uint(j))|(1<<uint(j+1))], dp[i][state]+1)
 				}
 			}
 		}

@@ -1,4 +1,4 @@
-package contest
+package p1207
 
 func uniqueOccurrences(arr []int) bool {
 	occ := make(map[int]int)

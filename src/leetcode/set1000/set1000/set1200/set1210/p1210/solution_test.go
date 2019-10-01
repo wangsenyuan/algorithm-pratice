@@ -1,4 +1,4 @@
-package contest
+package p1210
 
 import "testing"
 

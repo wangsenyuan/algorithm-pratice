@@ -1,4 +1,4 @@
-package contest
+package p1208
 
 import "bytes"
 

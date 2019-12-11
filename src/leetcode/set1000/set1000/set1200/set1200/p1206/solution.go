@@ -19,7 +19,7 @@ type Skiplist struct {
 
 func Constructor() Skiplist {
 	header := new(Node)
-	header.value = math.MaxInt32
+	header.value = math.MinInt32
 	header.forward = make([]*Node, 32)
 	rand.Seed(time.Now().UnixNano())
 	return Skiplist{header, 0}
@@ -39,12 +39,7 @@ func (this *Skiplist) Search(target int) bool {
 }
 
 func randomLevel() int {
-
-	level := 0
-	for rand.Float64() < 0.5 && level < 30 {
-		level++
-	}
-	return level
+	return rand.Intn(31)
 }
 
 func (this *Skiplist) Add(num int) {
@@ -77,7 +72,7 @@ func (this *Skiplist) Add(num int) {
 			node.forward[i] = update[i].forward[i]
 			update[i].forward[i] = node
 		}
-	} else if cur != nil {
+	} else {
 		cur.count++
 	}
 }
@@ -104,10 +99,14 @@ func (this *Skiplist) Erase(num int) bool {
 
 	if cur.count == 0 {
 		// need to remove it
-		for i := this.level; i >= 0; i-- {
-			if update[i].forward[i] == cur {
-				update[i].forward[i] = cur.forward[i]
+		for i := 0; i <= this.level; i++ {
+			if update[i].forward[i] != cur {
+				break
 			}
+			update[i].forward[i] = cur.forward[i]
+		}
+		for this.level > 0 && this.header.forward[this.level] == nil {
+			this.level--
 		}
 	}
 

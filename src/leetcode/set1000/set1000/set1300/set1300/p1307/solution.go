@@ -57,12 +57,8 @@ func isSolvable(words []string, result string) bool {
 
 			z := int(result[i] - 'A')
 
-			if assign[z] >= 0 && r != assign[z] {
-				return false
-			}
-
 			if assign[z] >= 0 {
-				return solve(i+1, 0, sum/10, used)
+				return r == assign[z] && solve(i+1, 0, sum/10, used)
 			}
 
 			if used&(1<<uint(r)) != 0 {

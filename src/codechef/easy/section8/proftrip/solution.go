@@ -3,8 +3,8 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math"
 	"os"
-	"sort"
 )
 
 func readInt(bytes []byte, from int, val *int) int {
@@ -76,85 +76,92 @@ func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	tc := readNum(scanner)
+
 	for tc > 0 {
 		tc--
-		n, Q := readTwoNums(scanner)
-		P := readNNums(scanner, n)
-		X := make([]int, Q)
-		for i := 0; i < Q; i++ {
-			X[i] = readNum(scanner)
-		}
-		res := solve(n, Q, P, X)
+		n, r := readTwoNums(scanner)
+		roads := make([][]int, r)
 
-		for i := 0; i < Q; i++ {
-			fmt.Println(res[i])
+		for i := 0; i < r; i++ {
+			roads[i] = readNNums(scanner, 3)
 		}
 
+		F := readNNums(scanner, n)
+		P, Q := readTwoNums(scanner)
+
+		fmt.Println(solve(n, roads, F, P, Q))
 	}
 }
 
-func solve(N, Q int, P []int, X []int) []int {
-	// var INF int64 = math.MaxInt64
-	// x 增加 1, 就可以产生很大的增幅
-	sort.Ints(P)
+func solve(N int, roads [][]int, F []int, P int, Q int) int64 {
+	const INF = math.MaxInt64
 
-	qs := make([]Pair, Q)
+	dp := make([][]int64, N)
 
-	for i := 0; i < Q; i++ {
-		qs[i] = Pair{i, X[i]}
+	for i := 0; i < N; i++ {
+		dp[i] = make([]int64, N)
+		for j := 0; j < N; j++ {
+			dp[i][j] = INF
+		}
+		dp[i][i] = 0
 	}
 
-	sort.Sort(Pairs(qs))
+	for _, road := range roads {
+		u, v, w := road[0]-1, road[1]-1, road[2]
+		dp[u][v] = min(int64(w), dp[u][v])
+		dp[v][u] = min(int64(w), dp[v][u])
+	}
 
-	const INF = int64(2000000007)
-
-	var prev, rem int64
-	var ans int
-
-	Y := make([]int, Q)
-
-	for i := 0; i < Q; i++ {
-		if int64(qs[i].second) > prev {
-			if ans > 32 {
-				rem = INF
-			} else {
-				rem += (int64(qs[i].second) - prev) * (int64(1) << uint(ans))
+	for k := 0; k < N; k++ {
+		for u := 0; u < N; u++ {
+			if dp[u][k] >= INF {
+				continue
 			}
-			prev = int64(qs[i].second)
-
-			for ans < N && rem > int64(P[ans]) {
-				rem = min(INF, 2*(rem-int64(P[ans])))
-				ans++
+			for v := 0; v < N; v++ {
+				if dp[k][v] < INF {
+					dp[u][v] = min(dp[u][v], dp[u][k]+dp[k][v])
+				}
 			}
 		}
-		Y[qs[i].first] = ans
 	}
 
-	return Y
+	// fp[u][v] = min cost from u, to v
+	fp := make([][]int64, N)
+	for i := 0; i < N; i++ {
+		fp[i] = make([]int64, N)
+
+		for j := 0; j < N; j++ {
+			if dp[i][j] < INF {
+				fp[i][j] = int64(F[i]) * dp[i][j]
+			} else {
+				fp[i][j] = INF
+			}
+		}
+	}
+
+	for k := 0; k < N; k++ {
+		for u := 0; u < N; u++ {
+			if fp[u][k] == INF {
+				continue
+			}
+			for v := 0; v < N; v++ {
+				if fp[k][v] < INF && fp[u][k]+fp[k][v] < fp[u][v] {
+					fp[u][v] = fp[u][k] + fp[k][v]
+				}
+			}
+		}
+	}
+
+	if fp[P-1][Q-1] == INF {
+		return -1
+	}
+
+	return fp[P-1][Q-1]
 }
 
 func min(a, b int64) int64 {
-	if a < b {
+	if a <= b {
 		return a
 	}
 	return b
-}
-
-type Pair struct {
-	first  int
-	second int
-}
-
-type Pairs []Pair
-
-func (ps Pairs) Len() int {
-	return len(ps)
-}
-
-func (ps Pairs) Less(i, j int) bool {
-	return ps[i].second < ps[j].second
-}
-
-func (ps Pairs) Swap(i, j int) {
-	ps[i], ps[j] = ps[j], ps[i]
 }

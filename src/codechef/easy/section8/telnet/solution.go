@@ -200,7 +200,9 @@ func solve1(n int, k int, grid [][]int) int {
 			for _, p := range ps {
 				u, v := p.x, p.y
 				item := items[u][v]
-
+				if item.index < 0 {
+					continue
+				}
 				if item.priority > items[x][y].priority+abs(x-u)+abs(y-v) {
 					pq.update(item, items[x][y].priority+abs(x-u)+abs(y-v))
 				}

@@ -108,6 +108,7 @@ func main() {
 }
 
 func solve(S []byte, P int) {
+	use := make([]int, len(S))
 
 	i, j := 0, len(S)-1
 
@@ -120,12 +121,13 @@ func solve(S []byte, P int) {
 			i++
 		}
 
-		if i == j {
+		if i >= j {
 			break
 		}
 		// S[i] == b, & S[j] == a, swap them
 		S[i], S[j] = S[j], S[i]
 		P--
+		use[j]++
 		i++
 		j--
 	}
@@ -133,9 +135,11 @@ func solve(S []byte, P int) {
 		return
 	}
 	// the string must be aaaabbb
-	for i < len(S) && P > 1 {
-		S[i] = 'a'
+	for i < len(S) && P > 0 {
+		if 2-use[i] <= P {
+			S[i] = 'a'
+			P -= (2 - use[i])
+		}
 		i++
-		P -= 2
 	}
 }

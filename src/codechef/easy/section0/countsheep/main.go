@@ -19,5 +19,5 @@ func main() {
 }
 
 func countSheep(n int) (int, bool) {
-	seen := make(map[int]bool)
+	return 0, false
 }

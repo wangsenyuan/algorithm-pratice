@@ -20,3 +20,7 @@ func TestSample2(t *testing.T) {
 func TestSample3(t *testing.T) {
 	runSample(t, 20, 2, 9, 3)
 }
+
+func TestSample4(t *testing.T) {
+	runSample(t, 25, 10, 25, 2)
+}

@@ -141,30 +141,40 @@ func solve(n int, u, v int) int {
 	if u == v {
 		return 0
 	}
+
+	if u%v == 0 && factors[v] == v {
+		return 1
+	}
+
+	if v%u == 0 && factors[u] == u {
+		return 1
+	}
+
+	uu := u
+
+	for uu > 1 {
+		x := factors[uu]
+		if v%x == 0 {
+			return 2
+		}
+		uu /= x
+	}
+
 	N := int64(n)
 
-	if factors[u] == u && factors[v] == v {
-		// both are primes
-		M := int64(u) * int64(v)
-		if M > N {
-			return -1
-		}
-		return 2
-	}
-
-	r := solve(n, factors[u], factors[v])
-
-	if r < 0 {
+	x := factors[u]
+	y := factors[v]
+	M := int64(x) * int64(y)
+	if M > N {
 		return -1
 	}
+	r := 2
 
-	if factors[u] != u {
+	if x != u {
 		r++
 	}
-
-	if factors[v] != v {
+	if y != v {
 		r++
 	}
-
 	return r
 }

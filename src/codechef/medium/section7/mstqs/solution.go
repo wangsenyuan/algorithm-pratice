@@ -105,9 +105,10 @@ func main() {
 type Solver struct {
 	n     int
 	edges [][]int
-	zeros *Pair
+	zeros *Node
 	arr   []int
 	cnt   []int
+	mem   map[int64]*Node
 }
 
 func find(arr []int, x int) int {
@@ -152,7 +153,7 @@ func NewSolver(n int, edges [][]int) Solver {
 		}
 	}
 
-	return Solver{n, used, nil, arr, cnt}
+	return Solver{n, used, new(Node), arr, cnt, make(map[int64]*Node)}
 }
 
 func (solver *Solver) runMST() int {
@@ -165,7 +166,7 @@ func (solver *Solver) runMST() int {
 		cnt[i] = 1
 	}
 
-	cur := solver.zeros
+	cur := solver.zeros.next
 
 	for cur != nil {
 		u, v := cur.u, cur.v
@@ -184,9 +185,10 @@ func (solver *Solver) runMST() int {
 	return res
 }
 
-type Pair struct {
+type Node struct {
 	u, v int
-	next *Pair
+	next *Node
+	prev *Node
 }
 
 func max(a, b int) int {
@@ -200,43 +202,54 @@ func (solver *Solver) AssigneZero(u, v int) {
 	u--
 	v--
 
-	cur := solver.zeros
+	key := solver.getKey(u, v)
+	node := solver.mem[key]
 
-	for cur != nil && (cur.u != u || cur.v != v) {
-		cur = cur.next
-	}
-
-	if cur != nil {
+	if node != nil {
+		// already there
 		return
 	}
 
-	p := &Pair{u, v, nil}
+	node = new(Node)
+	node.u = u
+	node.v = v
 
-	p.next = solver.zeros
-	solver.zeros = p
+	next := solver.zeros.next
+
+	solver.zeros.next = node
+	node.prev = solver.zeros
+	if next != nil {
+		node.next = next
+		next.prev = node
+	}
+
+	solver.mem[key] = node
+}
+
+func (solver *Solver) getKey(u, v int) int64 {
+	if u > v {
+		u, v = v, u
+	}
+	return int64(u)*int64(solver.n) + int64(v)
 }
 
 func (solver *Solver) AssignOriginal(u, v int) {
 	u--
 	v--
 
-	if solver.zeros == nil {
-		return
-	}
-	if solver.zeros.u == u && solver.zeros.v == v {
-		solver.zeros = solver.zeros.next
-		return
-	}
-	prev := solver.zeros
+	key := solver.getKey(u, v)
 
-	for prev.next != nil {
-		cur := prev.next
-		if cur.u == u && cur.v == v {
-			prev.next = cur.next
-			break
-		}
-		prev = cur
+	node := solver.mem[key]
+
+	if node == nil {
+		return
 	}
+	prev, next := node.prev, node.next
+	prev.next = next
+	if next != nil {
+		next.prev = prev
+	}
+	delete(solver.mem, key)
 }
 
 func (solver *Solver) GetAnswer() int {

@@ -181,6 +181,10 @@ func (solver *Solver) runMST() int {
 		if union(arr, cnt, u, v) {
 			res += w
 		}
+		pu := find(arr, u)
+		if cnt[pu] == solver.n {
+			break
+		}
 	}
 	return res
 }

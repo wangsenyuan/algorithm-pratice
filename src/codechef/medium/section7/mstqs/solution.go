@@ -108,7 +108,7 @@ type Solver struct {
 	zeros *Node
 	arr   []int
 	cnt   []int
-	mem   map[int64]*Node
+	mem   map[int]*Node
 }
 
 func find(arr []int, x int) int {
@@ -153,7 +153,7 @@ func NewSolver(n int, edges [][]int) Solver {
 		}
 	}
 
-	return Solver{n, used, new(Node), arr, cnt, make(map[int64]*Node)}
+	return Solver{n, used, new(Node), arr, cnt, make(map[int]*Node)}
 }
 
 func (solver *Solver) runMST() int {
@@ -233,11 +233,11 @@ func (solver *Solver) AssigneZero(u, v int) {
 	solver.mem[key] = node
 }
 
-func (solver *Solver) getKey(u, v int) int64 {
+func (solver *Solver) getKey(u, v int) int {
 	if u > v {
 		u, v = v, u
 	}
-	return int64(u)*int64(solver.n) + int64(v)
+	return u*solver.n + v
 }
 
 func (solver *Solver) AssignOriginal(u, v int) {

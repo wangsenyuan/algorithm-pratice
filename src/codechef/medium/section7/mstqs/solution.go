@@ -180,10 +180,9 @@ func (solver *Solver) runMST() int {
 		u, v, w := edge[0]-1, edge[1]-1, edge[2]
 		if union(arr, cnt, u, v) {
 			res += w
-		}
-		pu := find(arr, u)
-		if cnt[pu] == solver.n {
-			break
+			if cnt[find(arr, u)] == solver.n {
+				break
+			}
 		}
 	}
 	return res

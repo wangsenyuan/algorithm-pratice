@@ -174,6 +174,10 @@ func (solver *Solver) runMST() int {
 		cur = cur.next
 	}
 
+	if cnt[find(arr, 0)] == solver.n {
+		return 0
+	}
+
 	var res int
 
 	for _, edge := range solver.edges {

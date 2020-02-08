@@ -25,3 +25,7 @@ func TestSample3(t *testing.T) {
 func TestSample4(t *testing.T) {
 	runSample(t, "66666666664123+Who-32didn't love? Solo32..", "Who Didn T Love Solo.")
 }
+
+func TestSample5(t *testing.T) {
+	runSample(t, "abc", "Abc.")
+}

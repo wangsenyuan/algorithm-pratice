@@ -51,14 +51,10 @@ func solve(buf []byte) string {
 
 	if buf[j-1] == ' ' {
 		buf[j-1] = '.'
-	} else {
-		buf[j] = '.'
-		j++
+		return string(buf[:j])
 	}
 
-	s := string(buf[:j])
-
-	return s
+	return string(buf) + "."
 }
 
 func isLetter(c byte) bool {

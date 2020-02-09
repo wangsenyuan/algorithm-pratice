@@ -6,6 +6,55 @@ import "container/heap"
 
 func minJumps(arr []int) int {
 	n := len(arr)
+	mem := make(map[int][]int)
+
+	for i := 0; i < n; i++ {
+		if _, found := mem[arr[i]]; !found {
+			mem[arr[i]] = make([]int, 0, 10)
+		}
+		mem[arr[i]] = append(mem[arr[i]], i)
+	}
+
+	dist := make([]int, n)
+
+	for i := 0; i < n; i++ {
+		dist[i] = -1
+	}
+	dist[0] = 0
+
+	que := make([]int, n)
+	var front, end int
+	que[end] = 0
+	end++
+
+	for front < end {
+		u := que[front]
+		front++
+
+		for _, v := range mem[arr[u]] {
+			if dist[v] < 0 {
+				dist[v] = dist[u] + 1
+				que[end] = v
+				end++
+			}
+		}
+		if u-1 > 0 && dist[u-1] < 0 {
+			dist[u-1] = dist[u] + 1
+			que[end] = u - 1
+			end++
+		}
+		if u+1 < n && dist[u+1] < 0 {
+			dist[u+1] = dist[u] + 1
+			que[end] = u + 1
+			end++
+		}
+	}
+
+	return dist[n-1]
+}
+
+func minJumps1(arr []int) int {
+	n := len(arr)
 
 	mem := make(map[int][]int)
 

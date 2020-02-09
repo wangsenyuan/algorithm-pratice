@@ -2,59 +2,32 @@ package p1346
 
 import "testing"
 
-func runSample(t *testing.T, seats []string, expect int) {
-	ss := make([][]byte, len(seats))
-
-	for i := 0; i < len(seats); i++ {
-		ss[i] = []byte(seats[i])
+func TestCheckIfExists(t *testing.T) {
+	if !checkIfExist([]int{10, 2, 5, 3}) {
+		t.Errorf("Fail")
 	}
 
-	res := maxStudents(ss)
+	if !checkIfExist([]int{7, 1, 14, 11}) {
+		t.Errorf("Fail")
+	}
 
-	if res != expect {
-		t.Errorf("Sample %v, expect %d, but got %d", seats, expect, res)
+	if checkIfExist([]int{3, 1, 7, 11}) {
+		t.Errorf("Fail")
 	}
 }
 
-func TestSample1(t *testing.T) {
-	ss := []string{
-		"#.##.#",
-		".####.",
-		"#.##.#",
+func TestMinSteps(t *testing.T) {
+	if 1 != minSteps("bab", "aba") {
+		t.Errorf("Fail")
 	}
-	expect := 4
-	runSample(t, ss, expect)
-}
+	if 5 != minSteps("leetcode", "practice") {
+		t.Errorf("Fail")
+	}
+	if 0 != minSteps("anagram", "mangaar") {
+		t.Errorf("Fail")
+	}
 
-func TestSample2(t *testing.T) {
-	ss := []string{
-		".#",
-		"##",
-		"#.",
-		"##",
-		".#",
+	if 4 != minSteps("friend", "family") {
+		t.Errorf("Fail")
 	}
-	expect := 3
-	runSample(t, ss, expect)
-}
-
-func TestSample3(t *testing.T) {
-	ss := []string{
-		"#...#",
-		".#.#.",
-		"..#..",
-		".#.#.",
-		"#...#",
-	}
-	expect := 10
-	runSample(t, ss, expect)
-}
-
-func TestSample4(t *testing.T) {
-	ss := []string{
-		"####",
-		".###",
-	}
-	expect := 1
-	runSample(t, ss, expect)
 }

@@ -1,45 +1,23 @@
 package p1343
 
-/**
- * Definition for a binary tree node.
- */
-type TreeNode struct {
-	Val   int
-	Left  *TreeNode
-	Right *TreeNode
-}
+func numOfSubarrays(arr []int, k int, threshold int) int {
+	n := len(arr)
+	sum := make([]int64, n+1)
+	K := int64(k)
+	T := int64(threshold)
 
-func maxProduct(root *TreeNode) int {
+	var res int
 
-	var sum int64
+	for i := 0; i < n; i++ {
+		sum[i+1] = sum[i] + int64(arr[i])
 
-	var res int64
-
-	var dfs func(node *TreeNode) int64
-	dfs = func(node *TreeNode) int64 {
-		if node == nil {
-			return 0
+		if i+1 >= k {
+			aa := sum[i+1] - sum[i+1-k]
+			if T*K <= aa {
+				res++
+			}
 		}
-		x := int64(node.Val) + dfs(node.Left) + dfs(node.Right)
-		y := sum - x
-
-		res = max(res, x*y)
-
-		return x
 	}
 
-	sum = dfs(root)
-
-	res = 0
-
-	dfs(root)
-
-	return int(res % 1000000007)
-}
-
-func max(a, b int64) int64 {
-	if a >= b {
-		return a
-	}
-	return b
+	return res
 }

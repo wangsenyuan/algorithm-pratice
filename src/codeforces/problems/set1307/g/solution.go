@@ -133,7 +133,7 @@ func (solver Solver) Query(x int) float64 {
 	check := func(y float64) bool {
 		used := y
 
-		h := used + float64(paths[0])
+		h := y + float64(paths[0])
 
 		for i := 1; i < len(paths); i++ {
 			cur := float64(paths[i])

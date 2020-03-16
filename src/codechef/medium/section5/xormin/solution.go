@@ -71,7 +71,7 @@ func main() {
 		for i := 0; i < n-1; i++ {
 			E[i] = readNNums(scanner, 2)
 		}
-		solver := NewSolver(n, A, E)
+		solver := NewSolver1(n, A, E)
 
 		var v, k int
 
@@ -83,6 +83,8 @@ func main() {
 			v, k = solver.Query(v, k)
 			fmt.Printf("%d %d\n", v, k)
 		}
+
+		solver.Reset()
 	}
 }
 
@@ -92,6 +94,16 @@ var nodes []*Node
 var visit []bool
 var G [][]int
 
+var L []int
+var R []int
+var mn []int
+var rt []int
+
+const MAX_M = 1 << 20
+const MAX_S = 2 * 20 * 20 * MAX_N
+
+var sub []map[int]bool
+
 func init() {
 	nodes = make([]*Node, MAX_N)
 	visit = make([]bool, MAX_N)
@@ -99,6 +111,121 @@ func init() {
 	for i := 0; i < MAX_N; i++ {
 		G[i] = make([]int, 0, 3)
 	}
+	L = make([]int, MAX_S)
+	R = make([]int, MAX_S)
+	mn = make([]int, MAX_S)
+	for i := 0; i < MAX_S; i++ {
+		mn[i] = MAX_M
+	}
+	rt = make([]int, MAX_N)
+	sub = make([]map[int]bool, MAX_N)
+}
+
+type Solver1 struct {
+	L, R, mn, rt []int
+	sz           int
+}
+
+func NewSolver1(n int, W []int, E [][]int) Solver1 {
+	sz := 1
+
+	for i := 0; i <= n; i++ {
+		G[i] = G[i][:0]
+		sub[i] = make(map[int]bool)
+	}
+
+	for _, e := range E {
+		u, v := e[0], e[1]
+		G[u] = append(G[u], v)
+		G[v] = append(G[v], u)
+	}
+
+	copy := func(v int) int {
+		L[sz] = L[v]
+		R[sz] = R[v]
+		mn[sz] = mn[v]
+		sz++
+		return sz - 1
+	}
+
+	var update func(p, c, v int, l, r int)
+
+	update = func(p, c, v int, l, r int) {
+		mn[v] = min(mn[v], c)
+		if r-l > 1 {
+			m := (l + r) / 2
+			if p < m {
+				L[v] = copy(L[v])
+				update(p, c, L[v], l, m)
+			} else {
+				R[v] = copy(R[v])
+				update(p, c, R[v], m, r)
+			}
+		}
+	}
+
+	var dfs func(p, u int)
+
+	dfs = func(p, u int) {
+		rt[u] = copy(0)
+		sub[u][u] = true
+
+		update(W[u-1], u, rt[u], 0, MAX_M)
+
+		for _, v := range G[u] {
+			if p == v {
+				continue
+			}
+			dfs(u, v)
+
+			if len(sub[u]) < len(sub[v]) {
+				rt[u] = copy(rt[v])
+				sub[u], sub[v] = sub[v], sub[u]
+			}
+
+			for it := range sub[v] {
+				sub[u][it] = true
+				update(W[it-1], it, rt[u], 0, MAX_M)
+			}
+		}
+	}
+
+	dfs(0, 1)
+
+	return Solver1{L, R, mn, rt, sz}
+}
+
+func (solver Solver1) Query(v, k int) (int, int) {
+	var get func(v int, l, r int) (int, int)
+	get = func(v int, l, r int) (int, int) {
+		if r-l == 1 {
+			return mn[v], l
+		}
+		m := (l + r) / 2
+		if ((k^(m-l)) < k && L[v] > 0) || R[v] == 0 {
+			return get(L[v], l, m)
+		}
+		return get(R[v], m, r)
+	}
+
+	x, y := get(rt[v], 0, MAX_M)
+	y ^= k
+	return x, y
+}
+
+func (solver *Solver1) Reset() {
+	for i := 0; i < solver.sz; i++ {
+		L[i] = 0
+		R[i] = 0
+		mn[i] = MAX_M
+	}
+}
+
+func min(a, b int) int {
+	if a <= b {
+		return a
+	}
+	return b
 }
 
 type Solver struct {

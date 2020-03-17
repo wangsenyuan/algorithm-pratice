@@ -63,7 +63,7 @@ func main() {
 
 	n, q := readTwoNums(scanner)
 
-	solver := NewSolver2(n)
+	solver := NewSolver(n)
 
 	la := len("UNION")
 	lb := len("GET")
@@ -200,9 +200,8 @@ func (solver *Solver) Union(a, b int) {
 	a %= sz
 	b %= sz
 	c := solver.tail
-	solver.tail = (solver.tail + 1) % sz
-
 	solver.nodes[c] = join2(solver.nodes[a], solver.nodes[b])
+	solver.tail = (solver.tail + 1) % sz
 }
 
 func (solver *Solver) Get(a, k int) int {
@@ -241,7 +240,7 @@ func NewNode(l *Node, k int, r *Node) *Node {
 	node.key = k
 	node.right = r
 	node.count = l.GetCount() + 1
-	node.height = max(l.GetCount(), r.GetHeight()) + 1
+	node.height = max(l.GetHeight(), r.GetHeight()) + 1
 	return node
 }
 

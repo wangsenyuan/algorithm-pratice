@@ -84,6 +84,7 @@ func main() {
 	P := readNNums(reader, n)
 
 	a, b := solve(n, k, P)
+
 	fmt.Printf("%d %d\n", a, b)
 }
 

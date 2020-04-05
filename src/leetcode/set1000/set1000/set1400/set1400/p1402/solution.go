@@ -10,6 +10,32 @@ func maxSatisfaction(satisfaction []int) int {
 
 	n := len(satisfaction)
 
+	dp := make([]int, n+1)
+
+	for i := 1; i <= n; i++ {
+		dp[i] = N_INF
+	}
+
+	for i := 1; i <= n; i++ {
+		// prepare i
+		for k := i; k > 0; k-- {
+			dp[k] = max(dp[k], dp[k-1]+k*satisfaction[i-1])
+		}
+	}
+
+	var res int
+	for i := 0; i <= n; i++ {
+		res = max(res, dp[i])
+	}
+
+	return res
+}
+
+func maxSatisfaction1(satisfaction []int) int {
+	sort.Ints(satisfaction)
+
+	n := len(satisfaction)
+
 	dp := make([][]int, n+1)
 
 	for i := 0; i <= n; i++ {

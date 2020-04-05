@@ -4,6 +4,43 @@ import "math"
 
 func stoneGameIII(stoneValue []int) string {
 	n := len(stoneValue)
+	dp := make([]int, n+1)
+
+	get := func(j int) int {
+		if j >= n {
+			return 0
+		}
+		return dp[j]
+	}
+	var sum int
+	for i := n - 1; i >= 0; i-- {
+		sum += stoneValue[i]
+		dp[i] = sum - get(i+1)
+		dp[i] = max(dp[i], sum-get(i+2))
+		dp[i] = max(dp[i], sum-get(i+3))
+	}
+
+	took := dp[0]
+
+	if took > sum-took {
+		return "Alice"
+	}
+	if took < sum-took {
+		return "Bob"
+	}
+
+	return "Tie"
+}
+
+func max(a, b int) int {
+	if a >= b {
+		return a
+	}
+	return b
+}
+
+func stoneGameIII1(stoneValue []int) string {
+	n := len(stoneValue)
 
 	sum := make([]int, n+1)
 	for i := n - 1; i >= 0; i-- {
@@ -45,11 +82,4 @@ func stoneGameIII(stoneValue []int) string {
 	}
 
 	return "Tie"
-}
-
-func max(a, b int) int {
-	if a >= b {
-		return a
-	}
-	return b
 }

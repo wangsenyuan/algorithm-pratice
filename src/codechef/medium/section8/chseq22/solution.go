@@ -82,22 +82,59 @@ func main() {
 const MOD = 1000000007
 
 func solve(n, m int, segs [][]int) int {
-	arr := make([]int, n+2)
+	edges := make([][]int, n+1)
+
+	for i := 0; i <= n; i++ {
+		edges[i] = make([]int, 0, 3)
+	}
 
 	for _, seg := range segs {
 		a, b := seg[0], seg[1]
-		arr[a]++
-		arr[b+1]--
+		a--
+		edges[a] = append(edges[a], b)
+		edges[b] = append(edges[b], a)
 	}
 
-	res := int64(1)
+	vis := make([]bool, n+1)
 
-	for i := 1; i <= n; i++ {
-		arr[i] += arr[i-1]
-		if arr[i]&1 == 1 {
-			res *= 2
-			res %= MOD
+	var dfs func(u int) int
+
+	dfs = func(u int) int {
+		var res = 0
+		vis[u] = true
+
+		for _, v := range edges[u] {
+			if vis[v] {
+				continue
+			}
+			res++
+			res += dfs(v)
 		}
+
+		return res
 	}
-	return int(res)
+
+	var count int
+	for i := 0; i < n; i++ {
+		count += dfs(i)
+	}
+
+	return pow(2, count)
+}
+
+func pow(a, b int) int {
+	A := int64(a)
+	R := int64(1)
+
+	for b > 0 {
+		if b&1 == 1 {
+			R *= A
+			R %= MOD
+		}
+		A *= A
+		A %= MOD
+		b >>= 1
+	}
+
+	return int(R)
 }

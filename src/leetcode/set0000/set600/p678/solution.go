@@ -1,8 +1,6 @@
-package main
+package p678
 
-import "fmt"
-
-func checkValidString(s string) bool {
+func checkValidString1(s string) bool {
 	n := len(s)
 	if n == 0 {
 		return true
@@ -49,11 +47,72 @@ func checkValidString(s string) bool {
 	return dp[0][n]
 }
 
-func main() {
-	fmt.Println(checkValidString("(*))"))
-	fmt.Println(checkValidString("(*)"))
-	fmt.Println(checkValidString("()"))
-	fmt.Println(checkValidString("())"))
-	fmt.Println(checkValidString("*"))
+func checkValidString(s string) bool {
+	n := len(s)
+	var low, high int
 
+	for i := 0; i < n; i++ {
+		if s[i] == '(' {
+			low++
+		} else {
+			low--
+		}
+
+		if s[i] != ')' {
+			high++
+		} else {
+			high--
+		}
+		if high < 0 {
+			return false
+		}
+		if low < 0 {
+			low = 0
+		}
+	}
+	return low == 0
+}
+func checkValidString2(s string) bool {
+	n := len(s)
+
+	var open, star int
+
+	for i := 0; i < n; i++ {
+		if s[i] == '(' {
+			open++
+		} else if s[i] == ')' {
+			open--
+		} else {
+			star++
+		}
+		if open < 0 {
+			if star == 0 {
+				return false
+			}
+			open++
+			star--
+		}
+	}
+
+	open = 0
+	star = 0
+
+	for i := n - 1; i >= 0; i-- {
+		if s[i] == '(' {
+			open--
+		} else if s[i] == ')' {
+			open++
+		} else {
+			star++
+		}
+		if open < 0 {
+			if star == 0 {
+				return false
+			}
+			open++
+			star--
+		}
+	}
+
+	return true
 }

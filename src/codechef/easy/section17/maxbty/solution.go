@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math"
 	"os"
 )
 
@@ -86,7 +87,7 @@ func main() {
 		n, m := readTwoNums(reader)
 		A := readNNums(reader, n)
 
-		solver := NewSolver(n, A)
+		solver := NewSolver1(n, A)
 
 		for m > 0 {
 			m--
@@ -102,6 +103,121 @@ func main() {
 			}
 		}
 	}
+}
+
+type Solver1 struct {
+	n  int
+	A  []int
+	sr *SegTree
+	sl *SegTree
+}
+
+func NewSolver1(n int, A []int) Solver1 {
+	sr := NewSegTree(n)
+	sl := NewSegTree(n)
+
+	for i := 0; i < n; i++ {
+		sr.Update(i+1, n, int64(A[i]))
+		sl.Update(i+1, n, -int64(A[i]))
+	}
+
+	return Solver1{n, A, sr, sl}
+}
+
+func (solver *Solver1) Update(pos int, v int) {
+	solver.sr.Update(pos, solver.n, int64(v-solver.A[pos-1]))
+	solver.sl.Update(pos, solver.n, int64(solver.A[pos-1]-v))
+	solver.A[pos-1] = v
+}
+
+func (solver *Solver1) Query(left, right int) int64 {
+	return solver.sr.Query(right, solver.n) + solver.sl.Query(0, left-1)
+}
+
+type SegTree struct {
+	n int
+	A []int64
+	B []int64
+}
+
+func NewSegTree(n int) *SegTree {
+	A := make([]int64, 4*n)
+	B := make([]int64, 4*n)
+	return &SegTree{n, A, B}
+}
+
+func (seg *SegTree) apply(i int, v int64) {
+	seg.A[i] += v
+	seg.B[i] += v
+}
+
+func (seg *SegTree) push(i int) {
+	seg.apply(2*i, seg.B[i])
+	seg.apply(2*i+1, seg.B[i])
+	seg.B[i] = 0
+}
+
+func (seg *SegTree) Update(left, right int, v int64) {
+
+	var loop func(i int, start int, end int)
+
+	loop = func(i int, start int, end int) {
+		if left <= start && end <= right {
+			seg.apply(i, v)
+			return
+		}
+
+		seg.push(i)
+		mid := (start + end) / 2
+
+		if left <= mid {
+			loop(2*i, start, mid)
+		}
+
+		if mid < right {
+			loop(2*i+1, mid+1, end)
+		}
+
+		seg.A[i] = max(seg.A[2*i], seg.A[2*i+1])
+	}
+
+	loop(1, 0, seg.n)
+}
+
+func (seg *SegTree) Query(left, right int) int64 {
+
+	var loop func(i int, start, end int) int64
+
+	loop = func(i int, start, end int) int64 {
+		if left <= start && end <= right {
+			return seg.A[i]
+		}
+		mid := (start + end) / 2
+		seg.push(i)
+
+		var x int64 = math.MinInt64
+
+		if left <= mid {
+			x = loop(2*i, start, mid)
+		}
+
+		var y int64 = math.MinInt64
+
+		if mid < right {
+			y = loop(2*i+1, mid+1, end)
+		}
+
+		return max(x, y)
+	}
+
+	return loop(1, 0, seg.n)
+}
+
+func max(a, b int64) int64 {
+	if a >= b {
+		return a
+	}
+	return b
 }
 
 type Solver struct {

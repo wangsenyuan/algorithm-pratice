@@ -106,25 +106,12 @@ func main() {
 }
 
 func solve(n int) int {
-	N := int64(n)
 
-	var x int64 = 1
-	for x*x <= N {
-		if N%x != 0 {
-			x++
-			continue
+	for k := 2; k < 30; k++ {
+		y := 1<<k - 1
+		if n%y == 0 {
+			return n / y
 		}
-
-		y := N / x
-
-		if isPower2(y+1) && y+1 > 2 {
-			return int(x)
-		}
-
-		if isPower2(x+1) && x+1 > 2 {
-			return int(y)
-		}
-		x++
 	}
 
 	return 1

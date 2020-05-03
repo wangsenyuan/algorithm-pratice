@@ -9,33 +9,16 @@ func checkIfCanBreak(s1 string, s2 string) bool {
 	sort.Sort(Bytes(x))
 	sort.Sort(Bytes(y))
 
-	if x[0] >= y[0] {
-		var ok = true
-		for i := 1; i < len(x); i++ {
-			if x[i] < y[i] {
-				ok = false
-				break
-			}
-		}
-		if ok {
-			return true
+	return compare(x, y) || compare(y, x)
+}
+
+func compare(x, y []byte) bool {
+	for i := 0; i < len(x); i++ {
+		if x[i] < y[i] {
+			return false
 		}
 	}
-
-	if x[0] <= y[0] {
-		var ok = true
-		for i := 1; i < len(x); i++ {
-			if x[i] > y[i] {
-				ok = false
-				break
-			}
-		}
-		if ok {
-			return true
-		}
-	}
-
-	return false
+	return true
 }
 
 type Bytes []byte

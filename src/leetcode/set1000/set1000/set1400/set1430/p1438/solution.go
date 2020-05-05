@@ -3,6 +3,84 @@ package p1438
 func longestSubarray(nums []int, limit int) int {
 	n := len(nums)
 
+	maxQueue := NewDQueue(n)
+	minQueue := NewDQueue(n)
+
+	var best int
+
+	for i, j := 0, 0; i < n; i++ {
+		for !maxQueue.IsEmpty() && nums[maxQueue.PeekLast()] < nums[i] {
+			maxQueue.PopLast()
+		}
+
+		maxQueue.PushLast(i)
+
+		for !minQueue.IsEmpty() && nums[minQueue.PeekLast()] > nums[i] {
+			minQueue.PopLast()
+		}
+
+		minQueue.PushLast(i)
+
+		for nums[maxQueue.PeekFirst()]-nums[minQueue.PeekFirst()] > limit {
+			if j == maxQueue.PeekFirst() {
+				maxQueue.PopFirst()
+			}
+			if j == minQueue.PeekFirst() {
+				minQueue.PopFirst()
+			}
+			j++
+		}
+
+		if best < i-j+1 {
+			best = i - j + 1
+		}
+	}
+
+	return best
+}
+
+type DQueue struct {
+	arr        []int
+	front, end int
+}
+
+func NewDQueue(n int) DQueue {
+	arr := make([]int, n)
+	return DQueue{arr, 0, 0}
+}
+
+func (que *DQueue) PushLast(v int) {
+	que.arr[que.end] = v
+	que.end++
+}
+
+func (que *DQueue) PopLast() int {
+	res := que.arr[que.end-1]
+	que.end--
+	return res
+}
+
+func (que DQueue) PeekLast() int {
+	return que.arr[que.end-1]
+}
+
+func (que DQueue) IsEmpty() bool {
+	return que.front == que.end
+}
+
+func (que *DQueue) PeekFirst() int {
+	return que.arr[que.front]
+}
+
+func (que *DQueue) PopFirst() int {
+	res := que.arr[que.front]
+	que.front++
+	return res
+}
+
+func longestSubarray1(nums []int, limit int) int {
+	n := len(nums)
+
 	arr1 := make([]int, 2*n)
 	arr2 := make([]int, 2*n)
 	for i := n; i < len(arr1); i++ {

@@ -137,12 +137,6 @@ func solve(n, m int, F [][]int) (int, string) {
 		}
 	}
 
-	for i := 1; i <= n; i++ {
-		if vis[i] == 0 {
-			return 0, "-1"
-		}
-	}
-
 	seq := make([]int, n)
 
 	var topo func(u int)

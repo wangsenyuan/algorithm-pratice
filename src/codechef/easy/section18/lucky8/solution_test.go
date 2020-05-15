@@ -21,3 +21,7 @@ func TestSample2(t *testing.T) {
 func TestSample3(t *testing.T) {
 	runSample(t, "47", "74", 1)
 }
+
+func TestSample4(t *testing.T) {
+	runSample(t, "0", "7474174", 12)
+}

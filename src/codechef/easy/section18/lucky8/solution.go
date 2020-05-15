@@ -101,63 +101,37 @@ func solve(L, R string) int {
 
 	if i < n {
 		// L[i] < R[i]
-		x := int(L[i] - '0')
-		y := int(R[i] - '0')
 
-		if x < 4 && 4 < y {
-			best = max(best, count(n4+1, n7, n-i-1))
-		}
-		if x < 7 && 7 < y {
-			best = max(best, count(n4, n7+1, n-i-1))
-		}
+		best = max(best, check(int(L[i]-'0')+1, int(R[i]-'0')-1, n4, n7, n-i-1))
 
-		if x+1 < y {
-			best = max(best, count(n4, n7, n-i-1))
-		}
 		a, b := n4, n7
-		if x == 4 {
-			a++
-		}
-		// try stay same as L
-		for k := i + 1; k < n; k++ {
-			// same as L before k
-			// it is already less than R, and at position k, we make it larger than L
-			if L[k] < '7' {
-				best = max(best, count(a, b+1, n-k-1))
-			}
-			if L[k] < '4' {
-				best = max(best, count(a+1, b, n-k-1))
-			}
-			if L[k] == '4' {
+
+		for j := i; j < n; j++ {
+			if L[j] == '4' {
 				a++
-			} else if L[k] == '7' {
+			} else if L[j] == '7' {
 				b++
 			}
+			if j+1 < n {
+				best = max(best, check(int(L[j+1]-'0')+1, 9, a, b, n-(j+2)))
+			}
 		}
-
-		best = max(best, count(a, b, 0))
+		best = max(best, a*b)
 
 		a, b = n4, n7
-		if y == 7 {
-			b++
-		}
 
-		for k := i + 1; k < n; k++ {
-			if R[k] > '7' {
-				best = max(best, count(a, b+1, n-k-1))
-			}
-			if R[k] > '4' {
-				best = max(best, count(a+1, b, n-k-1))
-			}
-			if R[k] == '4' {
+		for j := i; j < n; j++ {
+			if R[j] == '4' {
 				a++
-			} else if R[k] == '7' {
+			} else if R[j] == '7' {
 				b++
 			}
+			if j+1 < n {
+				best = max(best, check(0, int(R[j+1]-'0')-1, a, b, n-(j+2)))
+			}
 		}
 
-		best = max(best, count(a, b, 0))
-
+		best = max(best, a*b)
 	} else {
 		best = n4 * n7
 	}
@@ -183,14 +157,32 @@ func leftPadZero(s string, n int) string {
 	return buf.String()
 }
 
-func count(cnt4, cnt7 int, n int) int {
-	best := cnt4 * cnt7
-
-	for a := 0; a <= n; a++ {
-		x := (cnt4 + a) * (cnt7 + n - a)
-		if x > best {
-			best = x
-		}
+func check(l, r int, cnt4, cnt7, n int) int {
+	if l > r {
+		return 0
 	}
-	return best
+
+	ans := count(cnt4, cnt7, n)
+	if l <= 4 && 4 <= r {
+		ans = max(ans, count(cnt4+1, cnt7, n))
+	}
+	if l <= 7 && 7 <= r {
+		ans = max(ans, count(cnt4, cnt7+1, n))
+	}
+
+	return ans
+}
+
+func count(cnt4, cnt7 int, n int) int {
+	k := (cnt7 + n - cnt4) / 2
+	if k >= 0 && k <= n {
+		return (cnt4 + k) * (cnt7 + n - k)
+	}
+
+	k++
+	if k >= 0 && k <= n {
+		return (cnt4 + k) * (cnt7 + n - k)
+	}
+
+	return max((cnt4+n)*cnt7, cnt4*(cnt7+n))
 }

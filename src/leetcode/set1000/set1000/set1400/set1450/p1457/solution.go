@@ -11,43 +11,34 @@ type TreeNode struct {
 
 func pseudoPalindromicPaths(root *TreeNode) int {
 
-	var dfs func(node *TreeNode)
+	var dfs func(node *TreeNode, flag int)
 
 	var res int
 
-	cnt := make([]int, 10)
-
-	dfs = func(node *TreeNode) {
-		cnt[node.Val]++
+	dfs = func(node *TreeNode, flag int) {
+		flag ^= (1 << node.Val)
 
 		if node.Left == nil && node.Right == nil {
-			var odd int
-
-			for i := 1; i < 10; i++ {
-				odd += cnt[i] & 1
-			}
-
-			if odd == 0 || odd == 1 {
+			if flag == 0 || flag == (flag&(-flag)) {
 				res++
 			}
-		} else {
-			if node.Left != nil {
-				dfs(node.Left)
-			}
-
-			if node.Right != nil {
-				dfs(node.Right)
-			}
+			return
 		}
 
-		cnt[node.Val]--
+		if node.Left != nil {
+			dfs(node.Left, flag)
+		}
+
+		if node.Right != nil {
+			dfs(node.Right, flag)
+		}
 	}
 
 	if root == nil {
 		return 0
 	}
 
-	dfs(root)
+	dfs(root, 0)
 
 	return res
 }

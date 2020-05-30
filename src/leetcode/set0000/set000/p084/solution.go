@@ -8,6 +8,36 @@ func main() {
 
 func largestRectangleArea(heights []int) int {
 	n := len(heights)
+	left := make([]int, n)
+	right := make([]int, n)
+	for i := 0; i < n; i++ {
+		right[i] = n
+		left[i] = -1
+	}
+
+	stack := make([]int, n)
+	var p int
+
+	for i := 0; i < n; i++ {
+		for p > 0 && heights[stack[p-1]] >= heights[i] {
+			right[stack[p-1]] = i
+			p--
+		}
+		if p > 0 {
+			left[i] = stack[p-1]
+		}
+		stack[p] = i
+		p++
+	}
+	var res int
+	for i := 0; i < n; i++ {
+		res = max(res, max(1, (right[i]-left[i]-1))*heights[i])
+	}
+	return res
+}
+
+func largestRectangleArea1(heights []int) int {
+	n := len(heights)
 
 	stack := make([]int, n)
 

@@ -1,1 +1,2 @@
-# learn-go
+# golang practice
+A leetcode, codechef problem solution collection by golang.

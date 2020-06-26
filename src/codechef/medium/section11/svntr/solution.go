@@ -105,6 +105,32 @@ func solve(N, M, s int, A [][]int) int64 {
 		}
 	}
 
+	// var res int64
+
+	// for i := 0; i < N; i++ {
+	// 	for j := 0; j < M; j++ {
+	// 		for ii := i; ii < N; ii++ {
+	// 			for jj := j; jj < M; jj++ {
+	// 				tmp := F[ii][jj]
+	// 				if i > 0 {
+	// 					tmp -= F[i-1][jj]
+	// 				}
+	// 				if j > 0 {
+	// 					tmp -= F[ii][j-1]
+	// 				}
+	// 				if i > 0 && j > 0 {
+	// 					tmp += F[i-1][j-1]
+	// 				}
+	// 				if tmp < S {
+	// 					res++
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
+
+	// return res
+
 	findSum := func(i, ii, j int) int64 {
 		res := F[ii][j]
 		if i > 0 {
@@ -120,7 +146,7 @@ func solve(N, M, s int, A [][]int) int64 {
 	var mergeSort func(l, r int)
 
 	mergeSort = func(l, r int) {
-		if l >= r {
+		if l == r {
 			return
 		}
 		mid := (l + r) / 2

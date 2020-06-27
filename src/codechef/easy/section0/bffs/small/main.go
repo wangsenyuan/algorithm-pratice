@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"strconv"
-	"time"
 )
 
 func main() {
@@ -70,7 +69,7 @@ func play(f []int, ps [][]int) int {
 }
 
 func checkPermutation(f []int, p []int, n int) int {
-	start := time.Now()
+	//start := time.Now()
 	first := p[0]
 	second := p[1]
 	var r = 0

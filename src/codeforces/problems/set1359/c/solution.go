@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math"
 	"os"
 )
 
@@ -80,6 +81,41 @@ func main() {
 }
 
 func solve(h, c, t int) int64 {
+	if h <= t {
+		return 1
+	}
+
+	if 2*t <= h+c {
+		return 2
+	}
+
+	calc := func(n int64) float64 {
+		y := float64(2*n - 1)
+		x := float64(n*int64(h)) / y
+		z := float64((n-1)*int64(c)) / y
+		return x + z
+	}
+
+	var left, right int64 = 2, math.MaxInt32
+
+	for left < right {
+		mid := (left + right) / 2
+		x := calc(mid)
+		if x <= float64(t) {
+			right = mid
+		} else {
+			left = mid + 1
+		}
+	}
+	x := calc(right - 1)
+	y := calc(right)
+	if math.Abs(x-float64(t)) <= math.Abs(y-float64(t)) {
+		right--
+	}
+	return 2*right - 1
+}
+
+func solve1(h, c, t int) int64 {
 
 	if h <= t {
 		return 1

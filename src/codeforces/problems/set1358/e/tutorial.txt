@@ -1,0 +1,17 @@
+Let's call the value of all elements in the second half of the array 𝑥.
+
+Let 𝑠𝑖=𝑎𝑖+𝑎𝑖+1+…+𝑎𝑖+𝑘−1 — the reported incomes.
+
+Pretend there exists such a 𝑘 that 𝑘≤𝑛2. Consider the following reported incomes: 𝑠𝑖 and 𝑠𝑖+𝑘. Notice that if we double 𝑘, the 𝑖-th reported income will be equal to 𝑠𝑖+𝑠𝑖+𝑘. 𝑠𝑖>0 and 𝑠𝑖+𝑘>0 imply 𝑠𝑖+𝑠𝑖+𝑘>0. It means that after doubling 𝑘, the new value will still be correct  ⟹  if some 𝑘 exists, there's also 𝑘>𝑛2.
+
+Now, let's notice that 𝑠𝑖+1=𝑠𝑖+(𝑎𝑖+𝑘−𝑎𝑖).
+
+It means we can think of 𝑠𝑖 as prefix sums of the following array: 𝑝=[𝑠1, 𝑎𝑘+1−𝑎1, 𝑎𝑘+2−𝑎2, …, 𝑎𝑛−𝑎𝑛−𝑘].  As 𝑘>𝑛2, 𝑎𝑘+𝑗=𝑥 holds for 𝑗≥0, so, actually 𝑝=[𝑠1, 𝑥−𝑎1, 𝑥−𝑎2, …, 𝑥−𝑎𝑛−𝑘].
+
+How is this array changed when we increment 𝑘 by 1? 𝑝𝑛𝑒𝑤=[𝑠1+𝑎𝑘+1, 𝑎𝑘+2−𝑎1, 𝑎𝑘+3−𝑎2, …, 𝑎𝑛−𝑎𝑛−𝑘−1], which equals [𝑠1+𝑥, 𝑥−𝑎1, 𝑥−𝑎2, …, 𝑥−𝑎𝑛−𝑘−1].  So, when you increase 𝑘 by 1, the first element is changed, and the last element is removed — and that's it.
+
+Recall that 𝑠𝑖=𝑝1+𝑝2+…+𝑝𝑖. Notice that the minimum reported income (some number from 𝑠) doesn't depend on the first element of 𝑝 because it's a term of all sums (𝑠1,𝑠2,…). For example, if 𝑝1 is increased by 1, all 𝑠𝑖 are increased by 1 too. So, let's calculate the following array 𝑚:  𝑚𝑖=𝑚𝑖𝑛(𝑠1−𝑝1,𝑠2−𝑝1,…,𝑠𝑖−𝑝1)=𝑚𝑖𝑛(0,𝑝2, 𝑝2+𝑝3, …, 𝑝2+…+𝑝𝑖).  This can be done in (𝑛).
+
+Notice that this array is the same for all 𝑘, except its size. So, it's obvious that the minimum reported income for a particular 𝑘 is 𝑝1+𝑚𝑛−𝑘+1=𝑎1+…+𝑎𝑘+𝑚𝑛−𝑘+1. So, we can just check if this number is greater than 0 for some 𝑘.
+
+We can calculate prefix sums and 𝑚 in (𝑛), so the overall complexity is (𝑛).

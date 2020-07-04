@@ -26,6 +26,42 @@ func main() {
 }
 
 func kthSmallest(matrix [][]int, k int) int {
+	m := len(matrix)
+	n := len(matrix[0])
+
+	count := func(num int) int {
+		var cnt int
+
+		var r, c = 0, n - 1
+
+		for r < m && c >= 0 {
+			if matrix[r][c] > num {
+				c--
+			} else {
+				cnt += c + 1
+				r++
+			}
+		}
+		return cnt
+	}
+
+	left := matrix[0][0]
+	right := matrix[m-1][n-1] + 1
+
+	for left < right {
+		mid := left + (right-left)/2
+		c := count(mid)
+		if c >= k {
+			right = mid
+		} else {
+			left = mid + 1
+		}
+	}
+
+	return right
+}
+
+func kthSmallest1(matrix [][]int, k int) int {
 	n := len(matrix)
 	pq := make(CellPQ, 1)
 	pq[0] = &Cell{0, 0, matrix[0][0]}

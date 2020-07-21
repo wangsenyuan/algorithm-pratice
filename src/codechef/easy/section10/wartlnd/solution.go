@@ -112,7 +112,7 @@ func init() {
 			D[j] = append(D[j], i)
 		}
 	}
-	fmt.Fprintf(os.Stderr, "%v\n", mobius)
+	// fmt.Fprintf(os.Stderr, "%v\n", mobius)
 }
 
 type Pair struct {

@@ -1,7 +1,6 @@
 package p725
 
 import (
-	. "leetcode/util"
 	"testing"
 )
 

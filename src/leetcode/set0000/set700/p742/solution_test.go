@@ -1,7 +1,6 @@
 package p742
 
 import "testing"
-import . "leetcode/util"
 
 func runSample(t *testing.T, tree *TreeNode, k int, expect []int) {
 	res := findClosestLeaf(tree, k)

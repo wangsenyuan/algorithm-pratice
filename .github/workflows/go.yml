@@ -48,10 +48,8 @@ jobs:
     - name: TestCodeChef_practice
       run: go test -v ./src/codechef/practice/...
 
-    - name: TestCodeChef_easy
-      run: go test -v ./src/codechef/easy/...
-      timeout-minutes: 30
-
     - name: TestCodeChef_medium
       run: go test -v ./src/codechef/medium/...
-      timeout-minutes: 30
+      
+    - name: TestCodeChef_easy
+      run: go test -v ./src/codechef/easy/...

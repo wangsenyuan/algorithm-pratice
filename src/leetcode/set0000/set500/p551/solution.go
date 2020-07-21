@@ -1,4 +1,4 @@
-package main
+package p551
 
 func checkRecord(s string) bool {
 	aCount := 0

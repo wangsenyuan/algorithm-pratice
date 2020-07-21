@@ -46,6 +46,6 @@ func display(path string, v reflect.Value) {
 	}
 }
 
-fimc formatAtom(v reflect.Value) string {
-  
+func formatAtom(v reflect.Value) string {
+	return "none"
 }

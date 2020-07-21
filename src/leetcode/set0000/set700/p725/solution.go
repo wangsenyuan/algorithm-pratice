@@ -1,10 +1,56 @@
 package p725
 
 import (
+	"bytes"
 	"fmt"
 	"strconv"
 	"strings"
 )
+
+/**
+ * Definition for singly-linked list.
+ */
+type ListNode struct {
+	Val  int
+	Next *ListNode
+}
+
+func (list *ListNode) String() string {
+	var buf bytes.Buffer
+	buf.WriteString("[")
+
+	for tmp := list; tmp != nil; tmp = tmp.Next {
+		buf.WriteString(strconv.Itoa(tmp.Val))
+		buf.WriteString(",")
+	}
+
+	if buf.Len() > 0 {
+		buf.Truncate(buf.Len() - 1)
+	}
+
+	buf.WriteString("]")
+	return buf.String()
+}
+
+func ParseAsList(str string) *ListNode {
+	str = strings.Replace(str, "[", "", 1)
+	str = strings.Replace(str, "]", "", 1)
+	nodes := strings.Split(str, ",")
+
+	if len(nodes) == 0 {
+		return nil
+	}
+
+	head := &ListNode{Val: parseNum(nodes[0])}
+	prev := head
+	for i := 1; i < len(nodes); i++ {
+		cur := &ListNode{Val: parseNum(nodes[i])}
+		prev.Next = cur
+		prev = cur
+	}
+
+	return head
+}
 
 /**
  * Definition for a binary tree node.

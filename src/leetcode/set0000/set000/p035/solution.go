@@ -1,4 +1,4 @@
-package main
+package p035
 
 func searchInsert(nums []int, target int) int {
 	i, j := 0, len(nums)

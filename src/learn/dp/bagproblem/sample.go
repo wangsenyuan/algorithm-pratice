@@ -30,14 +30,3 @@ func max(a, b int) int {
 	}
 	return b
 }
-
-func backTrack(ws []int, vs []int, W int) int {
-  var knapsack func(i int, profit int, weight int) int
-  maxPrifit := 0
-
-  knapsack = func(i int, profit int, weight int) int {
-
-  }
-}
-
-}

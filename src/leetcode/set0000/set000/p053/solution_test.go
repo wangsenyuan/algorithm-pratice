@@ -1,4 +1,4 @@
-package main
+package p053
 
 import "testing"
 

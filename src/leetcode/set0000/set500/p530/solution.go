@@ -1,10 +1,10 @@
-package main
+package p530
 
 import "math"
 
 /**
  * Definition for a binary tree node.
-  */
+ */
 type TreeNode struct {
 	Val   int
 	Left  *TreeNode

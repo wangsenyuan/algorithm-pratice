@@ -1,4 +1,4 @@
-package main
+package p1504
 
 func numSubmat(mat [][]int) int {
 	m := len(mat)

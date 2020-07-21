@@ -1,4 +1,4 @@
-package main
+package p070
 
 func climbStairs(n int) int {
 	a, b := 1, 1

@@ -1,4 +1,4 @@
-package main
+package p477
 
 func totalHammingDistance(nums []int) int {
 	n := len(nums)

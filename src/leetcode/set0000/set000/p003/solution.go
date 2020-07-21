@@ -1,4 +1,4 @@
-package main
+package p003
 
 func lengthOfLongestSubstring(s string) int {
 	if len(s) == 0 {

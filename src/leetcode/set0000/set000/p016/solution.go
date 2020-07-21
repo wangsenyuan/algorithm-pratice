@@ -1,4 +1,4 @@
-package main
+package p016
 
 import (
 	"math"

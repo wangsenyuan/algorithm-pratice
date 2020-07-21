@@ -1,4 +1,4 @@
-package main
+package p507
 
 func checkPerfectNumber(num int) bool {
 	var perfectNumbers = []int{6, 28, 496, 8128, 33550336, 8589869056}
@@ -9,5 +9,5 @@ func checkPerfectNumber(num int) bool {
 		}
 	}
 
-	return false;
+	return false
 }

@@ -1,4 +1,4 @@
-package main
+package p026
 
 func removeDuplicates(nums []int) int {
 	p := 1

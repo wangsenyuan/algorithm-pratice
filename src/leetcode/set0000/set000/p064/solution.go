@@ -1,4 +1,4 @@
-package main
+package p064
 
 func minPathSum(grid [][]int) int {
 	m := len(grid)

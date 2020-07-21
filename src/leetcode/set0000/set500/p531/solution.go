@@ -1,4 +1,4 @@
-package main
+package p531
 
 func findLonelyPixel(picture [][]byte) int {
 	n := len(picture)

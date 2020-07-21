@@ -1,4 +1,4 @@
-package main
+package p1503
 
 import "sort"
 

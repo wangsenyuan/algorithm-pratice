@@ -1,4 +1,4 @@
-package main
+package p035
 
 import "testing"
 

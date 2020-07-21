@@ -1,4 +1,4 @@
-package main
+package p073
 
 func setZeroes(matrix [][]int) {
 	m := len(matrix)

@@ -1,4 +1,4 @@
-package main
+package p633
 
 import "math"
 

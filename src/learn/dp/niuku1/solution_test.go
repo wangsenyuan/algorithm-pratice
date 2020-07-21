@@ -18,10 +18,6 @@ func TestSample2(t *testing.T) {
 	runSample(t, "Who love?, Solo..", "Who Love Solo.")
 }
 
-func TestSample3(t *testing.T) {
-	runSample(t, "----Who,love???Solo", "Who Love Solo.")
-}
-
 func TestSample4(t *testing.T) {
 	runSample(t, "66666666664123+Who-32didn't love? Solo32..", "Who Didn T Love Solo.")
 }

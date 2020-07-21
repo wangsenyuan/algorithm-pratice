@@ -34,16 +34,6 @@ func TestSample2(t *testing.T) {
 	runSample(t, R, C, r, c, board, expect)
 }
 
-func TestSample3(t *testing.T) {
-	R, C, r, c := 2, 1, 2, 1
-	board := [][]int{
-		{1},
-		{1},
-	}
-	expect := INF
-	runSample(t, R, C, r, c, board, expect)
-}
-
 func TestSample4(t *testing.T) {
 	R, C, r, c := 3, 5, 3, 4
 	board := [][]int{

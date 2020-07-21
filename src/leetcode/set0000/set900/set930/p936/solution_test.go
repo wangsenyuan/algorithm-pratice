@@ -28,9 +28,3 @@ func TestSample1(t *testing.T) {
 	target := "ababc"
 	runSample(t, stamp, target, true)
 }
-
-func TestSample2(t *testing.T) {
-	stamp := "abca"
-	target := "ababc"
-	runSample(t, stamp, target, true)
-}

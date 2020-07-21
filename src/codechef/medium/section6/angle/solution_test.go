@@ -12,7 +12,7 @@ func runSample(t *testing.T, n int, p, q int, A []int, x, y, z int) {
 func TestSample1(t *testing.T) {
 	n, p, q := 4, 1, 2
 	A := []int{6, 6, 6, 7}
-	x, y, z := 1, 2, 3
+	x, y, z := 3, 1, 2
 	runSample(t, n, p, q, A, x, y, z)
 }
 

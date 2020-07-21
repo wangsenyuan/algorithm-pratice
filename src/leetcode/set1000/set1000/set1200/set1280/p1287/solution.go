@@ -1,3 +1,4 @@
+package p1349
 
 func findSpecialInteger(arr []int) int {
 	n := len(arr)
@@ -16,4 +17,3 @@ func findSpecialInteger(arr []int) int {
 
 	return -1
 }
-package p1287

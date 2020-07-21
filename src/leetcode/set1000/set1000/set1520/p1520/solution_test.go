@@ -58,3 +58,9 @@ func TestSample7(t *testing.T) {
 	expect := []string{"baabaab"}
 	runSample(t, s, expect)
 }
+
+func TestSample8(t *testing.T) {
+	s := "dabddcdc"
+	expect := []string{"a", "b"}
+	runSample(t, s, expect)
+}

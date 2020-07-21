@@ -110,9 +110,3 @@ func trimBST(root *TreeNode, L int, R int) *TreeNode {
 
 	return newRoot
 }
-
-func main() {
-	tree := ParseAsTree("[3,0,4,null,2,null,null,1]")
-	tree = trimBST(tree, 1, 3)
-	fmt.Printf(SprintTree(tree))
-}

@@ -1,4 +1,4 @@
-package main
+package p276
 
 func numWays(n int, k int) int {
 	if n == 0 {

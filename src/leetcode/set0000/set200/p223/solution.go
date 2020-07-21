@@ -1,4 +1,4 @@
-package main
+package p223
 
 func computeArea(A int, B int, C int, D int, E int, F int, G int, H int) int {
 	return (C-A)*(D-B) + (G-E)*(H-F) - commonArea(A, B, C, D, E, F, G, H)

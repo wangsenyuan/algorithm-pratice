@@ -1,4 +1,4 @@
-package main
+package p057
 
 //Interval Definition for an interval.
 type Interval struct {

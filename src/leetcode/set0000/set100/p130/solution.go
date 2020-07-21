@@ -1,4 +1,4 @@
-package main
+package p130
 
 const (
 	X = 'X'

@@ -1,4 +1,4 @@
-package main
+package p331
 
 import "strings"
 

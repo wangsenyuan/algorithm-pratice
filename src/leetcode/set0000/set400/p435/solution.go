@@ -1,4 +1,4 @@
-package main
+package p435
 
 import "sort"
 

@@ -1,4 +1,4 @@
-package main
+package p347
 
 func topKFrequent1(nums []int, k int) []int {
 	freq := make(map[int]int)

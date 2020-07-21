@@ -1,4 +1,4 @@
-package main
+package p346
 
 type MovingAverage struct {
 	windowSize int

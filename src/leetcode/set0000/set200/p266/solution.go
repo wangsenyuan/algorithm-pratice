@@ -1,4 +1,4 @@
-package main
+package p266
 
 func canPermutePalindrome(s string) bool {
 	cnts := make(map[rune]int)

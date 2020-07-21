@@ -1,4 +1,4 @@
-package main
+package p372
 
 //MOD = 1337
 const MOD = 1337

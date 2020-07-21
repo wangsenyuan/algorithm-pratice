@@ -1,4 +1,4 @@
-package main
+package p240
 
 import "sort"
 

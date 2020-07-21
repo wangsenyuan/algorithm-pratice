@@ -1,13 +1,6 @@
-package main
+package p421
 
-import "fmt"
-
-func main() {
-	//fmt.Println(findMaximumXOR([]int{3, 10, 5, 25, 2, 8}))
-	fmt.Println(findMaximumXOR([]int{10, 23, 20, 18, 28}))
-}
-
-func findMaximumXOR(nums []int) int {
+func findMaximumXOR1(nums []int) int {
 	mst := findMostSiginificantBit(nums)
 	if mst < 0 {
 		return 0

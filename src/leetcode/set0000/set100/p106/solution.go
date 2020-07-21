@@ -1,4 +1,4 @@
-package main
+package p106
 
 /**
  * Definition for a binary tree node.

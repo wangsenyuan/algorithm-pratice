@@ -1,4 +1,4 @@
-package main
+package p359
 
 //Logger is the solution
 type Logger struct {

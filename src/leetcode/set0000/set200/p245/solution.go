@@ -1,4 +1,4 @@
-package main
+package p245
 
 func shortestWordDistance(words []string, word1 string, word2 string) int {
 	if word1 == word2 {

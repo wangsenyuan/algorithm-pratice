@@ -1,4 +1,4 @@
-package main
+package p124
 
 import "math"
 

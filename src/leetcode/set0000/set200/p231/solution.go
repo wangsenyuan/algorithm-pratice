@@ -1,4 +1,4 @@
-package main
+package p231
 
 func isPowerOfTwo(n int) bool {
 	ones := 0

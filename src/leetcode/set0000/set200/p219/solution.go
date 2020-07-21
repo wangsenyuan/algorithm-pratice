@@ -1,4 +1,4 @@
-package main
+package p219
 
 func containsNearbyDuplicate(nums []int, k int) bool {
 	idx := make(map[int]int)

@@ -1,4 +1,4 @@
-package main
+package p128
 
 func longestConsecutive(nums []int) int {
 	m := make(map[int]int)

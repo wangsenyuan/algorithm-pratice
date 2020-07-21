@@ -1,4 +1,4 @@
-package main
+package p413
 
 func numberOfArithmeticSlices(A []int) int {
 	res := 0

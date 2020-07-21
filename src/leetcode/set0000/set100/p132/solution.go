@@ -1,4 +1,4 @@
-package main
+package p132
 
 func minCut(s string) int {
 	cut := make([]int, len(s)+1)

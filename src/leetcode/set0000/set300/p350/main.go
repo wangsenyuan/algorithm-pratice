@@ -1,4 +1,4 @@
-package main
+package p350
 
 import "sort"
 

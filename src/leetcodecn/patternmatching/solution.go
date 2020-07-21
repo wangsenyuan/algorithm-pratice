@@ -1,4 +1,4 @@
-package main
+package patternmatching
 
 func patternMatching(pattern string, value string) bool {
 	if len(pattern) == 0 {

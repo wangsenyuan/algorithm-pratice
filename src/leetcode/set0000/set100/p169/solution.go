@@ -1,4 +1,4 @@
-package main
+package p169
 
 func majorityElement(nums []int) int {
 	x := nums[0]

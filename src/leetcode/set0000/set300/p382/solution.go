@@ -1,4 +1,4 @@
-package main
+package p382
 
 import "math/rand"
 

@@ -1,11 +1,4 @@
-package main
-
-import "fmt"
-
-func main() {
-	//fmt.Println(findMaximumXOR([]int{3, 10, 5, 25, 2, 8}))
-	fmt.Println(findMaximumXOR([]int{10, 23, 20, 18, 28}))
-}
+package p421
 
 func findMaximumXOR(nums []int) int {
 	t := &Trie{children: make([]*Trie, 2)}

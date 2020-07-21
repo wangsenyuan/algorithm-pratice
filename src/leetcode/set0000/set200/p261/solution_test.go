@@ -1,4 +1,4 @@
-package main
+package p261
 
 import "testing"
 

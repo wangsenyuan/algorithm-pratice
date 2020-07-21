@@ -8,7 +8,7 @@ func runSample(t *testing.T, H, N, M, A, B, IND int, D []int, expect float64) {
 	res := solve(H, N, M, A, B, IND, D)
 
 	if res != int64(expect*2) {
-		t.Errorf("Sample expect %f, but got %f", expect, res)
+		t.Errorf("Sample expect %f, but got %d", expect, res)
 	}
 }
 

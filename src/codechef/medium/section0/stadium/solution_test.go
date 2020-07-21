@@ -21,14 +21,3 @@ func TestSample(t *testing.T) {
 	expect := 3
 	runSample(t, n, events, expect)
 }
-
-func TestSample1(t *testing.T) {
-	n := 2
-	events := [][]int{
-		{2, 5},
-		{7, 1},
-	}
-
-	expect := 2
-	runSample(t, n, events, expect)
-}

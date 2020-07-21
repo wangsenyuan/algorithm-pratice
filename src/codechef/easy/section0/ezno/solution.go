@@ -45,12 +45,12 @@ func init() {
 			construct(base, toStr(x), 1)
 		}
 	}
-	fmt.Println("base length count")
+	// fmt.Println("base length count")
 	// fmt.Printf("%v\n", ans)
 	for base := 2; base <= 16; base++ {
 		mp := ans[base]
 		ks := make([]int, 0, len(mp))
-		for k, _ := range mp {
+		for k := range mp {
 			ks = append(ks, k)
 		}
 		sort.Ints(ks)

@@ -1,15 +1,15 @@
 package main
 
 import (
-	"testing"
 	"reflect"
+	"testing"
 )
 
 func runSample(t *testing.T, n int, m int, skills []int, edges [][]int, queries [][]byte, expect []int) {
 	res := solve(n, m, skills, edges, queries)
 
 	if !reflect.DeepEqual(res, expect) {
-		t.Errorf("Sample %d %d %v %v %v, expect %v, but got %v", n, m, skills, edges, queries, expect)
+		t.Errorf("Sample %d %d %v %v, expect %v, but got %v", n, m, skills, edges, queries, expect)
 	}
 }
 

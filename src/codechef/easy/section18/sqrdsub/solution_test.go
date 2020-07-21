@@ -20,11 +20,6 @@ func TestSample2(t *testing.T) {
 	runSample(t, A, 2)
 }
 
-func TestSample3(t *testing.T) {
-	A := []int{2, 5, 4}
-	runSample(t, A, 2)
-}
-
 func TestSample4(t *testing.T) {
 	A := []int{2, 5, 8}
 	expect := find(A)

@@ -9,13 +9,13 @@ import (
 )
 
 func main() {
-	nums := readFile("../p410/input1.txt")
+	nums := readFile("src/leetcode/set0000/set400/p410/input1.txt")
 	fmt.Println(splitArray(nums, 9))
 }
 
 func readFile(file string) []int {
-	fp, e := filepath.Abs(file)
-	dat, e := ioutil.ReadFile(fp)
+	path, _ := filepath.Abs(file)
+	dat, e := ioutil.ReadFile(path)
 	if e != nil {
 		panic(e)
 	}

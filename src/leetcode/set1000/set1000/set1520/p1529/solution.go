@@ -21,6 +21,7 @@ func getLengthOfOptimalCompression(s string, K int) int {
 	}
 	//dp[ind(s[0])][1][0] = 1
 	//dp[ind(s[0])][1][1] = 0
+	has := make([]bool, 26)
 
 	// dp[x][l][k] = 以l ge x结尾，且删除掉k个字符的最少长度
 	for u := 0; u < n; u++ {
@@ -33,7 +34,11 @@ func getLengthOfOptimalCompression(s string, K int) int {
 				}
 			}
 		}
+		has[v] = true
 		for i := 0; i < 26; i++ {
+			if !has[i] {
+				continue
+			}
 			for j := 0; j <= u; j++ {
 				for k := 0; k <= K && k <= (u+1); k++ {
 					if dp[i][j][k] >= INF {

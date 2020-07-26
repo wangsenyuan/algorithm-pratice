@@ -29,3 +29,10 @@ func TestSample3(t *testing.T) {
 	expect := 3
 	runSample(t, s, k, expect)
 }
+
+func TestSample4(t *testing.T) {
+	s := "llllllllllttttttttt"
+	k := 1
+	expect := 4
+	runSample(t, s, k, expect)
+}

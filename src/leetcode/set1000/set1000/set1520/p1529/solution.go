@@ -52,13 +52,7 @@ func getLengthOfOptimalCompression(s string, K int) int {
 				}
 			}
 		}
-		for i := 0; i < 26; i++ {
-			for j := 0; j <= u+1; j++ {
-				for k := 0; k <= K; k++ {
-					dp[i][j][k] = fp[i][j][k]
-				}
-			}
-		}
+		dp, fp = fp, dp
 	}
 
 	var res = INF

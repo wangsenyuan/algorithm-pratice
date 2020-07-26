@@ -29,7 +29,7 @@ func getLengthOfOptimalCompression(s string, K int) int {
 
 		for i := 0; i < 26; i++ {
 			for j := 0; j <= u+1; j++ {
-				for k := 0; k <= K && k <= (u+1); k++ {
+				for k := 0; k <= K && j+k <= (u+1); k++ {
 					fp[i][j][k] = INF
 				}
 			}
@@ -40,7 +40,7 @@ func getLengthOfOptimalCompression(s string, K int) int {
 				continue
 			}
 			for j := 0; j <= u; j++ {
-				for k := 0; k <= K && k <= (u+1); k++ {
+				for k := 0; k <= K && j+k <= u; k++ {
 					if dp[i][j][k] >= INF {
 						// invalid
 						continue

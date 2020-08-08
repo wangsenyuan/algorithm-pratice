@@ -8,6 +8,103 @@ func main() {
 }
 
 func palindromePairs(words []string) [][]int {
+	// xxxw + xxx
+	var res [][]int
+	find(words, func(i, j int) {
+		if len(words[i]) >= len(words[j]) {
+			res = append(res, []int{i, j})
+		}
+	})
+
+	rw := make([]string, len(words))
+
+	for i := 0; i < len(words); i++ {
+		rw[i] = reverse(words[i])
+	}
+
+	find(rw, func(i, j int) {
+		if len(rw[i]) > len(rw[j]) {
+			res = append(res, []int{j, i})
+		}
+	})
+
+	return res
+}
+
+func find(words []string, f func(i, j int)) {
+	root := new(Node)
+
+	for i, word := range words {
+		pal := calcPalindrome(word)
+		root.Add(i, word, 0, pal)
+	}
+
+	for i, w := range words {
+		node := root
+		j := len(w) - 1
+		for node != nil && j >= 0 {
+			node = node.Get(w[j])
+			j--
+		}
+		if node == nil {
+			continue
+		}
+		// j < 0
+		for _, k := range node.pals {
+			if i == k {
+				continue
+			}
+			f(k, i)
+		}
+	}
+}
+
+func calcPalindrome(s string) []bool {
+	n := len(s)
+	p := make([]bool, n+1)
+	p[n] = true
+	for i := n - 1; i >= 0; i-- {
+		j, k := i, n-1
+		for j <= k && s[j] == s[k] {
+			j++
+			k--
+		}
+		p[i] = j > k
+	}
+	return p
+}
+
+type Node struct {
+	pals     []int
+	children [26]*Node
+}
+
+func (node *Node) Add(index int, s string, pos int, pal []bool) {
+
+	// palindrome after pos
+	if pal[pos] {
+		node.pals = append(node.pals, index)
+	}
+
+	if pos == len(s) {
+		return
+	}
+
+	x := int(s[pos] - 'a')
+
+	if node.children[x] == nil {
+		node.children[x] = new(Node)
+	}
+
+	node.children[x].Add(index, s, pos+1, pal)
+}
+
+func (node *Node) Get(x byte) *Node {
+	y := int(x - 'a')
+	return node.children[y]
+}
+
+func palindromePairs1(words []string) [][]int {
 	wordMap := make(map[string]int)
 	for i, word := range words {
 		wordMap[word] = i

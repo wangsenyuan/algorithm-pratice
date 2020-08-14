@@ -7,51 +7,33 @@ func main() {
 }
 
 func isValid(s string) bool {
-	for i := 0; i < len(s); {
-		j := pairedIndex(s, i+1, s[i], 1)
-		if j == len(s) {
+	n := len(s)
+	stack := make([]int, n)
+	var p int
+
+	for i := 0; i < n; i++ {
+		if s[i] == '{' || s[i] == '(' || s[i] == '[' {
+			stack[p] = i
+			p++
+			continue
+		}
+		if p == 0 {
 			return false
 		}
-		if !isValid(s[i+1 : j]) {
+
+		if s[i] == '}' && s[stack[p-1]] != '{' {
 			return false
 		}
-		i = j + 1
+
+		if s[i] == ')' && s[stack[p-1]] != '(' {
+			return false
+		}
+
+		if s[i] == ']' && s[stack[p-1]] != '[' {
+			return false
+		}
+		p--
 	}
 
-	return true
-}
-
-func pairedIndex(s string, i int, x byte, level int) int {
-	if i >= len(s) {
-		return i
-	}
-	if s[i] == x {
-		return pairedIndex(s, i+1, x, level+1)
-	}
-
-	if pair(s[i], x) && level == 1 {
-		return i
-	}
-
-	if pair(s[i], x) {
-		return pairedIndex(s, i+1, x, level-1)
-	}
-
-	return pairedIndex(s, i+1, x, level)
-}
-
-func pair(y, x byte) bool {
-	if x == '(' {
-		return y == ')'
-	}
-
-	if x == '[' {
-		return y == ']'
-	}
-
-	if x == '{' {
-		return y == '}'
-	}
-
-	return false
+	return p == 0
 }

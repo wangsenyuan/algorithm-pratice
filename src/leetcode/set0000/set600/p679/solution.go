@@ -3,6 +3,98 @@ package main
 import "fmt"
 
 func judgePoint24(nums []int) bool {
+	// len(nums) == 4
+	N := 1 << 4
+	mem := make([]map[float64]int, N)
+	mem[0] = make(map[float64]int)
+
+	var dp func(bits int) map[float64]int
+
+	dp = func(bits int) map[float64]int {
+		if mem[bits] != nil {
+			return mem[bits]
+		}
+		mem[bits] = make(map[float64]int)
+		ii := make([]int, 0, 4)
+
+		for i := 0; i < 4; i++ {
+			if bits&(1<<i) > 0 {
+				ii = append(ii, i)
+			}
+		}
+		if len(ii) == 1 {
+			mem[bits][float64(nums[ii[0]])]++
+			return mem[bits]
+		}
+		xs := split(ii)
+
+		for _, x := range xs {
+			a, b := x[0], x[1]
+			as := dp(a)
+			bs := dp(b)
+
+			for ak := range as {
+				for bk := range bs {
+					mem[bits][ak+bk]++
+					mem[bits][ak-bk]++
+					mem[bits][ak*bk]++
+					if bk != 0 {
+						mem[bits][ak/bk]++
+					}
+				}
+			}
+		}
+		return mem[bits]
+	}
+
+	ans := dp(N - 1)
+
+	for k := range ans {
+		if k <= 24.0+1e-6 && k >= 24.0-1e-6 {
+			return true
+		}
+	}
+
+	return false
+}
+
+func split(arr []int) [][]int {
+	var res [][]int
+	n := len(arr)
+	N := 1 << n
+	for i := 1; i < n; i++ {
+		//left has i elements, right has len(arr) - i elements
+		flag := (1 << i) - 1
+
+		for flag < N {
+			var a, b int
+			for j := 0; j < n; j++ {
+				if flag>>j&1 == 1 {
+					a |= 1 << arr[j]
+				} else {
+					b |= 1 << arr[j]
+				}
+			}
+			res = append(res, []int{a, b})
+			flag = snoob(flag)
+		}
+	}
+
+	return res
+}
+
+// this function returns next higher number with same number of set bits as x.
+func snoob(x int) int {
+	rightOne := x & -x
+	nextHigherOneBit := x + rightOne
+	rightOnesPattern := x ^ nextHigherOneBit
+	rightOnesPattern = (rightOnesPattern) / rightOne
+	rightOnesPattern >>= 2
+	next := nextHigherOneBit | rightOnesPattern
+	return next
+}
+
+func judgePoint24_x(nums []int) bool {
 
 	var process func(nums []float64) bool
 

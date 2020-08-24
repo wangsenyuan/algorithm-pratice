@@ -1,17 +1,17 @@
-package main
+package p459
 
-import "fmt"
+// import "fmt"
 
-func main() {
-	fmt.Println(repeatedSubstringPattern("abab"))
-	fmt.Println(repeatedSubstringPattern("abb"))
-	fmt.Println(repeatedSubstringPattern("abcabcabcabc"))
+// func main() {
+// 	fmt.Println(repeatedSubstringPattern("abab"))
+// 	fmt.Println(repeatedSubstringPattern("abb"))
+// 	fmt.Println(repeatedSubstringPattern("abcabcabcabc"))
 
-}
+// }
 
 func repeatedSubstringPattern(str string) bool {
 	lps := computeLPS(str)
-	fmt.Println(lps)
+	// fmt.Println(lps)
 	n := len(lps)
 	last := lps[n-1]
 	if last > 0 && n%(n-last) == 0 {
@@ -22,20 +22,15 @@ func repeatedSubstringPattern(str string) bool {
 
 func computeLPS(str string) []int {
 	lps := make([]int, len(str))
-	length := 0
-	i := 1
-	for i < len(str) {
-		if str[i] == str[length] {
-			length++
-			lps[i] = length
-			i++
-		} else {
-			if length > 0 {
-				length = lps[length-1]
-			} else {
-				lps[i] = 0
-				i++
-			}
+
+	for i := 1; i < len(str); i++ {
+		j := lps[i-1]
+		for j > 0 && str[i] != str[j] {
+			j = lps[j-1]
+		}
+		lps[i] = j
+		if str[i] == str[j] {
+			lps[i]++
 		}
 	}
 	return lps

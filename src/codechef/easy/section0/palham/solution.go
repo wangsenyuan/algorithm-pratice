@@ -56,7 +56,7 @@ func main() {
 
 const MOD = 1000000007
 
-const MAX = 3e5 + 5
+const MAX = 300005
 
 var p2 []int64
 var p24 []int64

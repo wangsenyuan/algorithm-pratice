@@ -9,29 +9,33 @@ func main() {
 }
 
 func PredictTheWinner(nums []int) bool {
-	var play1 func(i int, j int, a int64, b int64) bool
-	var play2 func(i int, j int, a int64, b int64) bool
-
-	play1 = func(i int, j int, a int64, b int64) bool {
-		if i == j {
-			return a+int64(nums[i]) >= b
-		}
-
-		if play2(i+1, j, a+int64(nums[i]), b) && play2(i, j-1, a+int64(nums[j]), b) {
-			return false
-		}
-		return true
+	n := len(nums)
+	dp := make([][]int, n)
+	for i := 0; i < n; i++ {
+		dp[i] = make([]int, n)
+		dp[i][i] = nums[i]
 	}
 
-	play2 = func(i int, j int, a int64, b int64) bool {
-		if i == j {
-			return b+int64(nums[i]) > a
-		}
-		if play1(i+1, j, a, b+int64(nums[i])) && play1(i, j-1, a, b+int64(nums[j])) {
-			return false
-		}
-		return true
+	sum := make([]int, n+1)
+	for i := 0; i < n; i++ {
+		sum[i+1] = sum[i] + nums[i]
 	}
 
-	return play1(0, len(nums)-1, 0, 0)
+	for l := 2; l <= n; l++ {
+		for i := 0; i+l <= n; i++ {
+			j := i + l - 1
+			//dp[i][j] = sum[i][j] - min(dp[i+1][j], dp[i][j-1])
+			dp[i][j] = sum[j+1] - sum[i] - min(dp[i+1][j], dp[i][j-1])
+		}
+	}
+	x := dp[0][n-1]
+	y := sum[n] - x
+	return x >= y
+}
+
+func min(a, b int) int {
+	if a <= b {
+		return a
+	}
+	return b
 }

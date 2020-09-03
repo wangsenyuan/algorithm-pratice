@@ -6,6 +6,18 @@ import (
 	"os"
 )
 
+func main() {
+	reader := bufio.NewReader(os.Stdin)
+
+	tc := readNum(reader)
+
+	for tc > 0 {
+		tc--
+		n := readNum(reader)
+		fmt.Println(solve(n))
+	}
+}
+
 func readInt(bytes []byte, from int, val *int) int {
 	i := from
 	sign := 1
@@ -66,23 +78,9 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 	return i
 }
 
-func main() {
-	reader := bufio.NewReader(os.Stdin)
-
-	tc := readNum(reader)
-
-	for tc > 0 {
-		tc--
-		n := readNum(reader)
-		res := solve(n)
-		if res {
-			fmt.Println("YES")
-		} else {
-			fmt.Println("NO")
-		}
+func solve(n int) int {
+	if n < 4 {
+		return 1
 	}
-}
-
-func solve(n int) bool {
-	return n%4 == 0
+	return n / 2
 }

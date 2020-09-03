@@ -2,9 +2,31 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"os"
+	"sort"
 )
+
+func main() {
+	reader := bufio.NewReader(os.Stdin)
+
+	tc := readNum(reader)
+
+	for tc > 0 {
+		tc--
+		n := readNum(reader)
+		A := readNNums(reader, 2*n)
+		res := solve(n, A)
+		var buf bytes.Buffer
+
+		for _, ans := range res {
+			buf.WriteString(fmt.Sprintf("%d %d\n", ans[0], ans[1]))
+		}
+
+		fmt.Println(buf.String())
+	}
+}
 
 func readInt(bytes []byte, from int, val *int) int {
 	i := from
@@ -65,24 +87,49 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 
 	return i
 }
-
-func main() {
-	reader := bufio.NewReader(os.Stdin)
-
-	tc := readNum(reader)
-
-	for tc > 0 {
-		tc--
-		n := readNum(reader)
-		res := solve(n)
-		if res {
-			fmt.Println("YES")
-		} else {
-			fmt.Println("NO")
-		}
+func solve(n int, A []int) [][]int {
+	ps := make([]Pair, 2*n)
+	for i := 0; i < len(A); i++ {
+		ps[i] = Pair{A[i], i}
 	}
+	sort.Sort(Pairs(ps))
+
+	j := sort.Search(len(ps), func(j int) bool {
+		return ps[j].first&1 == 0
+	})
+	var u int
+	if j&1 == 1 {
+		u++
+	}
+	var p int
+	res := make([][]int, n-1)
+
+	for p < n-1 {
+		res[p] = []int{ps[u].second + 1, ps[u+1].second + 1}
+		u += 2
+		p++
+	}
+
+	return res
 }
 
-func solve(n int) bool {
-	return n%4 == 0
+type Pair struct {
+	first, second int
+}
+
+type Pairs []Pair
+
+func (pairs Pairs) Len() int {
+	return len(pairs)
+}
+
+func (pairs Pairs) Less(i, j int) bool {
+	a := pairs[i]
+	b := pairs[j]
+
+	return a.first&1 > b.first&1 || a.first&1 == b.first&1 && a.second < b.second
+}
+
+func (pairs Pairs) Swap(i, j int) {
+	pairs[i], pairs[j] = pairs[j], pairs[i]
 }

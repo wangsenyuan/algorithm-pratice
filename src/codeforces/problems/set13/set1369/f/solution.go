@@ -6,6 +6,35 @@ import (
 	"os"
 )
 
+func main() {
+	reader := bufio.NewReader(os.Stdin)
+
+	n := readNum(reader)
+	var f, s = 1, 0
+	for n > 0 {
+		n--
+		var x, y uint64
+		bb, _ := reader.ReadBytes('\n')
+		pos := readUint64(bb, 0, &x)
+		readUint64(bb, pos+1, &y)
+
+		if f == s {
+			continue
+		}
+
+		a := chk(x, y)
+		b := lck(x, y)
+
+		if s == 1 {
+			a ^= 1
+			b ^= 1
+		}
+		s, f = a, b
+	}
+
+	fmt.Printf("%d %d\n", s, f)
+}
+
 func readInt(bytes []byte, from int, val *int) int {
 	i := from
 	sign := 1
@@ -66,23 +95,28 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 	return i
 }
 
-func main() {
-	reader := bufio.NewReader(os.Stdin)
-
-	tc := readNum(reader)
-
-	for tc > 0 {
-		tc--
-		n := readNum(reader)
-		res := solve(n)
-		if res {
-			fmt.Println("YES")
-		} else {
-			fmt.Println("NO")
-		}
+func chk(s, e uint64) int {
+	if s == e {
+		return 0
 	}
+	if s+1 == e {
+		return 1
+	}
+	if e&1 == 1 {
+		return 1 - int(s&1)
+	}
+	if s <= e/4 {
+		return chk(s, e/4)
+	}
+	if s > (e/4)*2 {
+		return int((e - s) & 1)
+	}
+	return 1
 }
 
-func solve(n int) bool {
-	return n%4 == 0
+func lck(s, e uint64) int {
+	if e < 2*s {
+		return 1
+	}
+	return chk(s, e/2)
 }

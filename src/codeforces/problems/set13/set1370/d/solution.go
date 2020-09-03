@@ -6,6 +6,13 @@ import (
 	"os"
 )
 
+func main() {
+	reader := bufio.NewReader(os.Stdin)
+	n, k := readTwoNums(reader)
+	A := readNNums(reader, n)
+	fmt.Println(solve(n, k, A))
+}
+
 func readInt(bytes []byte, from int, val *int) int {
 	i := from
 	sign := 1
@@ -66,23 +73,35 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 	return i
 }
 
-func main() {
-	reader := bufio.NewReader(os.Stdin)
+const MAX_A = 1000000001
 
-	tc := readNum(reader)
+// 236411286
 
-	for tc > 0 {
-		tc--
-		n := readNum(reader)
-		res := solve(n)
-		if res {
-			fmt.Println("YES")
+func solve(N, K int, A []int) int {
+
+	count := func(parity int, x int) int {
+		var j int
+		for i := 0; i < N; i++ {
+			if j&1 != parity || A[i] <= x {
+				j++
+			}
+		}
+		return j
+	}
+
+	check := func(x int) bool {
+		return count(0, x) >= K || count(1, x) >= K
+	}
+
+	var left, right = 1, MAX_A
+
+	for left < right {
+		mid := (left + right) / 2
+		if check(mid) {
+			right = mid
 		} else {
-			fmt.Println("NO")
+			left = mid + 1
 		}
 	}
-}
-
-func solve(n int) bool {
-	return n%4 == 0
+	return right
 }

@@ -6,6 +6,27 @@ import (
 	"os"
 )
 
+func main() {
+	reader := bufio.NewReader(os.Stdin)
+
+	tc := readNum(reader)
+
+	for tc > 0 {
+		tc--
+		n := readNum(reader)
+		res := solve(n)
+
+		if res {
+			fmt.Println(Ashishgup)
+		} else {
+			fmt.Println(FastestFinger)
+		}
+	}
+}
+
+const FastestFinger = "FastestFinger"
+const Ashishgup = "Ashishgup"
+
 func readInt(bytes []byte, from int, val *int) int {
 	i := from
 	sign := 1
@@ -66,23 +87,30 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 	return i
 }
 
-func main() {
-	reader := bufio.NewReader(os.Stdin)
-
-	tc := readNum(reader)
-
-	for tc > 0 {
-		tc--
-		n := readNum(reader)
-		res := solve(n)
-		if res {
-			fmt.Println("YES")
-		} else {
-			fmt.Println("NO")
-		}
-	}
-}
-
 func solve(n int) bool {
-	return n%4 == 0
+	if n == 1 {
+		return false
+	}
+	if n == 2 || n&1 == 1 {
+		return true
+	}
+
+	// n is even
+	// can't Subtract 1, because it will definitely lose
+	// 28 can divide 7
+	var x = 2
+	for x*x <= n {
+		if n%x == 0 {
+			y := n / x
+			if x&1 == 1 && !solve(y) {
+				return true
+			}
+			if x != y && y&1 == 1 && !solve(x) {
+				return true
+			}
+		}
+
+		x++
+	}
+	return false
 }

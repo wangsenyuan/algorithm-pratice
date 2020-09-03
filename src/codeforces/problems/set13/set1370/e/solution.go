@@ -6,6 +6,15 @@ import (
 	"os"
 )
 
+func main() {
+	reader := bufio.NewReader(os.Stdin)
+
+	n := readNum(reader)
+	s, _ := reader.ReadString('\n')
+	t, _ := reader.ReadString('\n')
+	fmt.Println(solve(n, s, t))
+}
+
 func readInt(bytes []byte, from int, val *int) int {
 	i := from
 	sign := 1
@@ -66,23 +75,44 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 	return i
 }
 
-func main() {
-	reader := bufio.NewReader(os.Stdin)
-
-	tc := readNum(reader)
-
-	for tc > 0 {
-		tc--
-		n := readNum(reader)
-		res := solve(n)
-		if res {
-			fmt.Println("YES")
-		} else {
-			fmt.Println("NO")
+func solve(n int, s, t string) int {
+	A := make([]int, n)
+	var sum int
+	for i := 0; i < n; i++ {
+		if s[i] > t[i] {
+			A[i] = 1
+		} else if s[i] < t[i] {
+			A[i] = -1
 		}
+		sum += A[i]
 	}
+
+	if sum != 0 {
+		return -1
+	}
+
+	get := func(x int) int {
+		var cur int
+		var best int
+
+		for i := 0; i < n; i++ {
+			cur += x * A[i]
+			if best < cur {
+				best = cur
+			}
+			if cur < 0 {
+				cur = 0
+			}
+		}
+		return best
+	}
+
+	return max(get(1), get(-1))
 }
 
-func solve(n int) bool {
-	return n%4 == 0
+func max(a, b int) int {
+	if a >= b {
+		return a
+	}
+	return b
 }

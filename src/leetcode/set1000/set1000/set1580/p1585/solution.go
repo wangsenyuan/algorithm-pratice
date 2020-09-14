@@ -1,5 +1,26 @@
 package p1585
 
+func isTransformable(s string, t string) bool {
+	cnt := make([]int, 10)
+
+	for i := 0; i < len(s); i++ {
+		cnt[int(s[i]-'0')]++
+		cnt[int(t[i]-'0')]--
+
+		if cnt[int(t[i]-'0')] == 0 {
+			continue
+		}
+
+		for j := t[i] - 1; j >= '0'; j-- {
+			if cnt[int(j-'0')] > 0 {
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
 func calc(s string) [][][]int {
 	n := len(s)
 	dp := make([][][]int, 10)
@@ -17,7 +38,7 @@ func calc(s string) [][][]int {
 	return dp
 }
 
-func isTransformable(s string, t string) bool {
+func isTransformable2(s string, t string) bool {
 	dp := calc(s)
 	fp := calc(t)
 

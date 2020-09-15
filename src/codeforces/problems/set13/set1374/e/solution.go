@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"container/heap"
 	"fmt"
+	"math"
 	"os"
 	"sort"
 )
@@ -86,6 +87,54 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 }
 
 func solve(n, k int, books [][]int) int64 {
+	times := make([][]int, 4)
+	sums := make([][]int64, 4)
+
+	for i := 0; i < 4; i++ {
+		times[i] = make([]int, 0, n)
+		sums[i] = make([]int64, 0, n)
+	}
+
+	for _, book := range books {
+		t, a, b := book[0], book[1], book[2]
+		times[2*a+b] = append(times[2*a+b], t)
+	}
+
+	for i := 0; i < 4; i++ {
+		sort.Ints(times[i])
+		var cur int64
+		sums[i] = append(sums[i], cur)
+		for j := 0; j < len(times[i]); j++ {
+			cur += int64(times[i][j])
+			sums[i] = append(sums[i], cur)
+		}
+	}
+
+	var best int64 = math.MaxInt64
+
+	for cnt := 0; cnt < min(k+1, len(sums[3])); cnt++ {
+		if k-cnt < len(sums[1]) && k-cnt < len(sums[2]) {
+			tmp := sums[3][cnt] + sums[1][k-cnt] + sums[2][k-cnt]
+			if tmp < best {
+				best = tmp
+			}
+		}
+	}
+
+	if best == math.MaxInt64 {
+		return -1
+	}
+	return best
+}
+
+func min(a, b int) int {
+	if a <= b {
+		return a
+	}
+	return b
+}
+
+func solve1(n, k int, books [][]int) int64 {
 
 	sort.Sort(Books(books))
 

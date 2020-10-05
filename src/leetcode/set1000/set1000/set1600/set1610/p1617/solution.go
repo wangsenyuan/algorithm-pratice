@@ -1,6 +1,16 @@
 package p1617
 
 func minimumOneBitOperations(num int) int {
+	var ans int
+	for num > 0 {
+		ans ^= num
+		num >>= 1
+	}
+
+	return ans
+}
+
+func minimumOneBitOperations1(num int) int {
 
 	mem := make(map[int]int)
 

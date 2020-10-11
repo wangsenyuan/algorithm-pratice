@@ -1,15 +1,63 @@
-package main
+package p416
 
 import (
-	"fmt"
 	"sort"
 )
 
-func main() {
-	fmt.Println(canPartition([]int{1, 2, 3, 5}))
+func canPartition(nums []int) bool {
+	sum := 0
+	for _, num := range nums {
+		sum += num
+	}
+
+	if sum%2 == 1 {
+		return false
+	}
+	half := sum / 2
+	dp := make([]bool, half+1)
+	dp[0] = true
+
+	for _, cur := range nums {
+		for j := half; j >= cur; j-- {
+			dp[j] = dp[j] || dp[j-cur]
+		}
+	}
+
+	return dp[half]
 }
 
-func canPartition(nums []int) bool {
+func canPartition2(nums []int) bool {
+	sum := 0
+	for _, num := range nums {
+		sum += num
+	}
+
+	if sum%2 == 1 {
+		return false
+	}
+	n := len(nums)
+	dp := make([][]bool, n+1)
+	for i := 0; i <= n; i++ {
+		dp[i] = make([]bool, 2*sum+1)
+	}
+	dp[0][sum] = true
+
+	for i := 1; i <= n; i++ {
+		cur := nums[i-1]
+		for diff := 0; diff <= 2*sum; diff++ {
+			if dp[i-1][diff] {
+				dp[i][diff+cur] = true
+				if diff-cur >= 0 {
+					dp[i][diff-cur] = true
+				}
+			}
+		}
+	}
+
+	return dp[n][sum]
+}
+
+func canPartition1(nums []int) bool {
 	sum := 0
 	for _, num := range nums {
 		sum += num

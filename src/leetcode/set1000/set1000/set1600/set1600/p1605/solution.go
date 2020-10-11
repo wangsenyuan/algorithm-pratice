@@ -13,34 +13,17 @@ func countSubgraphsForEachDiameter(n int, edges [][]int) []int {
 	}
 	H := make([]int, n)
 
-	var dfs func(u int) int
-	dfs = func(u int) int {
-		r := u
+	var dfs func(p, u int) Pair
+	dfs = func(p, u int) Pair {
 		vis[u]++
+		res := Pair{u, H[u]}
 		for _, v := range G[u] {
-			if vis[v] == 0 {
-				H[v] = H[u] + 1
-				tmp := dfs(v)
-				if H[tmp] > H[r] {
-					r = tmp
-				}
-			}
-		}
-		return r
-	}
-
-	var dfs2 func(p, u int) int
-
-	dfs2 = func(p, u int) int {
-		res := H[u]
-
-		for _, v := range G[u] {
-			if v == p {
+			if p == v {
 				continue
 			}
 			H[v] = H[u] + 1
-			tmp := dfs2(u, v)
-			if tmp > res {
+			tmp := dfs(u, v)
+			if res.second < tmp.second {
 				res = tmp
 			}
 		}
@@ -65,13 +48,13 @@ func countSubgraphsForEachDiameter(n int, edges [][]int) []int {
 			if vis[i] == 0 {
 				cnt++
 				H[i] = 0
-				r = dfs(i)
+				r = dfs(-1, i).first
 			}
 		}
 
 		if cnt == 1 {
 			H[r] = 0
-			d := dfs2(-1, r)
+			d := dfs(-1, r).second
 			if d > 0 {
 				res[d-1]++
 			}
@@ -84,4 +67,8 @@ func countSubgraphsForEachDiameter(n int, edges [][]int) []int {
 	}
 
 	return res
+}
+
+type Pair struct {
+	first, second int
 }

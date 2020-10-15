@@ -100,13 +100,23 @@ func solve(n int, A []int, X int, p int, k int) int {
 		A[k] = X
 		res++
 		sort.Ints(A)
-		i = sort.SearchInts(A, X)
 	}
 
-	if i < p && p < k {
+	for d := 0; d < n; d++ {
+		if k-d >= 0 && A[k-d] == X {
+			i = k - d
+			break
+		}
+		if k+d < n && A[k+d] == X {
+			i = k + d
+			break
+		}
+	}
+
+	if i <= p && p <= k {
 		return p - i + res
 	}
-	if k < p && p < i {
+	if k <= p && p <= i {
 		return i - p + res
 	}
 

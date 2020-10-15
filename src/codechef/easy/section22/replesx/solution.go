@@ -102,6 +102,10 @@ func solve(n int, A []int, X int, p int, k int) int {
 		sort.Ints(A)
 	}
 
+	if A[p] == X {
+		return res
+	}
+
 	for d := 0; d < n; d++ {
 		if k-d >= 0 && A[k-d] == X {
 			i = k - d

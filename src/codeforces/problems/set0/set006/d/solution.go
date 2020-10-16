@@ -155,12 +155,11 @@ func solve(n int, a int, b int, h []int) []int {
 	for best > 0 {
 		k := num[ii][jj][kk]
 		j := hlh[ii][jj][kk]
-		x := dp[ii][jj][kk] - dp[ii-1][j][k]
-		for x > 0 {
-			res = append(res, ii+1)
-			x--
-			best--
+		//x := dp[ii][jj][kk] - dp[ii-1][j][k]
+		for x := 0; x < k; x++ {
+			res = append(res, ii)
 		}
+		best -= k
 		ii--
 		jj, kk = j, k
 	}

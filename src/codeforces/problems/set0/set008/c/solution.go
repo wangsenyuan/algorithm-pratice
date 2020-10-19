@@ -136,6 +136,12 @@ func solve(home []int, items [][]int) (int, []int) {
 						}
 					}
 				}
+				// 这个break很重要。
+				// Now think in this way. While building the answer for 'i', take any 'on' bit.
+				// There are two cases 1. It is picked alone. 2. It is picked with one other object.
+				// That's it. This covers all the cases for 'i'.
+				// So we can compute for these two cases and then break i.e. only one bit is required. Hope it is clear!
+				break
 			}
 		}
 	}

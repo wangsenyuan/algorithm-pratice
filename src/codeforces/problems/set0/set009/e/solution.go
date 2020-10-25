@@ -120,32 +120,59 @@ func solve(n, m int, E [][]int) (int, [][]int) {
 		}
 		uf.Union(u, v)
 	}
-	root := uf.Find(0)
-	if uf.cnt[root] == n {
-		// only one comp
-
+	var sameComp = true
+	var tot int
+	compDegree := make([]int, n)
+	for i := 0; i < n && sameComp; i++ {
+		sameComp = uf.Find(i) == uf.Find(0)
+		tot += degree[i]
+		compDegree[uf.Find(i)] += degree[i]
 	}
 
-	pair := make([]bool, n)
+	if sameComp && tot == 2*n {
+		return 0, nil
+	}
+
 	for i := 0; i < n; i++ {
+		p := uf.Find(i)
+		if uf.cnt[p]*2 == compDegree[p] {
+			return -1, nil
+		}
+	}
+
+	res := make([][]int, 0, n-m)
+
+	for i := 0; i < n && uf.size > 1; {
 		if degree[i] == 2 {
+			i++
 			continue
 		}
-		if degree[i] == 0 {
-			var j = i + 1
-			for j < n {
-				if degree[j] < 2 && !pair[j] && uf.Find(j) != uf.Find(i) {
-					break
-				}
-				j++
+		for j := i + 1; j < n; j++ {
+			if degree[j] == 2 || uf.Find(i) == uf.Find(j) {
+				continue
 			}
+			degree[i]++
+			degree[j]++
 
-			if j == n {
-				return -1, nil
-			}
+			uf.Union(i, j)
+
+			res = append(res, []int{i + 1, j + 1})
+			break
 		}
 	}
-	return -1, nil
+
+	var first, second = -1, -1
+	for i := 0; i < n; i++ {
+		if degree[i] == 1 {
+			if first < 0 {
+				first = i
+			}
+			second = i
+		}
+	}
+	res = append(res, []int{first + 1, second + 1})
+
+	return len(res), res
 }
 
 type Pair struct {
@@ -167,8 +194,9 @@ func (ps Pairs) Swap(i, j int) {
 }
 
 type UFSet struct {
-	arr []int
-	cnt []int
+	arr  []int
+	cnt  []int
+	size int
 }
 
 func NewUFSet(n int) UFSet {
@@ -180,7 +208,7 @@ func NewUFSet(n int) UFSet {
 		cnt[i] = 1
 	}
 
-	return UFSet{arr, cnt}
+	return UFSet{arr, cnt, n}
 }
 
 func (uf *UFSet) Find(x int) int {
@@ -202,5 +230,6 @@ func (uf *UFSet) Union(a, b int) bool {
 	}
 	uf.cnt[pa] += uf.cnt[pb]
 	uf.arr[pb] = pa
+	uf.size--
 	return true
 }

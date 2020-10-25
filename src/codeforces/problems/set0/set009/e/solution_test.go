@@ -28,8 +28,8 @@ func TestSample2(t *testing.T) {
 	E := [][]int{
 		{1, 1},
 	}
-	expect := [][]int{}
-	runSample(t, n, m, E, expect)
+	//expect := [][]int{}
+	runSample(t, n, m, E, nil)
 }
 
 func TestSample3(t *testing.T) {

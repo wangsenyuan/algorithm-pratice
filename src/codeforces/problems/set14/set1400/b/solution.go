@@ -1,0 +1,132 @@
+package main
+
+import (
+	"bufio"
+	"bytes"
+	"fmt"
+	"os"
+)
+
+func main() {
+	reader := bufio.NewReader(os.Stdin)
+
+	tc := readNum(reader)
+	var buf bytes.Buffer
+	for tc > 0 {
+		tc--
+		p, f := readTwoNums(reader)
+		cnts, cntw := readTwoNums(reader)
+		s, w := readTwoNums(reader)
+		res := solve(p, f, cnts, cntw, s, w)
+		buf.WriteString(fmt.Sprintf("%d\n", res))
+	}
+	fmt.Print(buf.String())
+}
+
+func readInt(bytes []byte, from int, val *int) int {
+	i := from
+	sign := 1
+	if bytes[i] == '-' {
+		sign = -1
+		i++
+	}
+	tmp := 0
+	for i < len(bytes) && bytes[i] >= '0' && bytes[i] <= '9' {
+		tmp = tmp*10 + int(bytes[i]-'0')
+		i++
+	}
+	*val = tmp * sign
+	return i
+}
+
+func readNum(reader *bufio.Reader) (a int) {
+	bs, _ := reader.ReadBytes('\n')
+	readInt(bs, 0, &a)
+	return
+}
+
+func readTwoNums(reader *bufio.Reader) (a int, b int) {
+	res := readNNums(reader, 2)
+	a, b = res[0], res[1]
+	return
+}
+
+func readThreeNums(reader *bufio.Reader) (a int, b int, c int) {
+	res := readNNums(reader, 3)
+	a, b, c = res[0], res[1], res[2]
+	return
+}
+
+func readNNums(reader *bufio.Reader, n int) []int {
+	res := make([]int, n)
+	x := 0
+	bs, _ := reader.ReadBytes('\n')
+	for i := 0; i < n; i++ {
+		for x < len(bs) && (bs[x] < '0' || bs[x] > '9') && bs[x] != '-' {
+			x++
+		}
+		x = readInt(bs, x, &res[i])
+	}
+	return res
+}
+
+func readUint64(bytes []byte, from int, val *uint64) int {
+	i := from
+
+	var tmp uint64
+	for i < len(bytes) && bytes[i] >= '0' && bytes[i] <= '9' {
+		tmp = tmp*10 + uint64(bytes[i]-'0')
+		i++
+	}
+	*val = tmp
+
+	return i
+}
+
+func solve(p, f int, cnts int, cntw int, s, w int) int64 {
+	// a * s + b * w <= p
+	// c * s + d * w <= f
+	// a + c <= cnts
+	// b + d <= cntw
+	// max a + b + c + d
+	//if cnts > cntw {
+	//	cnts, cntw = cntw, cnts
+	//	s, w = w, s
+	//}
+	P := int64(p)
+	F := int64(f)
+	S := int64(s)
+	W := int64(w)
+	var best int64
+	for a := 0; a <= cnts; a++ {
+		A := int64(a)
+		if A*S > P {
+			break
+		}
+		B := min((P-A*S)/W, int64(cntw))
+		var C, D int64
+		if S <= W {
+			C = min(int64(cnts)-A, F/S)
+			D = min(int64(cntw)-B, (F-C*S)/W)
+		} else {
+			D = min(int64(cntw)-B, F/W)
+			C = min(int64(cnts)-A, (F-D*W)/S)
+		}
+
+		if C < 0 || D < 0 || C*S+D*W > F {
+			continue
+		}
+
+		if A+B+C+D > best {
+			best = A + B + C + D
+		}
+	}
+	return best
+}
+
+func min(a, b int64) int64 {
+	if a <= b {
+		return a
+	}
+	return b
+}

@@ -2,25 +2,15 @@ package main
 
 import (
 	"bufio"
-	"bytes"
 	"fmt"
 	"os"
 )
 
 func main() {
 	reader := bufio.NewReader(os.Stdin)
-
-	tc := readNum(reader)
-	var buf bytes.Buffer
-	for tc > 0 {
-		tc--
-
-		n := readNum(reader)
-		A := readNNums(reader, n)
-		res := solve(n, A)
-		buf.WriteString(fmt.Sprintf("%d\n", res))
-	}
-	fmt.Print(buf.String())
+	n := readNum(reader)
+	A := readNNums(reader, n)
+	fmt.Println(solve(n, A))
 }
 
 func readInt(bytes []byte, from int, val *int) int {
@@ -83,23 +73,44 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 	return i
 }
 
-func solve(n int, A []int) int64 {
-	cnt := make([][]int64, n+1)
-	for i := 0; i <= n; i++ {
-		cnt[i] = make([]int64, n+1)
+func solve(n int, A []int) int {
+
+	var loop func(l, r int, x int) int
+
+	loop = func(l, r int, x int) int {
+		y := A[l]
+		for i := l + 1; i <= r; i++ {
+			if A[i] < y {
+				y = A[i]
+			}
+		}
+		cnt := r - l + 1
+		if y-x >= cnt {
+			return cnt
+		}
+		res := y - x
+		i := l
+		for i <= r {
+			if A[i] == y {
+				i++
+				continue
+			}
+			// A[i] != y
+			j := i
+			for i <= r && A[i] > y {
+				i++
+			}
+			res += loop(j, i-1, y)
+		}
+		return min(res, cnt)
 	}
 
-	var res int64
+	return loop(0, n-1, 0)
+}
 
-	for j := n - 1; j >= 0; j-- {
-		k := j + 1
-		for l := k + 1; l < n; l++ {
-			cnt[A[k]][A[l]]++
-		}
-		for i := 0; i < j; i++ {
-			res += cnt[A[i]][A[j]]
-		}
+func min(a, b int) int {
+	if a <= b {
+		return a
 	}
-
-	return res
+	return b
 }

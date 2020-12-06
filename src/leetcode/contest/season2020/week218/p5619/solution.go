@@ -4,7 +4,7 @@ import "sort"
 
 const INF = 1 << 30
 
-func minimumIncompatibility(nums []int, k int) int {
+func minimumIncompatibility1(nums []int, k int) int {
 	res := check(nums, k)
 	if res == -1 {
 		return -1
@@ -84,7 +84,7 @@ func check(nums []int, k int) int {
 	return -2
 }
 
-func minimumIncompatibility1(nums []int, k int) int {
+func minimumIncompatibility(nums []int, k int) int {
 	res := check(nums, k)
 	if res == -1 {
 		return -1
@@ -96,24 +96,22 @@ func minimumIncompatibility1(nums []int, k int) int {
 	n := len(nums)
 	N := 1 << n
 	var P []Pair
-
-	var pick func(i int, mask int, mem map[int]int, a int, b int)
+	sort.Ints(nums)
+	var pick func(i int, mask int, prev int, a int, b int)
 	x := n / k
-	pick = func(i int, mask int, mem map[int]int, a int, b int) {
+	pick = func(i int, mask int, prev int, a int, b int) {
 		if i == x {
 			P = append(P, Pair{mask, b - a})
 			return
 		}
 
-		for j := 0; j < n; j++ {
-			if mem[nums[j]] == 0 {
-				mem[nums[j]]++
-				pick(i+1, mask|1<<j, mem, min(a, nums[j]), max(b, nums[j]))
-				mem[nums[j]]--
+		for j := prev + 1; j < n; j++ {
+			if prev < 0 || nums[j] > nums[prev] {
+				pick(i+1, mask|(1<<j), j, min(a, nums[j]), nums[j])
 			}
 		}
 	}
-	pick(0, 0, make(map[int]int), n+1, 0)
+	pick(0, 0, -1, n+1, 0)
 	// then need to pick k sets, such that set a & b == 0 && sum(a, b, ..) = 0
 	m := len(P)
 	// C(m, k)

@@ -39,14 +39,14 @@ func boxDelivering(boxes [][]int, portsCount int, maxBoxes int, maxWeight int) i
 		return res
 	}
 
-	diff := make([]int, n+1)
-
-	for i := 1; i <= n; i++ {
-		diff[i] = diff[i-1]
+	diff := func(cur int, i int) int {
 		if i > 1 && boxes[i-1][0] != boxes[i-2][0] {
-			diff[i]++
+			return cur + 1
 		}
+		return cur
 	}
+
+	var cur int
 	var ans int
 	var w int
 	update(0, 0)
@@ -60,10 +60,12 @@ func boxDelivering(boxes [][]int, portsCount int, maxBoxes int, maxWeight int) i
 
 		tmp := get(j, i)
 
-		ans = tmp + diff[i] + 2
+		cur = diff(cur, i)
+
+		ans = tmp + cur + 2
 
 		if i < n {
-			update(i, ans-diff[i+1])
+			update(i, ans-diff(cur, i+1))
 		}
 	}
 

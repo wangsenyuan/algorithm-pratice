@@ -9,6 +9,42 @@ func distanceLimitedPathsExist(n int, edgeList [][]int, queries [][]int) []bool 
 		return edgeList[i][2] < edgeList[j][2]
 	})
 
+	qs := make([]Query, len(queries))
+
+	for i := 0; i < len(queries); i++ {
+		qs[i] = Query{queries[i][0], queries[i][1], queries[i][2], i}
+	}
+
+	sort.Slice(qs, func(i, j int) bool {
+		return qs[i].w < qs[j].w
+	})
+	ans := make([]bool, len(queries))
+	var ii int
+	uf := NewUFSet(n)
+
+	for _, q := range qs {
+		w := q.w
+		for ii < len(edgeList) && edgeList[ii][2] < w {
+			edge := edgeList[ii]
+			u, v := edge[0], edge[1]
+			uf.Union(u, v)
+			ii++
+		}
+		ans[q.i] = uf.Find(q.u) == uf.Find(q.v)
+	}
+	return ans
+}
+
+type Query struct {
+	u, v, w int
+	i       int
+}
+
+func distanceLimitedPathsExist1(n int, edgeList [][]int, queries [][]int) []bool {
+	sort.Slice(edgeList, func(i, j int) bool {
+		return edgeList[i][2] < edgeList[j][2]
+	})
+
 	use := make([]bool, len(edgeList))
 	uf := NewUFSet(n)
 	degree := make([]int, n)

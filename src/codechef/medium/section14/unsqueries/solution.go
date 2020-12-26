@@ -12,7 +12,7 @@ func main() {
 
 	n, q, s := readThreeNums(reader)
 	heights := readNNums(reader, n)
-	solver := NewSolver(n, s, heights)
+	solver := NewSolver1(n, s, heights)
 	var buf bytes.Buffer
 	for q > 0 {
 		q--

@@ -2,9 +2,29 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"os"
 )
+
+func main() {
+	reader := bufio.NewReader(os.Stdin)
+
+	tc := readNum(reader)
+	var buf bytes.Buffer
+	for tc > 0 {
+		tc--
+		n := readNum(reader)
+
+		E := make([][]int, n-1)
+		for i := 0; i < n-1; i++ {
+			E[i] = readNNums(reader, 2)
+		}
+		buf.WriteString(solve(n, E))
+		buf.WriteByte('\n')
+	}
+	fmt.Print(buf.String())
+}
 
 func readInt(bytes []byte, from int, val *int) int {
 	i := from
@@ -66,56 +86,65 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 	return i
 }
 
-func main() {
-	scanner := bufio.NewReader(os.Stdin)
+func solve(n int, E [][]int) string {
+	G := getGraph(n, E)
+	cnt := make([]int, n)
+	buf := make([]byte, n)
 
-	tc := readNum(scanner)
+	for i := 0; i < n; i++ {
+		buf[i] = '0'
+	}
 
-	for tc > 0 {
-		tc--
+	if n%2 == 1 {
+		return string(buf)
+	}
 
-		line := readNNums(scanner, 4)
-		n, a, b, c := line[0], line[1], line[2], line[3]
+	var dfs func(p, u int)
 
-		solver := NewSolver(a, b, c)
-		var pos, num int
-
-		bs, _ := scanner.ReadBytes('\n')
-
-		for i := 0; i < n; i++ {
-			pos = readInt(bs, pos, &num) + 1
-			solver.ReadFloor(num)
+	dfs = func(p, u int) {
+		cnt[u]++
+		for _, v := range G[u] {
+			if v != p {
+				dfs(u, v)
+				cnt[u] += cnt[v]
+			}
 		}
 
-		fmt.Println(solver.ans)
+		tmp := n - cnt[u]
+
+		for _, v := range G[u] {
+			if v != p && tmp < cnt[v] {
+				tmp = cnt[v]
+			}
+		}
+
+		if tmp <= n/2 {
+			buf[u] = '1'
+		}
 	}
+
+	dfs(-1, 0)
+
+	return string(buf)
 }
 
-type Solver struct {
-	a, b, c int64
-	ans     int64
-}
-
-func NewSolver(a, b, c int) Solver {
-	return Solver{int64(a), int64(b), int64(c), int64(1) << 60}
-}
-
-func (solver *Solver) ReadFloor(f int) {
-	F := int64(f)
-	tmp := abs(F-solver.a) + abs(F-solver.b) + solver.c
-	solver.ans = min(solver.ans, tmp)
-}
-
-func abs(num int64) int64 {
-	if num < 0 {
-		return -num
+func getGraph(n int, E [][]int) [][]int {
+	degree := make([]int, n)
+	for _, e := range E {
+		u, v := e[0]-1, e[1]-1
+		degree[u]++
+		degree[v]++
 	}
-	return num
-}
-
-func min(a, b int64) int64 {
-	if a <= b {
-		return a
+	adj := make([][]int, n)
+	for i := 0; i < n; i++ {
+		adj[i] = make([]int, 0, degree[i])
 	}
-	return b
+
+	for _, e := range E {
+		u, v := e[0]-1, e[1]-1
+		adj[u] = append(adj[u], v)
+		adj[v] = append(adj[v], u)
+	}
+
+	return adj
 }

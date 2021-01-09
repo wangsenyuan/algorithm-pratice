@@ -34,7 +34,7 @@ func waysToSplit(nums []int) int {
 			k := search(i, func(k int) bool {
 				return pref[i]-pref[k] <= right
 			}) - 1
-
+			// pref[i] - pref[k] > right
 			if k < 0 {
 				k = 0
 			}

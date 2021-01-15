@@ -182,74 +182,73 @@ func (solver *Solver) Update(p int, color int) int64 {
 		return ways(1)
 	}
 
-	i := solver.tree1.Find(0, p)
-	j := solver.tree2.Find(p, n)
-
 	if p == 0 {
-		if solver.A[p] == solver.A[j] {
-			// case 1
+		j := solver.tree2.Find(0, n)
+		if j > p {
+			// [0...j] are same
 			ans = ans - ways(j+1) + ways(1) + ways(j)
-		} else if color == solver.A[j] {
-			//case 2
-			ans = ans - ways(j) - ways(1) + ways(j+1)
 		} else {
-			// case 3 no change
+			// j == p
+			jj := solver.tree2.Find(1, n)
+			if color == solver.A[jj] {
+				// now [0...jj] are same
+				ans = ans - ways(1) - ways(jj) + ways(jj+1)
+			}
+			// else no change
 		}
 	} else if p == n-1 {
-		if solver.A[i+1] == solver.A[p] {
-			// case 4
+		i := solver.tree1.Find(0, p)
+		// [i+1...p] are same
+		if i+1 < p {
 			ans = ans - ways(n-i) + ways(1) + ways(n-i-1)
-		} else if color == solver.A[i+1] {
-			// case 5
-			ans = ans - ways(n-i-1) - ways(1) + ways(n-i)
 		} else {
-			// case 6 no change
+			// i + 1 == p
+			ii := solver.tree1.Find(0, n-1)
+			if color == solver.A[ii+1] {
+				ans = ans - ways(1) - ways(n-1-ii) + ways(n-ii)
+			}
+			// else no change
 		}
-	} else if i+1 < p && p < j {
-		// case 7
-		ans = ans - ways(j-i) + ways(1) + ways(p-1-i) + ways(j-p)
-	} else if p == j {
-		// [i+1...p] has same color
-		if i+1 == p {
-			// color p differs with before & after
-			ii := solver.tree1.Find(0, p-1)
-			jj := solver.tree2.Find(p+1, n)
+	} else {
+		i := solver.tree1.Find(0, p)
+		j := solver.tree2.Find(p, n)
+		ii := solver.tree1.Find(0, i)
+		jj := solver.tree2.Find(j+1, n)
+
+		if i+1 == p && p == j {
+			// previous p is a standalone point
 			if solver.A[ii+1] == solver.A[jj] {
-				if solver.A[ii+1] == color {
-					// case 8 new color connects them
-					ans = ans - ways(1) - ways(p-1-ii) - ways(jj-p) + ways(jj-ii)
-				} else {
-					// case 9 no change
+				if color == solver.A[jj] {
+					ans = ans - ways(1) - ways(jj-p) - ways(i-ii) + ways(jj-ii)
 				}
-			} else if solver.A[ii+1] == color {
-				// case 10 append to before
-				ans = ans - ways(1) - ways(p-1-ii) + ways(p-ii)
-			} else if solver.A[jj] == color {
-				// case 11 prepend to after
-				ans = ans - ways(1) - ways(jj-(p+1)) + ways(jj-p)
+				// else no change
 			} else {
-				// case 12 no change
+				if color == solver.A[ii+1] {
+					ans = ans - ways(1) - ways(i-ii) + ways(p-ii)
+				} else if color == solver.A[jj] {
+					ans = ans - ways(1) - ways(jj-j) + ways(jj-p+1)
+				}
+				// else no change
 			}
-		} else {
-			// i + 1 < p, color p same as before but differ after
-			if color == solver.A[p+1] {
-				// new color same as after
-				jj := solver.tree2.Find(p+1, n)
-				ans = ans - ways(p-i) - ways(jj-p) + ways(p-1-i) + ways(jj-(p-1))
+		} else if i+1 == p {
+			// p < j, after change, it will break
+			if solver.A[i] != color {
+				//just a new standalone point
+				ans = ans - ways(j-i) + ways(1) + ways(j-p)
 			} else {
-				// new color diff from after
+				// p need to append to before
+				ans = ans - ways(j-i) - ways(i-ii) + ways(j-p) + ways(p-ii)
+			}
+		} else if p == j {
+			// [i+1....p] are same
+			if solver.A[j+1] != color {
 				ans = ans - ways(p-i) + ways(1) + ways(p-1-i)
+			} else {
+				ans = ans - ways(p-i) - ways(jj-p) + ways(p-1-i) + ways(jj-(p-1))
 			}
-		}
-	} else if i+1 == p {
-		// [p...j] has same color, and i >= 0
-		if color == solver.A[i] {
-			// same color as before
-			ii := solver.tree1.Find(0, i)
-			ans = ans - ways(j-(p-1)) - ways(p-1-ii) + ways(j-p) + ways(p-ii)
 		} else {
-			// still different with before
-			ans = ans - ways(j-(p-1)) + ways(1) + ways(j-(p+1))
+			// i + 1 < p && p < j
+			ans = ans - ways(j-i) + ways(1) + ways(j-p) + ways(p-1-i)
 		}
 	}
 

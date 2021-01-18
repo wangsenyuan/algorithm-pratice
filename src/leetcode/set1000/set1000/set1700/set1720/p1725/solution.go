@@ -8,41 +8,27 @@ func tupleSameProduct(nums []int) int {
 
 	var res int
 	cnt := make(map[Pair]int)
-	// a * d == b * c
-	// a / b = c / d
+
 	for i := 0; i < len(nums); i++ {
-		for j := i - 1; j >= 0; j-- {
-			b := nums[i]
-			a := nums[j]
+		for j := i + 1; j < len(nums); j++ {
+			a, b := nums[i], nums[j]
 			g := gcd(a, b)
 			a /= g
 			b /= g
 			p := Pair{a, b}
-			if cnt[p] > 0 {
-				res += cnt[p]
-			}
+			res += cnt[p]
+		}
+		for j := i - 1; j >= 0; j-- {
+			a, b := nums[j], nums[i]
+			g := gcd(a, b)
+			a /= g
+			b /= g
+			p := Pair{a, b}
 			cnt[p]++
 		}
 	}
-	cnt2 := make(map[int]int)
-	for i := 0; i < len(nums); i++ {
-		cnt2[nums[i]*nums[i]]++
-	}
 
-	for i := 0; i < len(nums); i++ {
-		for j := len(nums) - 1; j > i; j-- {
-			x := nums[i] * nums[j]
-			if cnt2[x] > 0 {
-				res--
-			}
-		}
-	}
-	// a/b = c / d
-	// a, d, b, c
-	// d, a, c, b
-	// b, c, a, d
-	// c, b, d, a
-	return res * 4
+	return res * 8
 }
 
 type Pair struct {

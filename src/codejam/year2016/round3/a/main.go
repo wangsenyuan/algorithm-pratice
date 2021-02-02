@@ -10,7 +10,7 @@ var LABELS = [26]string{}
 
 func init() {
 	for i := 0; i < 26; i++ {
-		LABELS[i] = string('A' + i)
+		LABELS[i] = fmt.Sprint('A' + i)
 	}
 }
 

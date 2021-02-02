@@ -22,7 +22,7 @@ func main() {
 	for i := 0; i < 26; i++ {
 		x := cnt[i]
 		for j := 0; j < x; j++ {
-			res += string('a' + i)
+			res += fmt.Sprint('a' + i)
 		}
 	}
 	if len(res) > 0 {
@@ -51,7 +51,7 @@ func countLetters(s string) []int {
 	cnt := make([]int, 26)
 
 	for i := 0; i < len(s); i++ {
-		cnt[s[i] - 'a']++
+		cnt[s[i]-'a']++
 	}
 
 	return cnt

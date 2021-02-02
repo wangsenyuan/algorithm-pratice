@@ -65,7 +65,7 @@ func toStr(x int) string {
 	if x < 10 {
 		return strconv.Itoa(x)
 	}
-	return string('A' + (x - 10))
+	return fmt.Sprint('A' + (x - 10))
 }
 
 func toInt(x byte) int {

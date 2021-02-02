@@ -68,38 +68,60 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 }
 
 func main() {
-	scanner := bufio.NewReader(os.Stdin)
+	reader := bufio.NewReader(os.Stdin)
 
-	tc := readNum(scanner)
+	tc := readNum(reader)
 
 	var buf bytes.Buffer
 
 	for tc > 0 {
 		tc--
-		n := readNum(scanner)
-		A := readNNums(scanner, n)
-		buf.WriteString(fmt.Sprintf("%d\n", solve(n, A)))
+		n := readNum(reader)
+		A := readNNums(reader, n)
+		res := solve(n, A)
+		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 	fmt.Print(buf.String())
 }
 
 func solve(n int, A []int) int64 {
-	x := make([]int, n)
-	x[0] = A[0]
+	var bits int
+	for 1<<uint(bits) < n {
+		bits++
+	}
 
-	for i := 1; i < n; i++ {
-		x[i] = x[i-1]
-		if A[i] < x[i] {
-			x[i] = A[i]
+	freq := make([]int, 1<<uint(bits))
+
+	for _, x := range A {
+		freq[x]++
+
+	}
+
+	for bit := 0; bit < bits; bit++ {
+		for mask := 0; mask < 1<<uint(bits); mask++ {
+			if mask&(1<<uint(bit)) == 0 {
+				freq[mask] += freq[mask^1<<uint(bit)]
+			}
 		}
 	}
 
-	var res int64
-	var prev int
-	for i := n - 1; i >= 0; i-- {
-		res += int64(i+1) * int64(x[i]-prev)
-		prev = x[i]
+	dp := make([]int64, 1<<uint(bits))
+	dp[(1<<uint(bits))-1] = int64(freq[(1<<uint(bits))-1]) * int64((1<<uint(bits))-1)
+
+	for mask := (1 << uint(bits)) - 1; mask >= 0; mask-- {
+		for bit := 0; bit < bits; bit++ {
+			if mask&(1<<uint(bit)) > 0 {
+				dp[mask^(1<<uint(bit))] = max(dp[mask^(1<<uint(bit))], dp[mask]+int64(freq[mask^(1<<uint(bit))]-freq[mask])*int64(mask^(1<<uint(bit))))
+			}
+		}
 	}
 
-	return res
+	return dp[0]
+}
+
+func max(a, b int64) int64 {
+	if a >= b {
+		return a
+	}
+	return b
 }

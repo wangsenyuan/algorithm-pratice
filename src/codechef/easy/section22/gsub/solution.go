@@ -99,17 +99,19 @@ type Solver struct {
 }
 
 func NewSolver(n int, A []int) Solver {
-	var cur int
+	var ans = 2
+	arr := make([]int, n+2)
+	copy(arr[1:], A)
+	arr[0] = -1
+	arr[n+1] = -1
 
 	for i := 1; i <= n; i++ {
-		if i == n || A[i] != A[i-1] {
-			cur++
+		if arr[i] != arr[i-1] {
+			ans++
 		}
 	}
 
-	copy(arr[:n], A)
-
-	return Solver{arr[:n], cur, n}
+	return Solver{arr, ans, n}
 }
 
 func max(a, b int) int {
@@ -120,47 +122,32 @@ func max(a, b int) int {
 }
 
 func (solver *Solver) Update(x int, y int) int {
-	x--
-	n := solver.n
 	arr := solver.arr
 	cur := solver.cur
 
 	if arr[x] == y {
 		// no change
-		return cur
+		return cur - 2
 	}
 
-	if x > 0 && x < n-1 {
-		if arr[x-1] == arr[x] && arr[x+1] == arr[x] {
-			cur += 2
-		} else if arr[x-1] != arr[x] && arr[x+1] == arr[x] {
-			cur++
-			if arr[x-1] == y {
-				cur--
-			}
-		} else if arr[x-1] == arr[x] && arr[x+1] != arr[x] {
-			cur++
-			if arr[x+1] == y {
-				cur--
-			}
-		} else {
-			if arr[x-1] == y {
-				cur--
-			}
-			if arr[x+1] == y {
-				cur--
-			}
+	if arr[x] == arr[x-1] && arr[x] == arr[x+1] {
+		cur += 2
+	} else if (arr[x] != arr[x-1]) && (arr[x] == arr[x+1]) {
+		cur++
+		if y == arr[x-1] {
+			cur--
 		}
-	} else if x == 0 {
-		if arr[x] == arr[x+1] {
-			cur++
-		} else if arr[x+1] == y {
+	} else if arr[x] == arr[x-1] && arr[x] != arr[x+1] {
+		cur++
+		if y == arr[x+1] {
 			cur--
 		}
 	} else {
-		if arr[x-1] == arr[x] {
-			cur++
-		} else if arr[x-1] == y {
+		// arr[x] != arr[x-1] && arr[x] != arr[x+1]
+		if y == arr[x-1] {
+			cur--
+		}
+		if y == arr[x+1] {
 			cur--
 		}
 	}
@@ -168,5 +155,5 @@ func (solver *Solver) Update(x int, y int) int {
 	arr[x] = y
 
 	solver.cur = cur
-	return cur
+	return cur - 2
 }

@@ -7,6 +7,23 @@ import (
 	"os"
 )
 
+func main() {
+	reader := bufio.NewReader(os.Stdin)
+
+	tc := readNum(reader)
+
+	var buf bytes.Buffer
+	for tc > 0 {
+		tc--
+		n := readNum(reader)
+		A := readNNums(reader, n)
+		res := solve(n, A)
+		buf.WriteString(fmt.Sprintf("%d\n", res))
+	}
+
+	fmt.Print(buf.String())
+}
+
 func readInt(bytes []byte, from int, val *int) int {
 	i := from
 	sign := 1
@@ -67,39 +84,15 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 	return i
 }
 
-func main() {
-	scanner := bufio.NewReader(os.Stdin)
+func solve(n int, A []int) int {
+	var sum int
 
-	tc := readNum(scanner)
-
-	var buf bytes.Buffer
-
-	for tc > 0 {
-		tc--
-		n := readNum(scanner)
-		A := readNNums(scanner, n)
-		buf.WriteString(fmt.Sprintf("%d\n", solve(n, A)))
-	}
-	fmt.Print(buf.String())
-}
-
-func solve(n int, A []int) int64 {
-	x := make([]int, n)
-	x[0] = A[0]
-
-	for i := 1; i < n; i++ {
-		x[i] = x[i-1]
-		if A[i] < x[i] {
-			x[i] = A[i]
-		}
+	for i := 0; i < n; i++ {
+		sum = (sum + A[i]) & 1
 	}
 
-	var res int64
-	var prev int
-	for i := n - 1; i >= 0; i-- {
-		res += int64(i+1) * int64(x[i]-prev)
-		prev = x[i]
+	if sum == 0 {
+		return 1
 	}
-
-	return res
+	return 2
 }

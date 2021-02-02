@@ -21,8 +21,8 @@ func TestSample1(t *testing.T) {
 
 func TestSample2(t *testing.T) {
 	grid := [][]int{}
-	var expect []int
-	runSample(t, grid, expect)
+	//var expect []int
+	runSample(t, grid, []int{})
 }
 
 func TestSample3(t *testing.T) {

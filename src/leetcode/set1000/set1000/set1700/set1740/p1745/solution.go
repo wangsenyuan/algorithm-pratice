@@ -1,4 +1,4 @@
-package p1755
+package p1745
 
 func canEat(candiesCount []int, queries [][]int) []bool {
 	n := len(candiesCount)

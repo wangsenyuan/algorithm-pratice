@@ -1,44 +1,33 @@
 package main
 
-import (
-	"reflect"
-	"fmt"
-)
-
-
 func checkInclusion(s1 string, s2 string) bool {
-	m1 := make(map[byte]int)
+	m1 := make([]int, 26)
 
 	for i := 0; i < len(s1); i++ {
-		m1[s1[i]]++
+		m1[int(s1[i]-'a')]++
 	}
 
-	m2 := make(map[byte]int)
+	m2 := make([]int, 26)
 
 	j := 0
 	for i := 0; i < len(s2); i++ {
-		x := s2[i]
+		x := int(s2[i] - 'a')
 		m2[x]++
 
-		if reflect.DeepEqual(m1, m2) {
+		ok := true
+
+		for j := 0; j < 26 && ok; j++ {
+			ok = m1[j] == m2[j]
+		}
+
+		if ok {
 			return true
 		}
 
 		for m2[x] > m1[x] && j <= i {
-			y := s2[j]
-			m2[y]--
-			if m2[y] == 0 {
-				delete(m2, y)
-			}
+			m2[int(s2[j]-'a')]--
 			j++
 		}
 	}
 	return false
-}
-
-
-func main() {
-	s1 := "ab"
-	s2 := "eidooab"
-	fmt.Println(checkInclusion(s1, s2))
 }

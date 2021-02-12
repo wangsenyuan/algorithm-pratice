@@ -365,6 +365,8 @@ func (tree *SegTree) GetMinDiff(p int) int64 {
 }
 
 func (tree *SegTree) GetMaxDiff(p int) int64 {
+	// p 是 lca，需要被重新激活，假设 u ----> p ----> v
+	// 那么p会出现2次。所以on[p] 就是 false, 那么p的贡献会被ingore。所以重新激活后，才能得到正确的答案
 	cur := tree.on[p]
 	if cur == 0 {
 		tree.Update(p, 1)

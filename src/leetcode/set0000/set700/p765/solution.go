@@ -1,8 +1,8 @@
 package p765
 
-func minSwapsCouples(ROW []int) int {
-	row := make([]int, len(ROW))
-	copy(row, ROW)
+func minSwapsCouples(row []int) int {
+	//row := make([]int, len(ROW))
+	//copy(row, ROW)
 	n := len(row) / 2
 	idx := make([]int, len(row))
 	for i := 0; i < n; i++ {
@@ -13,12 +13,7 @@ func minSwapsCouples(ROW []int) int {
 	var res int
 
 	for i := 0; i < len(row); i += 2 {
-		j := 0
-		if row[i]%2 == 0 {
-			j = row[i] + 1
-		} else {
-			j = row[i] - 1
-		}
+		j := row[i] ^ 1
 		if row[i+1] != j {
 			swap(row, idx, i+1, idx[j])
 			res++

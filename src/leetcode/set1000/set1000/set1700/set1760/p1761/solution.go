@@ -22,9 +22,9 @@ func minTrioDegree(n int, edges [][]int) int {
 	for u := 0; u < n; u++ {
 		for i := g.nodes[u]; i > 0; i = g.next[i] {
 			v := g.to[i]
-			for j := g.nodes[v]; j > 0; j = g.next[j] {
+			for j := g.next[i]; j > 0; j = g.next[j] {
 				w := g.to[j]
-				if grid[u][w] {
+				if grid[v][w] {
 					tmp := degree[w] + degree[u] + degree[v]
 					tmp -= 6
 					if res < 0 || res > tmp {

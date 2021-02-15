@@ -1,25 +1,22 @@
 package main
 
-import "fmt"
-
-func main() {
-	nums := []int{1, 1, 0, 1, 1, 1}
-	fmt.Println(findMaxConsecutiveOnes(nums))
-}
-
 func findMaxConsecutiveOnes(nums []int) int {
 	var res int
-	a, i := 0, 1
-
-	for i <= len(nums) {
-		if i == len(nums) || nums[i] != nums[a] {
-			if nums[a] == 1 && i-a > res {
-				res = i - a
-			}
-			a = i
+	var sum int
+	for i := 0; i < len(nums); i++ {
+		sum += nums[i]
+		if nums[i] == 0 {
+			res = max(res, sum)
+			sum = 0
 		}
-
-		i++
 	}
+	res = max(res, sum)
 	return res
+}
+
+func max(a, b int) int {
+	if a >= b {
+		return a
+	}
+	return b
 }

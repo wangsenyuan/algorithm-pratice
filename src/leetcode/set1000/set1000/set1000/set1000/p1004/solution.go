@@ -5,14 +5,9 @@ func longestOnes(A []int, K int) int {
 	var j int
 	n := len(A)
 	for i := 0; i < n; i++ {
-		if A[i] == 1 {
+		if A[i] == 1 || K > 0 {
 			best = max(best, i-j+1)
-			continue
-		}
-		// A[i] == 0
-		if K > 0 {
-			best = max(best, i-j+1)
-			K--
+			K -= 1 - A[i]
 			continue
 		}
 		// K == 0

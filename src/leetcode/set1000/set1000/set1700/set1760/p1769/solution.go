@@ -1,11 +1,10 @@
 package p1769
-
 func maximumScore(nums []int, multipliers []int) int {
 	n := len(nums)
 	m := len(multipliers)
 	dp := make([][]int, 2)
 	for i := 0; i < 2; i++ {
-		dp[i] = make([]int, n+2)
+		dp[i] = make([]int, m+1)
 	}
 
 	// dp[i][j] = 生成 长度为i的结果数组，且左边的index为j时的最大值
@@ -13,7 +12,7 @@ func maximumScore(nums []int, multipliers []int) int {
 	var p int
 	for l := 1; l <= m; l++ {
 		q := p ^ 1
-		for j := 0; j < n+2; j++ {
+		for j := 0; j < m+1; j++ {
 			dp[q][j] = -(1 << 30)
 		}
 		for i := 0; i < l; i++ {
@@ -29,7 +28,7 @@ func maximumScore(nums []int, multipliers []int) int {
 
 	var best = -(1 << 30)
 
-	for i := 0; i < n+2; i++ {
+	for i := 0; i < m+1; i++ {
 		best = max(best, dp[p][i])
 	}
 

@@ -12,6 +12,7 @@ func main() {
 }
 
 func calculate(s string) int {
+	s = normalize(s)
 	nums := make([]int, 10)
 	p0 := 0
 	ops := make([]byte, 10)
@@ -21,17 +22,6 @@ func calculate(s string) int {
 
 	for i < len(s) {
 		b := s[i]
-		if b == ' ' {
-			i++
-			continue
-		}
-		/*if b == '*' || b == '/' {
-			ops = extendOp(ops, p1, b)
-			p1++
-			i++
-			continue
-		}*/
-
 		if b == '+' || b == '-' {
 			for p1 > 0 {
 				num := doCalculate(nums, p0, ops, p1)
@@ -66,6 +56,23 @@ func calculate(s string) int {
 	}
 
 	return nums[0]
+}
+
+func normalize(s string) string {
+	buf := []byte(s)
+	var n int
+	for i := 0; i < len(s); i++ {
+		if buf[i] == ' ' {
+			continue
+		}
+		buf[n] = buf[i]
+		n++
+	}
+	s = string(buf[:n])
+	if s[0] == '-' {
+		return "0" + s
+	}
+	return s
 }
 
 func readNum(s string, start int) (int, int) {

@@ -110,8 +110,7 @@ func solve(n int, a []int) int {
 	}
 
 	for i := 2; i <= m; i++ {
-		cand := last[A[i]] + 1
-		f[i] = min(g(i-1, i), g(cand, i))
+		f[i] = min(g(i-1, i), g(last[A[i]]+1, i))
 
 		res = min(res, f[i]+m-i)
 

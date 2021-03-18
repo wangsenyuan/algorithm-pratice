@@ -2,11 +2,17 @@ package main
 
 import (
 	"bufio"
-	"bytes"
 	"fmt"
 	"math"
 	"os"
 )
+
+func main() {
+	reader := bufio.NewReader(os.Stdin)
+	n, k := readTwoNums(reader)
+	A := readNNums(reader, n)
+	fmt.Printf("%d\n", solve(n, k, A))
+}
 
 func readInt(bytes []byte, from int, val *int) int {
 	i := from
@@ -68,30 +74,75 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 	return i
 }
 
-func main() {
-	reader := bufio.NewReader(os.Stdin)
-
-	var buf bytes.Buffer
-
-	tc := readNum(reader)
-
-	for tc > 0 {
-		tc--
-		n := readNum(reader)
-		A := readNNums(reader, n)
-
-		res := solve(n, A)
-
-		for i := 0; i < len(res); i++ {
-			buf.WriteString(fmt.Sprintf("%d ", res[i]))
-		}
-		buf.WriteByte('\n')
+func solve(n int, k int, A []int) int {
+	cnt := make([]int, n+1)
+	for i := 0; i < n; i++ {
+		cnt[A[i]]++
+	}
+	pos := make([][]int, n+1)
+	for i := 0; i <= n; i++ {
+		pos[i] = make([]int, 0, cnt[i])
 	}
 
-	fmt.Print(buf.String())
+	for i := 0; i < n; i++ {
+		pos[A[i]] = append(pos[A[i]], i)
+	}
+
+	var ans int
+
+	for _, cur := range pos {
+		if len(cur) == 0 {
+			continue
+		}
+		ans += count(n, int64(k), cur)
+		if ans >= MOD {
+			ans -= MOD
+		}
+	}
+	return ans
 }
 
-const MAX_N = 1 << 21
+func count(n int, k int64, arr []int) int {
+	freq := make([]int64, len(arr)+1)
+	freq[0] = int64(arr[0] + 1)
+	for i := 1; i < len(arr); i++ {
+		freq[i] = int64(arr[i] - arr[i-1])
+	}
+	freq[len(arr)] = int64(n - arr[len(arr)-1])
+	rf := make([]int64, len(freq))
+	for i := 0; i < len(freq); i++ {
+		rf[i] = freq[len(freq)-1-i]
+	}
+	res := fftMul(freq, rf)
+
+	var ans int64
+
+	for i := 1; i <= len(arr); i++ {
+		tmp := pow(int64(i), k)
+		tmp *= res[i+len(arr)]
+		tmp %= MOD
+		ans += tmp
+		ans %= MOD
+	}
+	return int(ans)
+}
+
+func pow(a, b int64) int64 {
+	var res int64 = 1
+	for b > 0 {
+		if b&1 == 1 {
+			res *= a
+			res %= MOD
+		}
+		a = a * a % MOD
+		b >>= 1
+	}
+	return res
+}
+
+const MOD = 1000000007
+
+const MAX_N = 200010
 
 var f1 [MAX_N]complex128
 var w [MAX_N]complex128
@@ -100,67 +151,10 @@ var arr [MAX_N]int64
 var rarr [MAX_N]int64
 var rev [MAX_N]int
 
-const LIMIT = 3000
-
 func init() {
 	for i := 0; i < MAX_N; i++ {
 		w[i] = 0
 	}
-}
-
-func solve(n int, A []int) []int64 {
-	cnt := make(map[int]int)
-
-	var pre int
-
-	ans := make([]int64, n+1)
-
-	for i := 0; i < n; i++ {
-		pre ^= A[i]
-		if pre == 0 {
-			ans[i+1]++
-		}
-		cnt[pre]++
-	}
-	mp := make(map[int][]int)
-
-	pre = 0
-
-	for i := 0; i < n; i++ {
-		pre ^= A[i]
-		if mp[pre] == nil {
-			mp[pre] = make([]int, 0, cnt[pre])
-		}
-		mp[pre] = append(mp[pre], i)
-	}
-
-	for _, v := range mp {
-		if len(v) < LIMIT {
-			for i := 0; i < len(v); i++ {
-				for j := i + 1; j < len(v); j++ {
-					ans[v[j]-v[i]]++
-				}
-			}
-		} else {
-			for i := 0; i < n; i++ {
-				arr[i] = 0
-				rarr[i] = 0
-			}
-			for _, j := range v {
-				arr[j] = 1
-				rarr[n-1-j] = 1
-			}
-			//reverse(rev[:n])
-
-			res := fftMul(arr[:n], rarr[:n])
-
-			for i := 0; i < n; i++ {
-				ans[n-1-i] += res[i]
-			}
-		}
-	}
-
-	return ans[1:]
 }
 
 func fftMul(a, b []int64) []int64 {

@@ -142,7 +142,7 @@ func pow(a, b int64) int64 {
 
 const MOD = 1000000007
 
-const MAX_N = 200010
+const MAX_N = 400010
 
 var f1 [MAX_N]complex128
 var w [MAX_N]complex128

@@ -123,11 +123,11 @@ func solve(L, R int) (int, [][]int) {
 
 		add(1, k+3, 1)
 		for i := 0; i <= k; i++ {
-			if ((R-1)>>i)&1 == 1 {
+			if ((r-1)>>i)&1 == 1 {
 				add(i+2, k+3, 1+((r-1)>>(i+1)<<(i+1)))
 			}
 		}
-		return l + 3
+		return k + 3
 	}
 
 	k := process(L, R)

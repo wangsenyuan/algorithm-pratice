@@ -14,7 +14,38 @@ func main() {
 
 }
 
+const INF = 1 << 30
+
 func find132pattern(nums []int) bool {
+	n := len(nums)
+	// min value before n
+	mn := make([]int, n)
+	mn[0] = INF
+	stack := make([]int, n)
+	var p int
+	var pivot = nums[0]
+	for i := 1; i < n; i++ {
+		cur := nums[i]
+		for p > 0 && nums[stack[p-1]] <= cur {
+			p--
+		}
+		// p == 0 || stack[p-1] > cur
+		if p > 0 && mn[stack[p-1]] < cur {
+			return true
+		}
+		if pivot < cur {
+			stack[p] = i
+			p++
+			mn[i] = pivot
+		} else {
+			mn[i] = INF
+			pivot = cur
+		}
+	}
+	return false
+}
+
+func find132pattern1(nums []int) bool {
 	n := len(nums)
 	xs := make([]int, n)
 	stack := make([]int, n)

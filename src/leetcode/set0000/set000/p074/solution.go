@@ -5,7 +5,7 @@ import (
 	"sort"
 )
 
-func searchMatrix(matrix [][]int, target int) bool {
+func searchMatrix1(matrix [][]int, target int) bool {
 	i := sort.Search(len(matrix), func(i int) bool {
 		return matrix[i][0] > target
 	})
@@ -23,6 +23,25 @@ func searchMatrix(matrix [][]int, target int) bool {
 	}
 
 	return true
+}
+
+func searchMatrix(matrix [][]int, target int) bool {
+	m := len(matrix)
+	n := len(matrix[0])
+
+	var r, c = 0, n - 1
+
+	for r < m && c >= 0 {
+		if matrix[r][c] == target {
+			return true
+		}
+		if matrix[r][c] < target {
+			r++
+		} else {
+			c--
+		}
+	}
+	return false
 }
 
 func main() {

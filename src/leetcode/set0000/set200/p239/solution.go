@@ -8,6 +8,9 @@ func main() {
 
 func maxSlidingWindow(nums []int, k int) []int {
 	n := len(nums)
+	if n == 0 {
+		return nil
+	}
 	que := make([]int, n)
 	var front, end int
 

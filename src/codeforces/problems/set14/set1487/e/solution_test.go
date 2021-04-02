@@ -3,7 +3,7 @@ package main
 import "testing"
 
 func runSample(t *testing.T, A, B, C, D []int, X, Y, Z [][]int, expect int) {
-	res := solve(A, B, C, D, X, Y, Z)
+	res := solve1(A, B, C, D, X, Y, Z)
 
 	if res != expect {
 		t.Errorf("Sample expect %d, but got %d", expect, res)

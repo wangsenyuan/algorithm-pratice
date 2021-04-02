@@ -31,7 +31,7 @@ func main() {
 	for i := 0; i < m; i++ {
 		Z[i] = readNNums(reader, 2)
 	}
-	fmt.Println(solve(A, B, C, D, X, Y, Z))
+	fmt.Println(solve1(A, B, C, D, X, Y, Z))
 }
 
 func readInt(bytes []byte, from int, val *int) int {
@@ -373,59 +373,91 @@ func solve1(A, B, C, D []int, X, Y, Z [][]int) int {
 func process(A, B []int, X [][]int) []int {
 	n1 := len(A)
 	n2 := len(B)
-	cnt := make([]int, n2)
-	for _, x := range X {
-		cnt[x[1]-1]++
-	}
-
-	pref := make([][]int, n2)
-	for i := 0; i < n2; i++ {
-		pref[i] = make([]int, 0, cnt[i])
-	}
-
 	sort.Slice(X, func(i, j int) bool {
-		return X[i][0] < X[j][0]
+		return X[i][1] < X[j][1]
 	})
 
-	for _, x := range X {
-		a, b := x[0], x[1]
-		a--
-		b--
-		if B[b] >= INF {
-			continue
-		}
-		pref[b] = append(pref[b], a)
-	}
-
-	tree := NewSegTree(n1)
+	tree := NewTree(n2)
 
 	for i := 0; i < n2; i++ {
-		if B[i] >= INF {
-			continue
-		}
-		cur := pref[i]
-		//sort.Ints(cur)
-		var p int
-		for j := 0; j < len(cur); j++ {
-			if cur[j] > p {
-				tree.Update(p, cur[j]-1, B[i])
-			}
-			p = cur[j] + 1
-		}
-		if p < n1 {
-			tree.Update(p, n1-1, B[i])
-		}
+		tree.Update(i, B[i])
 	}
 
-	res := make([]int, n1)
+	cnt := make([]int, n1)
+
+	for _, x := range X {
+		cnt[x[0]-1]++
+	}
+
+	conn := make([][]int, n1)
 
 	for i := 0; i < n1; i++ {
-		tmp := tree.Query(i, i)
-		if tmp < INF {
-			res[i] = tmp + A[i]
-		} else {
-			res[i] = INF
+		conn[i] = make([]int, 0, cnt[i])
+	}
+
+	for _, x := range X {
+		u, v := x[0], x[1]
+		u--
+		v--
+		conn[u] = append(conn[u], v)
+	}
+	res := make([]int, n1)
+	for u := 0; u < n1; u++ {
+		res[u] = INF
+		var p int
+		for _, v := range conn[u] {
+			if p < v {
+				tmp := tree.Query(p, v)
+				res[u] = min(res[u], tmp+A[u])
+			}
+			p = v + 1
 		}
+		if p < n2 {
+			res[u] = min(res[u], tree.Query(p, n2)+A[u])
+		}
+	}
+	return res
+}
+
+type Tree struct {
+	arr []int
+	n   int
+}
+
+func NewTree(n int) *Tree {
+	arr := make([]int, n*2)
+	for i := 0; i < len(arr); i++ {
+		arr[i] = INF
+	}
+	return &Tree{arr, n}
+}
+
+func (tree *Tree) Update(p int, v int) {
+	p += tree.n
+	if tree.arr[p] > v {
+		tree.arr[p] = v
+		for p > 1 {
+			tree.arr[p>>1] = min(tree.arr[p], tree.arr[p^1])
+			p >>= 1
+		}
+	}
+}
+
+func (tree *Tree) Query(l, r int) int {
+	l += tree.n
+	r += tree.n
+	res := INF
+	for l < r {
+		if l&1 == 1 {
+			res = min(res, tree.arr[l])
+			l++
+		}
+		if r&1 == 1 {
+			r--
+			res = min(res, tree.arr[r])
+		}
+		l >>= 1
+		r >>= 1
 	}
 	return res
 }
@@ -438,10 +470,10 @@ type SegTree struct {
 
 func NewSegTree(n int) *SegTree {
 	arr := make([]int, 4*n)
-	for i := 0; i < len(arr); i++ {
-		arr[i] = INF
-	}
 	lazy := make([]int, 4*n)
+	for i := 0; i < len(arr); i++ {
+		arr[i] = INF + 1
+	}
 	return &SegTree{arr, lazy, n}
 }
 

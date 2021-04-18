@@ -104,7 +104,6 @@ func solve(H []int, Q [][]int) []int {
 	}
 
 	D := make([]int, n+1)
-	cnt := make([]int, n)
 	// node n is root
 	D[n] = 0
 	stack := make([]int, n)
@@ -117,7 +116,6 @@ func solve(H []int, Q [][]int) []int {
 			P[i][0] = n
 		} else {
 			P[i][0] = stack[p-1]
-			cnt[i] = cnt[P[i][0]] + 1
 		}
 		D[i] = D[P[i][0]] + 1
 		stack[p] = i
@@ -162,9 +160,9 @@ func solve(H []int, Q [][]int) []int {
 			u, v = v, u
 		}
 		x := lca(u, v)
-		res[i] = cnt[x]
-		if x != v {
-			res[i]++
+		res[i] = D[x]
+		if x == v {
+			res[i]--
 		}
 	}
 

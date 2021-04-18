@@ -1,6 +1,19 @@
 package p1834
 
 func getXORSum(arr1 []int, arr2 []int) int {
+	var xor int
+	for _, num := range arr1 {
+		xor ^= num
+	}
+	var res int
+	for _, num := range arr2 {
+		tmp := xor & num
+		res ^= tmp
+	}
+
+	return res
+}
+func getXORSum1(arr1 []int, arr2 []int) int {
 
 	cnt := make([]int, 30)
 

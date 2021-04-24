@@ -6,10 +6,30 @@ import (
 )
 
 func main() {
+	fmt.Println(combinationSum4([]int{1, 2, 3}, 4))
+
 	fmt.Println(combinationSum4([]int{1, 2, 3}, 32))
 }
 
 func combinationSum4(nums []int, target int) int {
+
+	//dp[i][j] = count when j = nums[i] + num < nums[i]
+	//dp[i][k] = dp[i][j] if k - j = nums[i]
+	dp := make([]int, target+1)
+	dp[0] = 1
+
+	for i := 1; i <= target; i++ {
+		for _, num := range nums {
+			if i >= num {
+				dp[i] += dp[i-num]
+			}
+		}
+	}
+
+	return dp[target]
+}
+
+func _combinationSum4(nums []int, target int) int {
 	if len(nums) == 0 || target == 0 {
 		return 0
 	}

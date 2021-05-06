@@ -118,6 +118,7 @@ func solve(n, m int, B int, G [][]int) int {
 			for r > 0 && X[i]+Y[r-1] > B {
 				r--
 			}
+			// X[i] + Y[r-1] >= B
 			res += r - l
 			if res >= MOD {
 				res -= MOD

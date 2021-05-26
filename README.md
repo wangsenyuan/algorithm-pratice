@@ -6,7 +6,7 @@
   </a>
 </p>
 
-> A project to learn algorithms by coding leetcode, codechef, codeforces problems, using golang
+> A project to learn algorithms by coding leetcode, codechef, codeforces problems, using jetbrains golang toolbox; 
 
 ## Author
 

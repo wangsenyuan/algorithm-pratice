@@ -134,7 +134,7 @@ func solve(n int, A []int) (bool, [][]int) {
 
 	if same {
 		for i := 0; i < n; i += 2 {
-			res = append(res, []int{1, 3, i + 1})
+			res = append(res, []int{2, 4, i + 1})
 		}
 		return true, res
 	}
@@ -143,7 +143,7 @@ func solve(n int, A []int) (bool, [][]int) {
 	odds := make(map[int]int)
 
 	for i := 0; i < n; i++ {
-		if i%2 == 0 {
+		if i%2 == 1 {
 			evens[A[i]] = i + 1
 		} else {
 			odds[A[i]] = i + 1

@@ -24,7 +24,7 @@ func TestSample2(t *testing.T) {
 	edges := [][]int{
 		{0, 0},
 	}
-	expect := 0
+	expect := -1
 	runSample(t, colors, edges, expect)
 }
 

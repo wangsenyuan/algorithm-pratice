@@ -25,3 +25,19 @@ func TestSample2(t *testing.T) {
 	expect := false
 	runSample(t, ranges, left, right, expect)
 }
+
+func TestSample3(t *testing.T) {
+	ranges := [][]int{{1, 1}, {3, 3}}
+	left := 3
+	right := 3
+	expect := true
+	runSample(t, ranges, left, right, expect)
+}
+
+func TestSample4(t *testing.T) {
+	ranges := [][]int{{1, 1}, {20, 20}}
+	left := 21
+	right := 21
+	expect := false
+	runSample(t, ranges, left, right, expect)
+}

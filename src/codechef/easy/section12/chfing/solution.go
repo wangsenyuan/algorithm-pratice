@@ -14,7 +14,7 @@ func main() {
 	}
 }
 
-const mod = 1e9 + 7
+const mod = 1000000007
 
 func solve(n int64, k int64) int64 {
 	total := (k - 1) / (n - 1)

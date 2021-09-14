@@ -297,7 +297,7 @@ func solve1(n int, S []string) int64 {
 		p := make([]int, n)
 		//c[i] = i-th position rank (classs)
 		c := make([]int, n)
-		cnt := make([]int, alphabet)
+		cnt := make([]int, max(alphabet, n)+1)
 
 		for i := 0; i < n; i++ {
 			cnt[int(s[i]-first_ch)]++
@@ -332,7 +332,7 @@ func solve1(n int, S []string) int64 {
 					pn[i] += n
 				}
 			}
-			for i := 0; i < alphabet; i++ {
+			for i := 0; i < len(cnt); i++ {
 				cnt[i] = 0
 			}
 
@@ -340,7 +340,7 @@ func solve1(n int, S []string) int64 {
 				cnt[c[pn[i]]]++
 			}
 
-			for i := 1; i < alphabet; i++ {
+			for i := 1; i < len(cnt); i++ {
 				cnt[i] += cnt[i-1]
 			}
 			for i := n - 1; i >= 0; i-- {

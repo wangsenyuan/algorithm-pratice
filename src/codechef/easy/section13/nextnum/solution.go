@@ -98,7 +98,7 @@ func init() {
 func countNumber(cnt []int64) int64 {
 	var y int
 	for i := 0; i < 10; i++ {
-		y += cnt[i]
+		y += int(cnt[i])
 	}
 	ans := P[y]
 	for i := 0; i < 10; i++ {

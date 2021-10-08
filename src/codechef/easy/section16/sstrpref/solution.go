@@ -28,7 +28,12 @@ func main() {
 
 func readString(reader *bufio.Reader) string {
 	s, _ := reader.ReadString('\n')
-	return s[:len(s)-1]
+	for i := 0; i < len(s); i++ {
+		if s[i] == '\n' {
+			return s[:i]
+		}
+	}
+	return s
 }
 
 func readInt(bytes []byte, from int, val *int) int {

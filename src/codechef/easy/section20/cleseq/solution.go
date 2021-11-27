@@ -70,48 +70,46 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 	var buf bytes.Buffer
-	// tc := readNum(reader)
-	tc := 1
+	tc := readNum(reader)
+	// tc := 1
 	for tc > 0 {
 		tc--
-		n := readNum(reader)
-		S := readNNums(reader, n)
-		res := solve(S)
-		buf.WriteString(fmt.Sprintf("%d\n", res))
+		n, k := readTwoNums(reader)
+		A := readNNums(reader, n)
+		res := solve(n, k, A)
+		for i := 0; i < k; i++ {
+			buf.WriteString(fmt.Sprintf("%d ", res[i]))
+		}
+		buf.WriteByte('\n')
 	}
 
 	fmt.Print(buf.String())
 }
 
-const MOD = 998244353
-const X = 200010
+func solve(n int, k int, A []int) []int {
+	var p int
 
-func solve(S []int) int {
-	arr := make([]int64, X)
-
-	update := func(p int, v int64) {
-		for p < X {
-			arr[p] += v
-			p += p & -p
+	for i := 1; i <= n; i++ {
+		if i == n || A[i] != A[i-1] {
+			A[p] = A[i-1]
+			p++
 		}
 	}
 
-	get := func(p int) int64 {
-		var res int64
-		for p > 0 {
-			res += arr[p]
-			p -= p & -p
-		}
-		return res
-	}
-	var ans int64
-	for _, num := range S {
-		prev := get(num - 1)
-		cur := (prev + 1) % MOD
-		ans = (ans + cur) % MOD
-		update(num, cur)
+	ans := make([]int, k)
+	for i := 0; i < k; i++ {
+		ans[i] = p - 1
 	}
 
-	ans = (ans + 1) % MOD
-	return int(ans)
+	if p == 1 {
+		return ans
+	}
+
+	for i := 0; i < p; i++ {
+		ans[A[i]-1]--
+		if i > 0 && i+1 < p && A[i-1] == A[i+1] {
+			ans[A[i]-1]--
+		}
+	}
+	return ans
 }

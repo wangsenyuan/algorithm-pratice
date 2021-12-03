@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"fmt"
 	"os"
-	"sort"
 )
 
 func main() {
@@ -17,10 +16,14 @@ func main() {
 
 	for tc > 0 {
 		tc--
-		n := readNum(reader)
-		A := readNNums(reader, n)
-		res := solve(A)
-		buf.WriteString(fmt.Sprintf("%d\n", res))
+		n, p, q := readThreeNums(reader)
+		S, _ := reader.ReadString('\n')
+		res := solve(n, p, q, S)
+		if res {
+			buf.WriteString("YES\n")
+		} else {
+			buf.WriteString("NO\n")
+		}
 	}
 	fmt.Print(buf.String())
 }
@@ -85,15 +88,35 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 	return i
 }
 
-func solve(A []int) int64 {
-	sort.Ints(A)
+func solve(n, p, q int, S string) bool {
 
-	n := len(A)
-
-	for i := 1; i < len(A); i++ {
-		if A[i] != A[0] {
-			return int64(n)*int64(A[0]) + int64(n-i)
+	check := func(u, v int) bool {
+		pos := make([]int, 2)
+		var p int
+		for i := 0; i < n; i++ {
+			if S[i] == '0' {
+				p = 1 - p
+			}
+			pos[p]++
 		}
+		if pos[0] < u || pos[1] < v {
+			return false
+		}
+		if (pos[0]-u)%2 != 0 || (pos[1]-v)%2 != 0 {
+			return false
+		}
+		return true
 	}
-	return int64(n) * int64(A[0])
+
+	p = abs(p)
+	q = abs(q)
+
+	return check(p, q) || check(q, p)
+}
+
+func abs(num int) int {
+	if num < 0 {
+		return -num
+	}
+	return num
 }

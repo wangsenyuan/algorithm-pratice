@@ -19,7 +19,8 @@ func main() {
 		tc--
 		n := readNum(reader)
 		A := readNNums(reader, n)
-		res := solve(A)
+		S, _ := reader.ReadString('\n')
+		res := solve(n, A, S)
 		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 	fmt.Print(buf.String())
@@ -85,15 +86,91 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 	return i
 }
 
-func solve(A []int) int64 {
-	sort.Ints(A)
+const INF = 1 << 30
 
-	n := len(A)
-
-	for i := 1; i < len(A); i++ {
-		if A[i] != A[0] {
-			return int64(n)*int64(A[0]) + int64(n-i)
+func solve(n int, A []int, S string) int {
+	S = S[:n]
+	pi := kmp(S + S)
+	var lbv int
+	for i := n; i < 2*n; i++ {
+		if pi[i] >= n {
+			lbv = i - n + 1
+			break
 		}
 	}
-	return int64(n) * int64(A[0])
+
+	B := make([]Pair, n)
+
+	for i := 0; i < n; i++ {
+		B[i] = Pair{A[i], i}
+	}
+
+	sort.Sort(Pairs(B))
+
+	j := n
+
+	for j > 0 && (B[j-1].second-B[0].second+n)%lbv == 0 {
+		j--
+	}
+
+	best := B[j-1].first - B[0].first
+
+	j = 0
+
+	for j < n && (B[n-1].second-B[j].second+n)%lbv == 0 {
+		j++
+	}
+
+	best = max(best, B[n-1].first-B[j].first)
+
+	return best
+
+}
+
+type Pair struct {
+	first, second int
+}
+
+type Pairs []Pair
+
+func (ps Pairs) Len() int {
+	return len(ps)
+}
+
+func (ps Pairs) Less(i, j int) bool {
+	return ps[i].first < ps[j].first
+}
+
+func (ps Pairs) Swap(i, j int) {
+	ps[i], ps[j] = ps[j], ps[i]
+}
+
+func max(a, b int) int {
+	if a >= b {
+		return a
+	}
+	return b
+}
+
+func min(a, b int) int {
+	if a <= b {
+		return a
+	}
+	return b
+}
+
+func kmp(s string) []int {
+	n := len(s)
+	pi := make([]int, n)
+	for i := 1; i < n; i++ {
+		j := pi[i-1]
+		for j > 0 && s[i] != s[j] {
+			j = pi[j-1]
+		}
+		if s[i] == s[j] {
+			j++
+		}
+		pi[i] = j
+	}
+	return pi
 }

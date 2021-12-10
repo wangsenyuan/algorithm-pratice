@@ -95,6 +95,7 @@ func solve(A []int, X, Y int) int {
 			dp[i][j] = INF
 		}
 	}
+
 	dp[0][0] = 0
 	// dp[i][j] = min count of elements not picked to get sum j in first i elements
 	for i := 0; i < n; i++ {
@@ -106,14 +107,95 @@ func solve(A []int, X, Y int) int {
 		}
 	}
 
-	fp := make([][]int, n+1)
-	L := Y + 1
-	// fp[i][j] = min count of elements picked to get sum j in last (n - i) elements
-	for i := 0; i <= n; i++ {
-		fp[i] = make([]int, 2*L)
-		for j := 0; j < len(fp[i]); j++ {
-			fp[i][j] = INF
+	best := INF
+
+	for j1 := X; j1 <= Y; j1++ {
+		best = min(best, dp[n][j1])
+	}
+
+	fp := make([]int, Y+1)
+	for i := 0; i < len(fp); i++ {
+		fp[i] = INF
+	}
+
+	fp[0] = 0
+
+	que := make([]Pair, Y+1)
+
+	for i := n - 1; i >= 0; i-- {
+		for j := Y; j >= A[i]; j-- {
+			fp[j] = min(fp[j], fp[j-A[i]]+1)
 		}
+
+		var front, end int
+		// find min value in the window [Y-j1, X-j1]
+		// j2 = Y - j1
+		// when j1 + 1, then j2 - 1
+		j2 := Y
+		for j2 >= X {
+			for front < end && que[end-1].second >= fp[j2] {
+				end--
+			}
+			que[end] = Pair{j2, fp[j2]}
+			end++
+			j2--
+		}
+		for j1 := 0; j1 <= Y; j1++ {
+			for front < end && que[front].first+j1 > Y {
+				front++
+			}
+			if front < end && que[front].first+j1 >= X {
+				best = min(best, max(que[front].second, dp[i][j1]))
+			}
+
+			if j2 >= 0 {
+				for front < end && que[end-1].second >= fp[j2] {
+					end--
+				}
+				que[end] = Pair{j2, fp[j2]}
+				end++
+			}
+			j2--
+		}
+	}
+
+	if best >= INF {
+		return -1
+	}
+
+	return best
+}
+
+type Pair struct {
+	first, second int
+}
+
+func solve1(A []int, X, Y int) int {
+	n := len(A)
+	dp := make([][]int, n+1)
+	for i := 0; i <= n; i++ {
+		dp[i] = make([]int, Y+1)
+		for j := 0; j <= Y; j++ {
+			dp[i][j] = INF
+		}
+	}
+
+	dp[0][0] = 0
+	// dp[i][j] = min count of elements not picked to get sum j in first i elements
+	for i := 0; i < n; i++ {
+		for j := 0; j < A[i] && j <= Y; j++ {
+			dp[i+1][j] = dp[i][j] + 1
+		}
+		for j := A[i]; j <= Y; j++ {
+			dp[i+1][j] = min(dp[i][j]+1, dp[i][j-A[i]])
+		}
+	}
+
+	L := Y + 1
+
+	fp := make([]int, 2*L)
+	for i := 0; i < len(fp); i++ {
+		fp[i] = INF
 	}
 
 	update := func(arr []int, p int, v int) {
@@ -125,7 +207,7 @@ func solve(A []int, X, Y int) int {
 		}
 	}
 	// fp[n][0] = 0
-	update(fp[n], 0, 0)
+	update(fp, 0, 0)
 
 	get := func(arr []int, p int) int {
 		p += L
@@ -150,37 +232,25 @@ func solve(A []int, X, Y int) int {
 		}
 		return res
 	}
-
-	for i := n - 1; i >= 0; i-- {
-		for j := 0; j < A[i] && j <= Y; j++ {
-			// fp[i][j] = fp[i+1][j]
-			update(fp[i], j, get(fp[i+1], j))
-		}
-		for j := A[i]; j <= Y; j++ {
-			// fp[i][j] = min(fp[i+1][j], fp[i+1][j-A[i]]+1)
-			update(fp[i], j, min(get(fp[i+1], j), get(fp[i+1], j-A[i])+1))
-		}
-	}
-
 	best := INF
 
-	for i := 0; i <= n; i++ {
+	for j1 := X; j1 <= Y; j1++ {
+		best = min(best, dp[n][j1])
+	}
+
+	for i := n - 1; i >= 0; i-- {
+		for j := Y; j >= A[i]; j-- {
+			// fp[i][j] = min(fp[i+1][j], fp[i+1][j-A[i]]+1)
+			update(fp, j, get(fp, j-A[i])+1)
+		}
 		for j1 := 0; j1 <= Y; j1++ {
 			if dp[i][j1] < INF {
 				// j2 >= max(0, X - j1) and j2 <= Y - j1
 				// we need to find min value of fp[i][s...e]
-				tmp := getRange(fp[i], max(0, X-j1), Y-j1+1)
+				tmp := getRange(fp, max(0, X-j1), Y-j1+1)
 				best = min(best, max(dp[i][j1], tmp))
 			}
 		}
-		// for s := X; s <= Y; s++ {
-		// 	for j1 := 0; j1 <= s; j1++ {
-		// 		j2 := s - j1
-		// 		// j1 inc, j2 dec
-		// 		best = min(best, max(dp[i][j1], fp[i][j2]))
-		// 	}
-		// }
-
 	}
 
 	if best >= INF {

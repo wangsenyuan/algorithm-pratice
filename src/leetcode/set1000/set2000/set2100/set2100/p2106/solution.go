@@ -51,9 +51,10 @@ func maxTotalFruits(fruits [][]int, startPos int, k int) int {
 			sum[i] += sum[i-1]
 		}
 	}
-	p = sort.Search(n, func(i int) bool {
-		return fruits[i][0] >= startPos
-	})
+
+	if p > 0 && fruits[p-1][0] == startPos {
+		p--
+	}
 
 	for i := p; i < n; i++ {
 		if fruits[i][0] < startPos {

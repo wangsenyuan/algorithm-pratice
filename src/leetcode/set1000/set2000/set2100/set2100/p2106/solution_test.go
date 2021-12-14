@@ -39,3 +39,23 @@ func TestSample3(t *testing.T) {
 	expect := 0
 	runSample(t, fruits, startPos, k, expect)
 }
+
+func TestSample4(t *testing.T) {
+	fruits := [][]int{
+		{0, 10000},
+	}
+	startPos := 20000
+	k := 20000
+	expect := 10000
+	runSample(t, fruits, startPos, k, expect)
+}
+
+func TestSample5(t *testing.T) {
+	fruits := [][]int{
+		{0, 7}, {7, 4}, {9, 10}, {12, 6}, {14, 8}, {16, 5}, {17, 8}, {19, 4}, {20, 1}, {21, 3}, {24, 3}, {25, 3}, {26, 1}, {28, 10}, {30, 9}, {31, 6}, {32, 1}, {37, 5}, {40, 9},
+	}
+	startPos := 21
+	k := 30
+	expect := 71
+	runSample(t, fruits, startPos, k, expect)
+}

@@ -87,8 +87,82 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 
 	return i
 }
-
 func solve(n int, G []string) int {
+	U, D, L, R := make([][]int, n), make([][]int, n), make([][]int, n), make([][]int, n)
+	for i := 0; i < n; i++ {
+		U[i] = make([]int, n)
+		D[i] = make([]int, n)
+		L[i] = make([]int, n)
+		R[i] = make([]int, n)
+
+		for j := 0; j < n; j++ {
+			if G[i][j] == '1' {
+				U[i][j] = 1
+				D[i][j] = 1
+				L[i][j] = 1
+				R[i][j] = 1
+			}
+		}
+	}
+
+	for i := 0; i < n; i++ {
+		for j := 0; j < n; j++ {
+			if G[i][j] == '1' {
+				if i > 0 {
+					U[i][j] += U[i-1][j]
+				}
+				if j > 0 {
+					L[i][j] += L[i][j-1]
+				}
+			}
+		}
+	}
+
+	for i := n - 1; i >= 0; i-- {
+		for j := n - 1; j >= 0; j-- {
+			if G[i][j] == '1' {
+				if i+1 < n {
+					D[i][j] += D[i+1][j]
+				}
+				if j+1 < n {
+					R[i][j] += R[i][j+1]
+				}
+			}
+		}
+	}
+
+	var res int
+
+	for i := 0; i < 2*n; i++ {
+		var pts []Pair
+		for j := 0; j < n; j++ {
+			if i-j >= 0 && i-j < n {
+				pts = append(pts, Pair{j, i - j})
+			}
+		}
+
+		for _, x := range pts {
+			for _, y := range pts {
+				if x.first <= y.first {
+					r1 := min(L[x.first][x.second], D[x.first][x.second])
+					r2 := min(R[y.first][y.second], U[y.first][y.second])
+					sz := y.first - x.first + 1
+					if r1 >= sz && r2 >= sz {
+						res++
+					}
+				}
+			}
+		}
+	}
+
+	return res
+}
+
+type Pair struct {
+	first, second int
+}
+
+func solve1(n int, G []string) int {
 	sum := make([][][]int, 4)
 	for i := 0; i < 4; i++ {
 		sum[i] = make([][]int, n+2)

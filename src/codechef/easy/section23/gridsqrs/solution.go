@@ -21,7 +21,7 @@ func main() {
 		for i := 0; i < n; i++ {
 			G[i], _ = reader.ReadString('\n')
 		}
-		res := solve(n, G)
+		res := solve1(n, G)
 		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 
@@ -133,29 +133,107 @@ func solve(n int, G []string) int {
 
 	var res int
 
-	for i := 0; i < 2*n; i++ {
-		var pts []Pair
-		for j := 0; j < n; j++ {
-			if i-j >= 0 && i-j < n {
-				pts = append(pts, Pair{j, i - j})
-			}
-		}
+	t := NewFeeTree(n)
 
-		for _, x := range pts {
-			for _, y := range pts {
-				if x.first <= y.first {
-					r1 := min(L[x.first][x.second], D[x.first][x.second])
-					r2 := min(R[y.first][y.second], U[y.first][y.second])
-					sz := y.first - x.first + 1
-					if r1 >= sz && r2 >= sz {
-						res++
-					}
-				}
+	dlt := make([][]int, n+2)
+	for i := 0; i < n+2; i++ {
+		dlt[i] = make([]int, 0, 2)
+	}
+
+	for j := 0; j < n; j++ {
+		t.Reset()
+
+		r := j
+		for r < n {
+			for _, h := range dlt[r] {
+				t.Update(h, -1)
 			}
+			l := r - j
+			if G[l][r] == '0' {
+				r++
+				continue
+			}
+			t.Update(r, 1)
+			x := r + min(R[l][r], D[l][r])
+			dlt[x] = append(dlt[x], r)
+			y := min(U[l][r], L[l][r])
+			if r-y >= 0 {
+				res += t.Get(r) - t.Get(r-y)
+			} else {
+				res += t.Get(r)
+			}
+			r++
+		}
+	}
+
+	for i := 0; i < n+2; i++ {
+		dlt[i] = make([]int, 0, 2)
+	}
+
+	for j := 1; j < n; j++ {
+		t.Reset()
+		l := j
+		for l < n {
+			for _, h := range dlt[l] {
+				t.Update(h, -1)
+			}
+			r := l - j
+			if G[l][r] == '0' {
+				l++
+				continue
+			}
+			t.Update(l, 1)
+			x := l + min(R[l][r], D[l][r])
+			dlt[x] = append(dlt[x], l)
+			y := min(U[l][r], L[l][r])
+			if l-y >= 0 {
+				res += t.Get(l) - t.Get(l-y)
+			} else {
+				res += t.Get(l)
+			}
+			l++
 		}
 	}
 
 	return res
+}
+
+type FenTree struct {
+	arr []int
+}
+
+func NewFeeTree(n int) *FenTree {
+	t := new(FenTree)
+	t.arr = make([]int, n+1)
+	return t
+}
+
+func (t *FenTree) Update(p int, v int) {
+	p++
+	for p < len(t.arr) {
+		t.arr[p] += v
+		p += p & -p
+	}
+}
+
+func (t *FenTree) Get(p int) int {
+	p++
+	var res int
+	for p > 0 {
+		res += t.arr[p]
+		p -= p & -p
+	}
+	return res
+}
+
+func (t *FenTree) GetRange(l, r int) int {
+	return t.Get(r) - t.Get(l-1)
+}
+
+func (t *FenTree) Reset() {
+	for i := 0; i < len(t.arr); i++ {
+		t.arr[i] = 0
+	}
 }
 
 type Pair struct {

@@ -17,7 +17,6 @@ func main() {
 	for tc > 0 {
 		tc--
 		S, _ := reader.ReadString('\n')
-		S = S[:len(S)-1]
 		res := solve(S)
 		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
@@ -85,51 +84,39 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 	return i
 }
 
-func solve(S string) int {
-	a := process(S)
-	b := process(reverse(flip(S)))
-	return min(a, b)
-}
-
-func flip(S string) string {
-	buf := []byte(S)
+func solve(S string) int64 {
+	var pos []int64
+	pos = append(pos, 0)
+	var n int
 	for i := 0; i < len(S); i++ {
-		if buf[i] == '(' {
-			buf[i] = ')'
-		} else {
-			buf[i] = '('
+		if S[i] == ')' {
+			pos = append(pos, pos[len(pos)-1]+int64(i))
+			n++
+		} else if S[i] == '(' {
+			n++
 		}
 	}
-	return string(buf)
-}
 
-func reverse(S string) string {
-	buf := []byte(S)
-	for i, j := 0, len(buf)-1; i < j; i, j = i+1, j-1 {
-		buf[i], buf[j] = buf[j], buf[i]
-	}
-	return string(buf)
-}
+	var open, close int64
+	var best = pos[1]
 
-func process(S string) int {
-	var prev int
-	var level int
-	best := len(S)
-	for i := 0; i < len(S); i++ {
-		if level == 0 {
-			prev = i
-		}
+	for i := 0; i < n; i++ {
 		if S[i] == '(' {
-			level++
+			open++
+			if open >= int64(len(pos)) {
+				break
+			}
+			x := open - close
+			tmp := pos[open] - pos[close] - int64(i)*(x) - (x)*(x-1)/2
+			best = min(best, tmp)
 		} else {
-			level--
-			best = min(best, i-prev)
+			close++
 		}
 	}
 	return best
 }
 
-func min(a, b int) int {
+func min(a, b int64) int64 {
 	if a <= b {
 		return a
 	}

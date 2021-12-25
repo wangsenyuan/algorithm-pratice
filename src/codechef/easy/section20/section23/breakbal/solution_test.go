@@ -3,7 +3,7 @@ package main
 import "testing"
 
 func runSample(t *testing.T, S string, expect int) {
-	res := solve(S)
+	res := int(solve(S))
 
 	if res != expect {
 		t.Errorf("Sample expect %d, but got %d", expect, res)
@@ -26,7 +26,6 @@ func TestSample3(t *testing.T) {
 	expect := 1
 	runSample(t, S, expect)
 }
-
 
 func TestSample4(t *testing.T) {
 	S := "((()))(())"

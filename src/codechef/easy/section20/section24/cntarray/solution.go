@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"bytes"
 	"fmt"
 	"os"
 )
@@ -10,16 +9,10 @@ import (
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 
-	tc := 1
-	var buf bytes.Buffer
-	for tc > 0 {
-		tc--
-		n, m := readTwoNums(reader)
-		A := readNNums(reader, n)
-		res := solve(n, m, A)
-		buf.WriteString(fmt.Sprintf("%d\n", res))
-	}
-	fmt.Println(buf.String())
+	n, m := readTwoNums(reader)
+	A := readNNums(reader, n)
+	res := solve(n, m, A)
+	fmt.Printf("%d\n", res)
 }
 
 func readInt(bytes []byte, from int, val *int) int {

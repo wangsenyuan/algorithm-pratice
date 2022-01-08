@@ -84,6 +84,69 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 }
 
 func solve(k int, n int) []int {
+	// dp[x][sz][xor]
+	// p[x][sz][xor]
+	dp := make([][]map[int]bool, n+1)
+	fp := make([][]map[int]bool, n+1)
+	for i := 0; i <= n; i++ {
+		dp[i] = make([]map[int]bool, k+1)
+		fp[i] = make([]map[int]bool, k+1)
+		for j := 0; j <= k; j++ {
+			dp[i][j] = make(map[int]bool)
+			fp[i][j] = make(map[int]bool)
+		}
+	}
+	dp[0][0][0] = true
+
+	for x := 0; x < n; x++ {
+		for sz := 0; sz <= x && sz <= k; sz++ {
+			// xor would be
+			y := highestOneBit(x) * 2
+			for xor := 0; xor <= y; xor++ {
+				if dp[x][sz][xor] {
+					if !dp[x+1][sz][xor] {
+						dp[x+1][sz][xor] = true
+						fp[x+1][sz][xor] = false
+					}
+					if sz+1 <= k && !dp[x+1][sz+1][xor^(x+1)] {
+						dp[x+1][sz+1][xor^(x+1)] = true
+						fp[x+1][sz+1][xor^(x+1)] = true
+					}
+				}
+			}
+		}
+	}
+
+	top := highestOneBit(n) * 2
+	var best int
+	for xor := 0; xor <= top; xor++ {
+		if dp[n][k][xor] {
+			best = xor
+		}
+	}
+
+	var arr []int
+
+	for pos, sz := n, k; pos > 0; pos-- {
+		if fp[pos][sz][best] {
+			arr = append(arr, pos)
+			best ^= pos
+			sz--
+		}
+	}
+
+	reverse(arr)
+
+	return arr
+}
+
+func reverse(arr []int) {
+	for i, j := 0, len(arr)-1; i < j; i, j = i+1, j-1 {
+		arr[i], arr[j] = arr[j], arr[i]
+	}
+}
+
+func solveFull(k int, n int) []int {
 	if k == 1 {
 		return []int{n}
 	}

@@ -4,38 +4,6 @@ func possibleToStamp(grid [][]int, stampHeight int, stampWidth int) bool {
 	m := len(grid)
 	n := len(grid[0])
 
-	for i := 0; i < m; i++ {
-		for j := 0; j < n; {
-			if grid[i][j] == 1 {
-				j++
-				continue
-			}
-			k := j
-			for j < n && grid[i][j] == 0 {
-				j++
-			}
-			if j-k < stampWidth {
-				return false
-			}
-		}
-	}
-
-	for j := 0; j < n; j++ {
-		for i := 0; i < m; {
-			if grid[i][j] == 1 {
-				i++
-				continue
-			}
-			k := i
-			for i < m && grid[i][j] == 0 {
-				i++
-			}
-			if i-k < stampHeight {
-				return false
-			}
-		}
-	}
-
 	sum := make([][]int, m)
 	for i := 0; i < m; i++ {
 		sum[i] = make([]int, n)
@@ -53,6 +21,11 @@ func possibleToStamp(grid [][]int, stampHeight int, stampWidth int) bool {
 		}
 	}
 
+	pref := make([][]int, m)
+	for i := 0; i < m; i++ {
+		pref[i] = make([]int, n)
+	}
+
 	getRangeSum := func(a, b, c, d int) int {
 		res := sum[c][d]
 		if a > 0 {
@@ -67,50 +40,53 @@ func possibleToStamp(grid [][]int, stampHeight int, stampWidth int) bool {
 		return res
 	}
 
-	get := func(i, j int) int {
-		if i < 0 || i >= m || j < 0 || j >= n {
-			return 1
-		}
-		return grid[i][j]
-	}
-
-	// lets check corners
-
 	for i := 0; i < m; i++ {
 		for j := 0; j < n; j++ {
 			if grid[i][j] == 1 {
 				continue
 			}
-
-			if get(i, j-1) == 1 && get(i-1, j) == 1 {
-				tmp := getRangeSum(i, j, i+stampHeight-1, j+stampWidth-1)
-				if tmp > 0 {
-					return false
+			// try put stamp here
+			if i+stampHeight-1 < m && j+stampWidth-1 < n && getRangeSum(i, j, i+stampHeight-1, j+stampWidth-1) == 0 {
+				pref[i][j]++
+				if i+stampHeight < m {
+					pref[i+stampHeight][j]--
 				}
-			}
-
-			if get(i, j+1) == 1 && get(i-1, j) == 1 {
-				tmp := getRangeSum(i, j-stampWidth+1, i+stampHeight-1, j)
-				if tmp > 0 {
-					return false
+				if j+stampWidth < n {
+					pref[i][j+stampWidth]--
 				}
-			}
-
-			if get(i+1, j) == 1 && get(i, j-1) == 1 {
-				tmp := getRangeSum(i-stampHeight+1, j, i, j+stampWidth-1)
-				if tmp > 0 {
-					return false
-				}
-			}
-
-			if get(i+1, j) == 1 && get(i, j+1) == 1 {
-				tmp := getRangeSum(i-stampHeight+1, j-stampWidth+1, i, j)
-				if tmp > 0 {
-					return false
+				if i+stampHeight < m && j+stampWidth < n {
+					pref[i+stampHeight][j+stampWidth]++
 				}
 			}
 		}
 	}
 
+	cnt := make([]int, n)
+
+	for i := 0; i < m; i++ {
+		var cur int
+		for j := 0; j < n; j++ {
+			cur += pref[i][j] + cnt[j]
+			if grid[i][j] == 0 && cur == 0 {
+				return false
+			}
+			cnt[j] += pref[i][j]
+		}
+	}
+
 	return true
+}
+
+func max(a, b int) int {
+	if a >= b {
+		return a
+	}
+	return b
+}
+
+func min(a, b int) int {
+	if a <= b {
+		return a
+	}
+	return b
 }

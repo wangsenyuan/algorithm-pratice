@@ -15,9 +15,8 @@ func main() {
 	var buf bytes.Buffer
 	for tc > 0 {
 		tc--
-		n := readNum(reader)
-		s, _ := reader.ReadString('\n')
-		res := solve(n, s)
+		k := readNum(reader)
+		res := solve(k)
 		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 	fmt.Print(buf.String())
@@ -93,24 +92,17 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 	return i
 }
 
-func solve(n int, s string) int {
-	var a, b int
+func solve(k int) int {
+	// A[0] = k / 2
 
-	for i := 0; i < n; i++ {
-		a += int(s[2*i] - '0')
-		if a > b+(n-i) {
-			return 2*i + 1
-		}
-		if a+n-i-1 < b {
-			return 2*i + 1
-		}
-		b += int(s[2*i+1] - '0')
-		if b > a+n-i-1 {
-			return 2*i + 2
-		}
-		if b+n-i-1 < a {
-			return 2*i + 2
-		}
+	var s int
+	var n int
+
+	for (k-s)%2 == 0 {
+		cur := (k - s) / 2
+		n++
+		s += cur
 	}
-	return 2 * n
+
+	return n
 }

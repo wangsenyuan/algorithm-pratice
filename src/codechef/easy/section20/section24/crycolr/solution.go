@@ -16,11 +16,14 @@ func main() {
 	for tc > 0 {
 		tc--
 		n := readNum(reader)
-		s, _ := reader.ReadString('\n')
-		res := solve(n, s)
+		boxes := make([][]int, 3)
+		for i := 0; i < 3; i++ {
+			boxes[i] = readNNums(reader, 3)
+		}
+		res := solve(n, boxes)
 		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
-	fmt.Print(buf.String())
+	fmt.Println(buf.String())
 }
 
 func readInt(bytes []byte, from int, val *int) int {
@@ -93,24 +96,59 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 	return i
 }
 
-func solve(n int, s string) int {
-	var a, b int
+func solve(n int, boxes [][]int) int {
+	// boxes[i] R, G, B
+	var res int
 
-	for i := 0; i < n; i++ {
-		a += int(s[2*i] - '0')
-		if a > b+(n-i) {
-			return 2*i + 1
+	swap := func(i int) int {
+		// try to make sure box i, has all color i (0 for R, 1 for G, 2 for B)
+		var res int
+
+		j := (i + 1) % 3
+		k := (i + 2) % 3
+
+		a := boxes[i][j]
+		b := boxes[j][i]
+
+		x := min(a, b)
+		res += x
+		boxes[i][j] -= x
+		boxes[j][i] -= x
+
+		if boxes[i][j] > 0 {
+			// then boxes[j][k], boxes[k][i]
+			res += 2 * boxes[i][j]
+			boxes[j][k] -= boxes[i][j]
+			boxes[k][i] -= boxes[i][j]
+			boxes[i][j] = 0
 		}
-		if a+n-i-1 < b {
-			return 2*i + 1
+
+		a = boxes[i][k]
+		b = boxes[k][i]
+		x = min(a, b)
+		res += x
+		boxes[i][k] -= x
+		boxes[k][i] -= x
+		if boxes[i][k] > 0 {
+			res += 2 * boxes[i][k]
+			boxes[k][j] -= boxes[i][k]
+			boxes[j][i] -= boxes[i][k]
+			boxes[i][k] = 0
 		}
-		b += int(s[2*i+1] - '0')
-		if b > a+n-i-1 {
-			return 2*i + 2
-		}
-		if b+n-i-1 < a {
-			return 2*i + 2
-		}
+
+		return res
 	}
-	return 2 * n
+
+	res += swap(0)
+	res += swap(1)
+	res += swap(2)
+
+	return res
+}
+
+func min(a, b int) int {
+	if a <= b {
+		return a
+	}
+	return b
 }

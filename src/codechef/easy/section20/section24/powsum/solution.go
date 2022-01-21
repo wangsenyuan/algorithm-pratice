@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-
+	
 	reader := bufio.NewReader(os.Stdin)
 
 	tc := readNum(reader)
@@ -16,11 +16,15 @@ func main() {
 	for tc > 0 {
 		tc--
 		n := readNum(reader)
-		s, _ := reader.ReadString('\n')
-		res := solve(n, s)
-		buf.WriteString(fmt.Sprintf("%d\n", res))
+		A := readNNums(reader, n)
+		res := solve(n, A)
+		if len(res) == 0 {
+			buf.WriteString("0\n")
+			continue
+		}
+		buf.WriteString(fmt.Sprintf("1\n1 %d\n%d\n", res[1], res[0]))
 	}
-	fmt.Print(buf.String())
+	fmt.Println(buf.String())
 }
 
 func readInt(bytes []byte, from int, val *int) int {
@@ -93,24 +97,30 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 	return i
 }
 
-func solve(n int, s string) int {
-	var a, b int
+func solve(n int, A []int) []int {
+
+	var sum int
+
+	var pivot int
 
 	for i := 0; i < n; i++ {
-		a += int(s[2*i] - '0')
-		if a > b+(n-i) {
-			return 2*i + 1
-		}
-		if a+n-i-1 < b {
-			return 2*i + 1
-		}
-		b += int(s[2*i+1] - '0')
-		if b > a+n-i-1 {
-			return 2*i + 2
-		}
-		if b+n-i-1 < a {
-			return 2*i + 2
+		sum += A[i]
+		if A[i] < A[pivot] {
+			pivot = i
 		}
 	}
-	return 2 * n
+
+	if sum&(sum-1) == 0 {
+		return nil
+	}
+
+	var r int
+	for (1 << uint(r)) <= sum {
+		r++
+	}
+
+	// 1 << r > sum
+	x := (1<<uint(r) - sum + A[pivot]) / A[pivot]
+
+	return []int{pivot + 1, x}
 }

@@ -15,12 +15,17 @@ func main() {
 	var buf bytes.Buffer
 	for tc > 0 {
 		tc--
-		n := readNum(reader)
-		s, _ := reader.ReadString('\n')
-		res := solve(n, s)
+		s, _ := reader.ReadBytes('\n')
+		var n uint64
+		pos := readUint64(s, 0, &n) + 1
+		var m int
+		readInt(s, pos, &m)
+
+		res := solve(int64(n), m)
+
 		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
-	fmt.Print(buf.String())
+	fmt.Println(buf.String())
 }
 
 func readInt(bytes []byte, from int, val *int) int {
@@ -93,24 +98,51 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 	return i
 }
 
-func solve(n int, s string) int {
-	var a, b int
+const MOD = 1000000007
 
-	for i := 0; i < n; i++ {
-		a += int(s[2*i] - '0')
-		if a > b+(n-i) {
-			return 2*i + 1
+// ap[i][x] 顶点至少为x时, 树的大小为 (1 << i) - 1, 且 level 1 < level 2 > level 3 ...
+// bp[i][x] 顶点至多为x时，树的大小为 (1 << i) - 1, 且 level 1 > level 2 < level 3 ...
+// dp[i][x] = 为顶点为x, 树的大小为 (1 << i) - 1, 且 level 1 < level 2 > level 3
+// dp[i][x] = bp[i-1][x-1] ** 2
+// fp[i][x] = 顶点为x，且树的大小为 (1 << i) - 1, 且 level 1 > level 2 < level 3 ...
+// fp[i][x] = ap[i-1][x+1] ** 2
+
+func solve(n int64, M int) int {
+	// n == 1 << h - 1
+	n++
+	var h int
+	for 1<<uint64(h+1) <= n {
+		h++
+	}
+
+	H := h + 1
+
+	ap := make([]int64, M+2)
+	bp := make([]int64, M+2)
+	dp := make([]int64, M+2)
+	fp := make([]int64, M+2)
+
+	for x := 1; x <= M; x++ {
+		bp[x] = 1 + bp[x-1]
+	}
+	for x := M; x >= 1; x-- {
+		ap[x] = 1 + ap[x+1]
+	}
+
+	for i := 2; i < H; i++ {
+		for x := 1; x <= M; x++ {
+			dp[x] = bp[x-1] * bp[x-1] % MOD
 		}
-		if a+n-i-1 < b {
-			return 2*i + 1
+		for x := M; x >= 1; x-- {
+			fp[x] = ap[x+1] * ap[x+1] % MOD
 		}
-		b += int(s[2*i+1] - '0')
-		if b > a+n-i-1 {
-			return 2*i + 2
+		for x := M; x >= 1; x-- {
+			ap[x] = (dp[x] + ap[x+1]) % MOD
 		}
-		if b+n-i-1 < a {
-			return 2*i + 2
+		for x := 1; x <= M; x++ {
+			bp[x] = (fp[x] + bp[x-1]) % MOD
 		}
 	}
-	return 2 * n
+
+	return int(ap[1])
 }

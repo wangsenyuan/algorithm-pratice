@@ -16,11 +16,13 @@ func main() {
 	for tc > 0 {
 		tc--
 		n := readNum(reader)
-		s, _ := reader.ReadString('\n')
-		res := solve(n, s)
-		buf.WriteString(fmt.Sprintf("%d\n", res))
+		res := solve(n)
+		for i := 0; i < n; i++ {
+			buf.WriteString(fmt.Sprintf("%d ", res[i]))
+		}
+		buf.WriteByte('\n')
 	}
-	fmt.Print(buf.String())
+	fmt.Println(buf.String())
 }
 
 func readInt(bytes []byte, from int, val *int) int {
@@ -93,24 +95,41 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 	return i
 }
 
-func solve(n int, s string) int {
-	var a, b int
-
-	for i := 0; i < n; i++ {
-		a += int(s[2*i] - '0')
-		if a > b+(n-i) {
-			return 2*i + 1
-		}
-		if a+n-i-1 < b {
-			return 2*i + 1
-		}
-		b += int(s[2*i+1] - '0')
-		if b > a+n-i-1 {
-			return 2*i + 2
-		}
-		if b+n-i-1 < a {
-			return 2*i + 2
-		}
+func solve(n int) []int {
+	// A[i] = 0 or A[i] = 1 << x | 1 << y
+	// A[i] ^ A[j] =  (1 << x | 1 << y) | (1 << a | a << b)
+	// C(19, 4) = 19 * 18 * 17 * 16 / 4 * 3 * 2
+	A := make([]int, n)
+	A[0] = 15
+	for i := 1; i < n; i++ {
+		A[i] = nextNum(A[i-1])
 	}
-	return 2 * n
+	return A
+}
+
+func nextNum(x int) int {
+	// right most set bit
+	rightOne := x & -x
+
+	// reset the pattern and set next higher bit
+	// left part of x will be here
+	nextHigherOneBit := x + rightOne
+
+	// nextHigherOneBit is now part [D] of the above explanation.
+
+	// isolate the pattern
+	rightOnesPattern := x ^ nextHigherOneBit
+
+	// right adjust pattern
+	rightOnesPattern = (rightOnesPattern) / rightOne
+
+	// correction factor
+	rightOnesPattern >>= 2
+
+	// rightOnesPattern is now part [A] of the above explanation.
+
+	// integrate new pattern (Add [D] and [A])
+	next := nextHigherOneBit | rightOnesPattern
+
+	return next
 }

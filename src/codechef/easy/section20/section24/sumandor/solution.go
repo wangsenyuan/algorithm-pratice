@@ -15,9 +15,8 @@ func main() {
 	var buf bytes.Buffer
 	for tc > 0 {
 		tc--
-		n := readNum(reader)
-		s, _ := reader.ReadString('\n')
-		res := solve(n, s)
+		x, s := readTwoNums(reader)
+		res := solve(x, s)
 		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 	fmt.Print(buf.String())
@@ -93,24 +92,56 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 	return i
 }
 
-func solve(n int, s string) int {
-	var a, b int
+const INF = 1000000001
 
-	for i := 0; i < n; i++ {
-		a += int(s[2*i] - '0')
-		if a > b+(n-i) {
-			return 2*i + 1
+func solve(x int, s int) int {
+
+	s -= x
+
+	cnt := make([]int, 30)
+
+	check := func(m int) bool {
+		for i := 0; i < 30; i++ {
+			cnt[i] = (s >> uint(i)) & 1
 		}
-		if a+n-i-1 < b {
-			return 2*i + 1
+
+		for i := 29; i > 0; i-- {
+			if (x>>uint(i))&1 == 1 {
+				if cnt[i] > m {
+					cnt[i-1] += 2 * (cnt[i] - m)
+				}
+			} else {
+				cnt[i-1] += 2 * cnt[i]
+			}
 		}
-		b += int(s[2*i+1] - '0')
-		if b > a+n-i-1 {
-			return 2*i + 2
+
+		if x&1 == 1 {
+			return cnt[0] <= m
 		}
-		if b+n-i-1 < a {
-			return 2*i + 2
+		return cnt[0] == 0
+	}
+
+	l, r := 0, INF
+
+	for l < r {
+		mid := (l + r) / 2
+		if check(mid - 1) {
+			r = mid
+		} else {
+			l = mid + 1
 		}
 	}
-	return 2 * n
+
+	if r >= INF {
+		return -1
+	}
+
+	return r
+}
+
+func max(a, b int) int {
+	if a >= b {
+		return a
+	}
+	return b
 }

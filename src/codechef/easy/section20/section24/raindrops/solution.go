@@ -15,9 +15,13 @@ func main() {
 	var buf bytes.Buffer
 	for tc > 0 {
 		tc--
-		n := readNum(reader)
-		s, _ := reader.ReadString('\n')
-		res := solve(n, s)
+		n, q := readTwoNums(reader)
+		E := make([][]int, n-1)
+		for i := 0; i < n-1; i++ {
+			E[i] = readNNums(reader, 2)
+		}
+		A := readNNums(reader, q)
+		res := solve(n, E, A)
 		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 	fmt.Print(buf.String())
@@ -93,24 +97,93 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 	return i
 }
 
-func solve(n int, s string) int {
-	var a, b int
+func solve(n int, E [][]int, A []int) int64 {
+	g := NewGraph(n, len(E)*2)
+	for _, e := range E {
+		u, v := e[0], e[1]
+		u--
+		v--
+		g.AddEdge(u, v)
+		g.AddEdge(v, u)
+	}
 
-	for i := 0; i < n; i++ {
-		a += int(s[2*i] - '0')
-		if a > b+(n-i) {
-			return 2*i + 1
+	L := make([]int, n)
+
+	var leaves int
+
+	var dfs func(p, u, d int) int
+
+	dfs = func(p, u, d int) int {
+		leaf := true
+		var res int
+		for i := g.nodes[u]; i > 0; i = g.next[i] {
+			v := g.to[i]
+			if p == v {
+				continue
+			}
+			leaf = false
+			res = max(res, dfs(u, v, d+1))
 		}
-		if a+n-i-1 < b {
-			return 2*i + 1
+
+		if leaf && u != 0 {
+			leaves++
+			L[d]++
 		}
-		b += int(s[2*i+1] - '0')
-		if b > a+n-i-1 {
-			return 2*i + 2
+		return max(res, d)
+	}
+
+	D := dfs(-1, 0, 0)
+
+	R := make([]int64, D+1)
+	var cur int64
+	for i := 1; i <= D; i++ {
+		R[i] = R[i-1] + cur + int64(L[i-1])
+		cur += int64(L[i-1])
+	}
+
+	var ans int64
+
+	for i := 0; i < len(A); i++ {
+		y := A[i]
+		if i > 0 {
+			y -= A[i-1]
 		}
-		if b+n-i-1 < a {
-			return 2*i + 2
+		if A[i] <= D {
+			ans += R[y]
+		} else {
+			ans += R[D] + int64(y-D)*int64(leaves)
 		}
 	}
-	return 2 * n
+
+	return ans
+}
+
+func max(a, b int) int {
+	if a >= b {
+		return a
+	}
+	return b
+}
+
+type Graph struct {
+	nodes []int
+	next  []int
+	to    []int
+	cur   int
+}
+
+func NewGraph(n int, e int) *Graph {
+	g := new(Graph)
+	g.nodes = make([]int, n)
+	g.next = make([]int, e+1)
+	g.to = make([]int, e+1)
+	g.cur = 0
+	return g
+}
+
+func (g *Graph) AddEdge(u, v int) {
+	g.cur++
+	g.next[g.cur] = g.nodes[u]
+	g.nodes[u] = g.cur
+	g.to[g.cur] = v
 }

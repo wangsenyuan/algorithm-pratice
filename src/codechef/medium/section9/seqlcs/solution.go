@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"os"
 )
@@ -81,14 +82,18 @@ func main() {
 
 	tc := readNum(reader)
 
+	var buf bytes.Buffer
+
 	for tc > 0 {
 		tc--
 		line := readNNums(reader, 3)
 		N, K, L := line[0], line[1], line[2]
 		A := readNNums(reader, N)
 
-		fmt.Println(solve(N, K, L, A))
+		buf.WriteString(fmt.Sprintf("%d\n", solve(N, K, L, A)))
 	}
+
+	fmt.Print(buf.String())
 }
 
 const MOD = 1000000007

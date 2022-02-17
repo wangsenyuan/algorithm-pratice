@@ -7,6 +7,27 @@ import (
 	"os"
 )
 
+func main() {
+
+	reader := bufio.NewReader(os.Stdin)
+
+	tc := readNum(reader)
+	var buf bytes.Buffer
+	for tc > 0 {
+		tc--
+		s, _ := reader.ReadBytes('\n')
+		var n int
+		pos := readInt(s, 0, &n)
+		var m uint64
+		readUint64(s, pos+1, &m)
+		A := readNNums(reader, n)
+		res := solve(int64(m), A)
+
+		buf.WriteString(fmt.Sprintf("%d\n", res))
+	}
+	fmt.Print(buf.String())
+}
+
 func readUint64(bytes []byte, from int, val *uint64) int {
 	i := from
 
@@ -77,81 +98,44 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func main() {
-	scanner := bufio.NewReader(os.Stdin)
+const MAX_N = 100000
 
-	var buf bytes.Buffer
+func solve(M int64, A []int) int {
+	cnt := make([]int64, MAX_N+1)
+	sum := make([]int64, MAX_N+1)
 
-	tc := readNum(scanner)
-
-	for tc > 0 {
-		tc--
-		_, p := readTwoNums(scanner)
-		s := readString(scanner)
-		res := solve(s, p)
-		buf.WriteString(res)
-		buf.WriteByte('\n')
+	for _, num := range A {
+		cnt[num]++
+		sum[num] += int64(num)
 	}
 
-	fmt.Print(buf.String())
-}
-
-func solve(S string, P int) string {
-	n := len(S)
-	var countb int
-	for i := 0; i < n; i++ {
-		if S[i] == 'b' {
-			countb++
-		}
+	for i := 1; i <= MAX_N; i++ {
+		cnt[i] += cnt[i-1]
+		sum[i] += sum[i-1]
 	}
-	idx := -1
-	var count int
-	for i := n - 1; i >= 0; i-- {
 
-		x := min(count, P)
-		tmp := P - x
-		if tmp/2+x >= countb {
-			idx = i
-			break
+	getSum := func(l, r int) int64 {
+		return sum[r] - sum[l]
+	}
+
+	getCnt := func(l, r int) int64 {
+		return cnt[r] - cnt[l]
+	}
+
+	for i := MAX_N; i > 1; i-- {
+		var cur int64
+		for j := 0; j < MAX_N; j += i {
+			a := getSum(j, min(MAX_N, j+i-1))
+			b := getCnt(j, min(MAX_N, j+i-1))
+			cur += a - b*int64(j)
 		}
 
-		if S[i] == 'a' {
-			count++
-		} else {
-			countb--
+		if M >= cur && (M-cur)%int64(i) == 0 {
+			return i
 		}
 	}
 
-	if idx < 0 {
-		return S
-	}
-
-	res := make([]byte, n)
-
-	copy(res, S)
-
-	for i := 0; i <= idx; i++ {
-		res[i] = 'a'
-	}
-
-	totalReplace := countb
-
-	for totalReplace*2+countb-totalReplace > P {
-		totalReplace--
-	}
-
-	swaps := countb - totalReplace
-
-	j := n - 1
-	for swaps > 0 {
-		if res[j] == 'a' {
-			res[j] = 'b'
-			swaps--
-		}
-		j--
-	}
-
-	return string(res)
+	return 1
 }
 
 func min(a, b int) int {

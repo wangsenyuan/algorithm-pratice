@@ -4,8 +4,27 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"math"
 	"os"
 )
+
+func main() {
+
+	reader := bufio.NewReader(os.Stdin)
+
+	tc := readNum(reader)
+	var buf bytes.Buffer
+	for tc > 0 {
+		tc--
+		n := readNum(reader)
+		A := readNNums(reader, n)
+
+		res := solve(A)
+
+		buf.WriteString(fmt.Sprintf("%d\n", res))
+	}
+	fmt.Print(buf.String())
+}
 
 func readUint64(bytes []byte, from int, val *uint64) int {
 	i := from
@@ -77,85 +96,61 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func main() {
-	scanner := bufio.NewReader(os.Stdin)
+func solve(A []int) int64 {
+	n := len(A)
+	dp := make([][]int64, n+1)
 
-	var buf bytes.Buffer
-
-	tc := readNum(scanner)
-
-	for tc > 0 {
-		tc--
-		_, p := readTwoNums(scanner)
-		s := readString(scanner)
-		res := solve(s, p)
-		buf.WriteString(res)
-		buf.WriteByte('\n')
+	for i := 0; i <= n; i++ {
+		dp[i] = make([]int64, n+1)
+		dp[i][i] = math.MinInt64
 	}
 
-	fmt.Print(buf.String())
+	for i := 0; i <= n; i++ {
+		for j := 0; j <= n; j++ {
+			k := max2(i, j) + 1
+			if k > n {
+				continue
+			}
+			// try calculate dp[i][k] and dp[k][j]
+			if i == 0 {
+				dp[k][j] = max(dp[k][j], dp[i][j])
+			} else {
+				dp[k][j] = max(dp[k][j], dp[i][j]+int64(abs(A[i-1]-A[k-1])))
+			}
+			if j == 0 {
+				dp[i][k] = max(dp[i][k], dp[i][j])
+			} else {
+				dp[i][k] = max(dp[i][k], dp[i][j]+int64(abs(A[j-1]-A[k-1])))
+			}
+		}
+	}
+
+	var res int64
+
+	for i := 0; i <= n; i++ {
+		res = max(res, dp[n][i])
+		res = max(res, dp[i][n])
+	}
+
+	return res
 }
 
-func solve(S string, P int) string {
-	n := len(S)
-	var countb int
-	for i := 0; i < n; i++ {
-		if S[i] == 'b' {
-			countb++
-		}
+func abs(num int) int {
+	if num < 0 {
+		return -num
 	}
-	idx := -1
-	var count int
-	for i := n - 1; i >= 0; i-- {
-
-		x := min(count, P)
-		tmp := P - x
-		if tmp/2+x >= countb {
-			idx = i
-			break
-		}
-
-		if S[i] == 'a' {
-			count++
-		} else {
-			countb--
-		}
-	}
-
-	if idx < 0 {
-		return S
-	}
-
-	res := make([]byte, n)
-
-	copy(res, S)
-
-	for i := 0; i <= idx; i++ {
-		res[i] = 'a'
-	}
-
-	totalReplace := countb
-
-	for totalReplace*2+countb-totalReplace > P {
-		totalReplace--
-	}
-
-	swaps := countb - totalReplace
-
-	j := n - 1
-	for swaps > 0 {
-		if res[j] == 'a' {
-			res[j] = 'b'
-			swaps--
-		}
-		j--
-	}
-
-	return string(res)
+	return num
 }
 
-func min(a, b int) int {
-	if a <= b {
+func max(a, b int64) int64 {
+	if a >= b {
+		return a
+	}
+	return b
+}
+
+func max2(a, b int) int {
+	if a >= b {
 		return a
 	}
 	return b

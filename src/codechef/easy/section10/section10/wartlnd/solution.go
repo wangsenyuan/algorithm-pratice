@@ -2,9 +2,23 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"os"
 )
+
+func readUint64(bytes []byte, from int, val *uint64) int {
+	i := from
+
+	var tmp uint64
+	for i < len(bytes) && bytes[i] >= '0' && bytes[i] <= '9' {
+		tmp = tmp*10 + uint64(bytes[i]-'0')
+		i++
+	}
+	*val = tmp
+
+	return i
+}
 
 func readInt(bytes []byte, from int, val *int) int {
 	i := from
@@ -14,7 +28,7 @@ func readInt(bytes []byte, from int, val *int) int {
 		i++
 	}
 	tmp := 0
-	for i < len(bytes) && bytes[i] != ' ' {
+	for i < len(bytes) && bytes[i] >= '0' && bytes[i] <= '9' {
 		tmp = tmp*10 + int(bytes[i]-'0')
 		i++
 	}
@@ -22,59 +36,53 @@ func readInt(bytes []byte, from int, val *int) int {
 	return i
 }
 
-func readNum(scanner *bufio.Scanner) (a int) {
-	scanner.Scan()
-	readInt(scanner.Bytes(), 0, &a)
+func readString(reader *bufio.Reader) string {
+	s, _ := reader.ReadString('\n')
+	for i := 0; i < len(s); i++ {
+		if s[i] == '\n' {
+			return s[:i]
+		}
+	}
+	return s
+}
+
+func readNum(reader *bufio.Reader) (a int) {
+	bs, _ := reader.ReadBytes('\n')
+	readInt(bs, 0, &a)
 	return
 }
 
-func readTwoNums(scanner *bufio.Scanner) (a int, b int) {
-	res := readNNums(scanner, 2)
+func readTwoNums(reader *bufio.Reader) (a int, b int) {
+	res := readNNums(reader, 2)
 	a, b = res[0], res[1]
 	return
 }
 
-func readNNums(scanner *bufio.Scanner, n int) []int {
+func readThreeNums(reader *bufio.Reader) (a int, b int, c int) {
+	res := readNNums(reader, 3)
+	a, b, c = res[0], res[1], res[2]
+	return
+}
+
+func readNNums(reader *bufio.Reader, n int) []int {
 	res := make([]int, n)
 	x := 0
-	scanner.Scan()
+	bs, _ := reader.ReadBytes('\n')
 	for i := 0; i < n; i++ {
-		for x < len(scanner.Bytes()) && scanner.Bytes()[x] == ' ' {
+		for x < len(bs) && (bs[x] < '0' || bs[x] > '9') && bs[x] != '-' {
 			x++
 		}
-		x = readInt(scanner.Bytes(), x, &res[i])
+		x = readInt(bs, x, &res[i])
 	}
 	return res
 }
 
-func fillNNums(scanner *bufio.Scanner, n int, res []int) {
-	x := 0
-	scanner.Scan()
-	for i := 0; i < n; i++ {
-		for x < len(scanner.Bytes()) && scanner.Bytes()[x] == ' ' {
-			x++
-		}
-		x = readInt(scanner.Bytes(), x, &res[i])
-	}
-}
-
-func readUint64(bytes []byte, from int, val *uint64) int {
-	i := from
-
-	var tmp uint64
-	for i < len(bytes) && bytes[i] != ' ' {
-		tmp = tmp*10 + uint64(bytes[i]-'0')
-		i++
-	}
-	*val = tmp
-
-	return i
-}
-
 func main() {
-	scanner := bufio.NewScanner(os.Stdin)
+	scanner := bufio.NewReader(os.Stdin)
 
 	tc := readNum(scanner)
+
+	var buf bytes.Buffer
 
 	for tc > 0 {
 		tc--
@@ -86,8 +94,9 @@ func main() {
 			roads[i] = readNNums(scanner, 3)
 		}
 
-		fmt.Println(solve(n, roads))
+		buf.WriteString(fmt.Sprintf("%d\n", solve(n, roads)))
 	}
+	fmt.Print(buf.String())
 }
 
 const MAX = 100005
@@ -124,7 +133,7 @@ func solve(n int, roads [][]int) int64 {
 	edge := make([][]Pair, MAX)
 
 	for i := 0; i < MAX; i++ {
-		edge[i] = make([]Pair, 0, 10)
+		edge[i] = make([]Pair, 0, 2)
 	}
 
 	for _, road := range roads {
@@ -154,24 +163,36 @@ func solve(n int, roads [][]int) int64 {
 
 	g := make([]int64, MAX)
 
+	rollback := make([]int, 2*n+1)
+
 	for i := 1; i < MAX; i++ {
 		g[i] = 0
-		rollback := make([]int, 0, 10)
-
+		var p int
 		for _, ed := range edge[i] {
 			u, v := ed.first, ed.second
-			rollback = append(rollback, u)
-			rollback = append(rollback, v)
+			rollback[p] = u
+			p++
+			rollback[p] = v
+			p++
 
 			u = find(u)
 			v = find(v)
 
+			if u == v {
+				continue
+			}
+
 			g[i] += int64(cnt[u]) * int64(cnt[v])
+
+			if cnt[u] < cnt[v] {
+				u, v = v, u
+			}
 			arr[u] = v
 			cnt[v] += cnt[u]
 		}
 
-		for _, x := range rollback {
+		for j := 0; j < p; j++ {
+			x := rollback[j]
 			arr[x] = x
 			cnt[x] = 1
 		}

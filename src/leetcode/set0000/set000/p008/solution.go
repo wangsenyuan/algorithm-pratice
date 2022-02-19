@@ -7,6 +7,7 @@ import (
 
 func main() {
 	fmt.Println(myAtoi("aaaa"))
+	fmt.Println(myAtoi("00000-42a1234"))
 }
 
 const (
@@ -20,6 +21,7 @@ func myAtoi(str string) int {
 	headSpace := true
 	var sign int64 = 1
 	signRead := false
+	digitRead := false
 	for _, r := range str {
 		if y > INT_MAX {
 			break
@@ -32,12 +34,20 @@ func myAtoi(str string) int {
 		headSpace = false
 
 		if !signRead && isPosSign(r) {
+			if digitRead {
+				break
+			}
+
 			sign = 1
 			signRead = true
 			continue
 		}
 
 		if !signRead && isNegSign(r) {
+			if digitRead {
+				break
+			}
+
 			sign = -1
 			signRead = true
 			continue
@@ -45,7 +55,12 @@ func myAtoi(str string) int {
 
 		if unicode.IsDigit(r) {
 			y = y*10 + int64(r-'0')
+			digitRead = true
 			continue
+		}
+
+		if digitRead {
+			break
 		}
 
 		break

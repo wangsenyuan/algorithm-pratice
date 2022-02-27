@@ -32,9 +32,7 @@ func minimumFinishTime(tires [][]int, changeTime int, numLaps int) int {
 			dp[i] = LIMIT
 		}
 		for j := i - 1; j > 0 && i-j <= 30; j-- {
-			if j > 0 {
-				dp[i] = min(dp[i], dp[j]+X[i-j]+int64(changeTime))
-			}
+			dp[i] = min(dp[i], dp[j]+X[i-j]+int64(changeTime))
 		}
 	}
 	return int(dp[numLaps])

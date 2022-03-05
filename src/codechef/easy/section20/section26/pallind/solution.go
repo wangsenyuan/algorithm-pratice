@@ -7,6 +7,21 @@ import (
 	"os"
 )
 
+func main() {
+
+	reader := bufio.NewReader(os.Stdin)
+
+	tc := readNum(reader)
+	var buf bytes.Buffer
+	for tc > 0 {
+		tc--
+		n := readNum(reader)
+		res := solve(n)
+		buf.WriteString(fmt.Sprintf("%d\n", res))
+	}
+	fmt.Print(buf.String())
+}
+
 func readUint64(bytes []byte, from int, val *uint64) int {
 	i := from
 
@@ -77,73 +92,42 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func main() {
-	scanner := bufio.NewReader(os.Stdin)
+const MOD = 1000000007
 
-	tc := readNum(scanner)
-
-	var buf bytes.Buffer
-
-	for tc > 0 {
-		tc--
-		n, q := readTwoNums(scanner)
-
-		A := readNNums(scanner, n)
-
-		solver := NewSolver(n, A)
-
-		for q > 0 {
-			q--
-			p := readNum(scanner)
-			a, b := solver.Ask(p)
-			buf.WriteString(fmt.Sprintf("%d %d\n", a, b))
+func pow(a, b int) int64 {
+	A := int64(a)
+	R := int64(1)
+	for b > 0 {
+		if b&1 == 1 {
+			R = (R * A) % MOD
 		}
+		A = (A * A) % MOD
+		b >>= 1
 	}
-	fmt.Print(buf.String())
+	return R
 }
 
-const MAX_N = 100001
-
-type Solver struct {
-	even, odd int
-}
-
-func NewSolver(n int, A []int) Solver {
-	var odd, even int
-
-	for i := 0; i < n; i++ {
-		var cnt int
-		for A[i] > 0 {
-			cnt += A[i] & 1
-			A[i] >>= 1
-		}
-		if cnt&1 == 1 {
-			odd++
-		} else {
-			even++
-		}
+func solve(n int) int {
+	var f int
+	if n&1 == 0 {
+		f = 1
 	}
+	last := pow(26, n/2)
+	last = pow(int(last), MOD-2)
 
-	return Solver{odd, even}
-}
+	n -= f
 
-func (solver Solver) Ask(p int) (x int, y int) {
-	var cnt int
-	for p > 0 {
-		cnt += p & 1
-		p >>= 1
+	a := pow(26, n/2)
+	d := a
+	a = (a - 1 + MOD) % MOD
+	a = (a * 2) % MOD
+	mmi1 := pow(int(d), MOD-2)
+	mmi2 := pow(25, MOD-2)
+	a = (a * mmi1) % MOD
+	a = (a * mmi2) % MOD
+	ans := (a + 1) % MOD
+	if f == 1 {
+		ans = (ans + last) % MOD
 	}
-	// o + o => e
-	// o + e => o
-	// e + e => e
-	// e + o => o
-	if cnt&1 == 1 {
-		// odd
-		x = solver.even
-		y = solver.odd
-	} else {
-		x = solver.odd
-		y = solver.even
-	}
-	return
+	return int(ans)
 }

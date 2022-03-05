@@ -7,6 +7,22 @@ import (
 	"os"
 )
 
+func main() {
+
+	reader := bufio.NewReader(os.Stdin)
+
+	tc := readNum(reader)
+	var buf bytes.Buffer
+	for tc > 0 {
+		tc--
+		n := readNum(reader)
+		A := readNNums(reader, n)
+		res := solve(A)
+		buf.WriteString(fmt.Sprintf("%d\n", res))
+	}
+	fmt.Print(buf.String())
+}
+
 func readUint64(bytes []byte, from int, val *uint64) int {
 	i := from
 
@@ -77,73 +93,34 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func main() {
-	scanner := bufio.NewReader(os.Stdin)
-
-	tc := readNum(scanner)
-
-	var buf bytes.Buffer
-
-	for tc > 0 {
-		tc--
-		n, q := readTwoNums(scanner)
-
-		A := readNNums(scanner, n)
-
-		solver := NewSolver(n, A)
-
-		for q > 0 {
-			q--
-			p := readNum(scanner)
-			a, b := solver.Ask(p)
-			buf.WriteString(fmt.Sprintf("%d %d\n", a, b))
-		}
+func solve(A []int) int64 {
+	var sum int64
+	for i := 0; i < len(A); i++ {
+		sum += int64(A[i])
 	}
-	fmt.Print(buf.String())
+	best := sum
+
+	var pref int64
+
+	for i := 0; i < len(A); i++ {
+		sum -= int64(A[i])
+		pref += int64(A[i])
+		best = min(best, max(sum, pref))
+	}
+
+	return best
 }
 
-const MAX_N = 100001
-
-type Solver struct {
-	even, odd int
+func min(a, b int64) int64 {
+	if a <= b {
+		return a
+	}
+	return b
 }
 
-func NewSolver(n int, A []int) Solver {
-	var odd, even int
-
-	for i := 0; i < n; i++ {
-		var cnt int
-		for A[i] > 0 {
-			cnt += A[i] & 1
-			A[i] >>= 1
-		}
-		if cnt&1 == 1 {
-			odd++
-		} else {
-			even++
-		}
+func max(a, b int64) int64 {
+	if a >= b {
+		return a
 	}
-
-	return Solver{odd, even}
-}
-
-func (solver Solver) Ask(p int) (x int, y int) {
-	var cnt int
-	for p > 0 {
-		cnt += p & 1
-		p >>= 1
-	}
-	// o + o => e
-	// o + e => o
-	// e + e => e
-	// e + o => o
-	if cnt&1 == 1 {
-		// odd
-		x = solver.even
-		y = solver.odd
-	} else {
-		x = solver.odd
-		y = solver.even
-	}
-	return
+	return b
 }

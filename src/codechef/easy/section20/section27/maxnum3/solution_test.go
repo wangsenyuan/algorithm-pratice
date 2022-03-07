@@ -27,3 +27,9 @@ func TestSample3(t *testing.T) {
 	expect := "-1"
 	runSample(t, s, expect)
 }
+
+func TestSample4(t *testing.T) {
+	s := "002221"
+	expect := "00222"
+	runSample(t, s, expect)
+}

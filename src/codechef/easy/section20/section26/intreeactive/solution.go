@@ -111,6 +111,40 @@ func solve(n int, E [][]int, query func([]int) bool) int {
 		return 0
 	}
 	g := buildGraph(n, E)
+	arr := make([]int, 0, n)
+	var dfs func(p, u int)
+	dfs = func(p, u int) {
+		arr = append(arr, u)
+		for i := g.node[u]; i > 0; i = g.next[i] {
+			v := g.to[i]
+			if p != v {
+				dfs(u, v)
+			}
+		}
+	}
+
+	dfs(-1, 0)
+	var node int
+	l := 0
+	r := n - 1
+	for l <= r {
+		mid := (l + r) / 2
+		if query(arr[l : mid+1]) {
+			r = mid - 1
+			node = arr[mid]
+		} else {
+			l = mid + 1
+		}
+	}
+
+	return node
+}
+
+func solve1(n int, E [][]int, query func([]int) bool) int {
+	if n == 1 {
+		return 0
+	}
+	g := buildGraph(n, E)
 	var leaf []int
 	parent := make([]int, n)
 	var dfs func(p, u int)

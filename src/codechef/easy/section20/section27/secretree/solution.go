@@ -12,15 +12,31 @@ func main() {
 	reader := bufio.NewReader(os.Stdin)
 
 	tc := readNum(reader)
-	var buf bytes.Buffer
+
+	query := func(arr []int) bool {
+		var buf bytes.Buffer
+		buf.WriteString(fmt.Sprintf("? %d", len(arr)))
+		for i := 0; i < len(arr); i++ {
+			buf.WriteString(fmt.Sprintf(" %d", arr[i]))
+		}
+		buf.WriteByte('\n')
+		fmt.Print(buf.String())
+		ans := readNum(reader)
+		return ans == 1
+	}
+
 	for tc > 0 {
 		tc--
 		n := readNum(reader)
-		A := readNNums(reader, n)
-		res := solve(A)
-		buf.WriteString(fmt.Sprintf("%d\n", res))
+		res := solve(n, query)
+		var buf bytes.Buffer
+		buf.WriteString("!\n")
+		for _, edge := range res {
+			buf.WriteString(fmt.Sprintf("%d %d\n", edge[0], edge[1]))
+		}
+		fmt.Print(buf.String())
 	}
-	fmt.Print(buf.String())
+
 }
 
 func readUint64(bytes []byte, from int, val *uint64) int {
@@ -92,29 +108,65 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	}
 	return res
 }
+func solve(n int, fn func([]int) bool) [][]int {
 
-func solve(A []int) int {
-	n := len(A)
-	if n == 1 {
-		return 0
+	var loop func(nodes []int)
+
+	var res [][]int
+
+	buf := make([]int, 3)
+
+	loop = func(nodes []int) {
+		if len(nodes) < 2 {
+			return
+		}
+		if len(nodes) == 2 {
+			res = append(res, []int{nodes[0], nodes[1]})
+			return
+		}
+		a := nodes[0]
+		b := nodes[1]
+
+		for i := 2; i < len(nodes); i++ {
+			x := nodes[i]
+			buf[0] = a
+			buf[1] = x
+			buf[2] = b
+			tmp := fn(buf)
+			if tmp {
+				a = x
+			}
+		}
+		// a direct edge between a & b
+		res = append(res, []int{a, b})
+		// how to remove a & b
+		var A []int
+		var B []int
+		for i := 0; i < len(nodes); i++ {
+			x := nodes[i]
+			if x == a || x == b {
+				continue
+			}
+			buf[0] = x
+			buf[1] = a
+			buf[2] = b
+			tmp := fn(buf)
+			if tmp {
+				A = append(A, x)
+			} else {
+				B = append(B, x)
+			}
+		}
+		A = append(A, a)
+		loop(A)
+		B = append(B, b)
+		loop(B)
 	}
-	// let m = max(A)
-	// because any value % A[i] < A[i], so we better get A[i] besides m
-	var first, second int
+	nodes := make([]int, n)
 	for i := 0; i < n; i++ {
-		if A[i] > first {
-			first = A[i]
-		}
+		nodes[i] = i + 1
 	}
+	loop(nodes)
 
-	for i := 0; i < n; i++ {
-		if A[i] == first {
-			continue
-		}
-		if A[i] > second {
-			second = A[i]
-		}
-	}
-
-	return second
+	return res
 }

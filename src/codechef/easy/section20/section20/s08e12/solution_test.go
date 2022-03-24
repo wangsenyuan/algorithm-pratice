@@ -13,7 +13,7 @@ func runSample(t *testing.T, S, T string, expect int) {
 func TestSample1(t *testing.T) {
 	S := "1000110001"
 	T := "010001100010010001100010"
-	expect := 9
+	expect := 14
 	runSample(t, S, T, expect)
 }
 

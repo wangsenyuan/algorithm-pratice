@@ -191,13 +191,10 @@ func solve(A []int, Q [][]int) []int {
 		ans[q.ind] = arr[1]
 	}
 
-	for i := 0; i < MAX; i++ {
-		cnt[i] = 0
+	for L < R {
+		sub(A[L])
+		L++
 	}
-	for i := 0; i < 2*MAX; i++ {
-		arr[i] = 0
-	}
-
 	return ans
 }
 

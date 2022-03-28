@@ -7,34 +7,13 @@ func kthPalindrome(queries []int, intLength int) []int64 {
 	for i := 0; i < d; i++ {
 		cnt[i] = make([]int, 10)
 	}
-	sum := make([]int, d)
-	for i := 0; i < d; i++ {
-		for x := 0; x < 10; x++ {
-			if i > 0 {
-				cnt[i][x] = sum[i-1]
-			} else {
-				cnt[i][x] = 1
-			}
-		}
-		for x := 0; x < 10; x++ {
-			sum[i] += cnt[i][x]
-			if x > 0 {
-				cnt[i][x] += cnt[i][x-1]
-			}
-		}
-	}
 
+	pw := make([]int, d+1)
+	pw[0] = 1
 	var base int64 = 1
-
 	for i := 0; i < h; i++ {
 		base *= 10
-	}
-
-	getSum := func(i int) int {
-		if i < 0 {
-			return 1
-		}
-		return sum[i]
+		pw[i+1] = 10 * pw[i]
 	}
 
 	getKth := func(k int) int64 {
@@ -45,16 +24,16 @@ func kthPalindrome(queries []int, intLength int) []int64 {
 				x++
 			}
 			y := x
-			for x <= 9 && getSum(i-1)*(x-y+1) < k {
+			for x <= 9 && pw[i]*(x-y+1) < k {
 				x++
 			}
 
-			if x > 9 || getSum(i-1)*(x-y+1) < k {
+			if x > 9 || pw[i]*(x-y+1) < k {
 				return -1
 			}
 			// sum[i-1] * x <= k
 			res = res*10 + int64(x)
-			k -= getSum(i-1) * (x - y)
+			k -= pw[i] * (x - y)
 		}
 		if k <= 0 {
 			return -1

@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"fmt"
 	"os"
-	"sort"
 )
 
 func main() {
@@ -16,10 +15,13 @@ func main() {
 	var buf bytes.Buffer
 	for tc > 0 {
 		tc--
-		n, k := readTwoNums(reader)
-		A := readNNums(reader, n)
-		res := solve(A, k)
-		buf.WriteString(fmt.Sprintf("%d\n", res))
+		n := readNum(reader)
+		S := readString(reader)
+		res := solve(n, S)
+		buf.WriteString(fmt.Sprintf("%d\n", len(res)))
+		for i := 0; i < len(res); i++ {
+			buf.WriteString(fmt.Sprintf("%d %d\n", res[i][0], res[i][1]))
+		}
 	}
 	fmt.Print(buf.String())
 }
@@ -94,59 +96,18 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-const MAX_X = 1000000000
-
-func solve(A []int, K int) int {
-	sort.Ints(A)
-	n := len(A)
-
-	if n <= K {
-		return A[n-1]
-	}
-	return A[K]
-}
-
-func solve1(A []int, K int) int {
-	n := len(A)
-
-	// can we make min value as v in at most K ops?
-	check := func(v int) bool {
-		var prev int = -1
-		var cnt int
-		for i := 0; i < n; i++ {
-			if A[i] >= v {
-				if prev < 0 {
-					cnt += i
-				} else {
-					cnt += i - prev - 1
-				}
-				prev = i
-			}
-		}
-		cnt += (n - prev - 1)
-		return cnt <= K
-	}
-
-	lo := MAX_X
-	hi := 1
-	for i := 0; i < n; i++ {
-		if lo > A[i] {
-			lo = A[i]
-		}
-		if hi < A[i] {
-			hi = A[i]
+func solve(n int, S string) [][]int {
+	var flip bool
+	var res [][]int
+	for i := n - 1; i >= 0; i-- {
+		if !flip && S[i] == '0' {
+			res = append(res, []int{1, i + 1})
+			flip = true
+		} else if flip && S[i] == '1' {
+			res = append(res, []int{1, i + 1})
+			flip = false
 		}
 	}
 
-	hi++
-
-	for lo < hi {
-		mid := (lo + hi) / 2
-		if !check(mid) {
-			hi = mid
-		} else {
-			lo = mid + 1
-		}
-	}
-	return hi - 1
+	return res
 }

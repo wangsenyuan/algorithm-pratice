@@ -167,11 +167,14 @@ func (bs *BitSet) Count() int {
 
 func countDigit(num uint64) int {
 	var res int
-	for num != 0 {
-		if num&1 == 1 {
-			res++
-		}
-		num >>= 1
+	if (num>>63)&1 == 1 {
+		res++
+	}
+	tmp := int64(num & ((1 << 63) - 1))
+
+	for tmp > 0 {
+		res++
+		tmp -= tmp & -tmp
 	}
 	return res
 }

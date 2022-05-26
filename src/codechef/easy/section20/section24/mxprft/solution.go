@@ -94,7 +94,7 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 	return i
 }
 
-func solve1(n int, A string, B string) int {
+func solve(n int, A string, B string) int {
 	a := makeArray(A)
 	a = append(a, 3)
 	b := makeArray(B)
@@ -245,7 +245,7 @@ type State struct {
 	next map[byte]int
 }
 
-func solve(n int, A string, B string) int {
+func solve1(n int, A string, B string) int {
 	st := make([]*State, 2*n+10)
 	for i := 0; i < len(st); i++ {
 		st[i] = new(State)

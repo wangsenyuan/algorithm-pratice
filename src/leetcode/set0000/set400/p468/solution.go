@@ -1,14 +1,6 @@
-package main
+package p468
 
-import (
-	"fmt"
-	"strings"
-)
-
-func main() {
-	fmt.Println(validIPAddress("2001:0db8:85a3:0:0:8A2E:0370:7334"))
-	fmt.Println(validIPAddress("172.16.254.1"))
-}
+import "strings"
 
 func validIPAddress(IP string) string {
 	if validIPv4(IP) {
@@ -77,6 +69,9 @@ func validIPv4(IP string) bool {
 }
 
 func validIPv4Part(part string) bool {
+	if len(part) == 0 {
+		return false
+	}
 	num := 0
 	for i := 0; i < len(part); i++ {
 		c := part[i]

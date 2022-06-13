@@ -96,15 +96,11 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func solve(n int, x int) bool {
-	if n*n == x || n >= x {
-		return true
-	}
-	// a * b == x
-	for a := 1; a <= x && a < n; a++ {
-		if x%a == 0 {
-			b := x / a
-			if b < n {
+func solve(n int, k int) bool {
+	for r := 1; r <= n && r <= k/r; r++ {
+		if k%r == 0 {
+			c := k / r
+			if c <= n {
 				return true
 			}
 		}

@@ -1,18 +1,18 @@
-package main
+package p556
 
 import (
-	"fmt"
 	"strconv"
 )
 
-func main() {
-	fmt.Println(nextGreaterElement(12))
-	fmt.Println(nextGreaterElement(21))
-	fmt.Println(nextGreaterElement(132))
-	fmt.Println(nextGreaterElement(123))
+// func main() {
+// 	fmt.Println(nextGreaterElement(12))
+// 	fmt.Println(nextGreaterElement(21))
+// 	fmt.Println(nextGreaterElement(132))
+// 	fmt.Println(nextGreaterElement(123))
 
-	fmt.Println(nextGreaterElement(110))
-}
+// 	fmt.Println(nextGreaterElement(110))
+// 	fmt.Println(nextGreaterElement(2147483486))
+// }
 
 func nextGreaterElement(n int) int {
 	s := []byte(strconv.Itoa(n))
@@ -40,5 +40,8 @@ func nextGreaterElement(n int) int {
 		j--
 	}
 	x, _ := strconv.Atoi(string(s))
+	if x > (1<<31)-1 {
+		return -1
+	}
 	return x
 }

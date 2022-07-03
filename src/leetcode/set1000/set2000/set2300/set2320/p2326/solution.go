@@ -2,7 +2,42 @@ package p2326
 
 const MOD = 1000000007
 
+func modAdd(a, b int) int {
+	a += b
+	if a >= MOD {
+		a -= MOD
+	}
+	return a
+}
+
+func modSub(a, b int) int {
+	return modAdd(a, MOD-b)
+}
+
 func peopleAwareOfSecret(n int, delay int, forget int) int {
+	cnt := make([]int, n+3)
+	cnt[0] = 1
+	cnt[1] = MOD - 1
+	var res int
+	for i := 0; i < n; i++ {
+		if i > 0 {
+			cnt[i] = modAdd(cnt[i], cnt[i-1])
+		}
+		res = modAdd(res, cnt[i])
+		if i-forget >= 0 {
+			res = modSub(res, cnt[i-forget])
+		}
+		if i+delay < n {
+			cnt[i+delay] = modAdd(cnt[i+delay], cnt[i])
+			if i+forget < n {
+				cnt[i+forget] = modSub(cnt[i+forget], cnt[i])
+			}
+		}
+	}
+	return res
+}
+
+func peopleAwareOfSecret1(n int, delay int, forget int) int {
 
 	arr := make([]int, n+1)
 

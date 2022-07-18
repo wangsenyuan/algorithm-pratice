@@ -5,22 +5,23 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"sort"
 )
 
 func main() {
-
+	// hint(105)
 	reader := bufio.NewReader(os.Stdin)
 
 	tc := readNum(reader)
 	var buf bytes.Buffer
-	for tc > 0 {
-		tc--
-		n := readNum(reader)
+
+	for i := 0; i < tc; i++ {
+		n, k := readTwoNums(reader)
 		A := readNNums(reader, n)
-		res := solve(A)
-		buf.WriteString(res)
-		buf.WriteByte('\n')
+		res := solve(k, A)
+		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
+
 	fmt.Print(buf.String())
 }
 
@@ -94,45 +95,27 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-const CHEF = "CHEF"
-const CHEFINA = "CHEFINA"
-
-func solve(A []int) string {
-	cnt := make([]int, 3)
+func solve(K int, A []int) int64 {
+	sort.Ints(A)
+	reverse(A)
 	n := len(A)
-	var sum int64
-	for i := 0; i < n; i++ {
-		if A[i] < 3 {
-			cnt[A[i]]++
-		}
-		sum += int64(A[i])
+	sum := make([]int64, 2)
+	var p int
+	for p < K {
+		sum[0] += int64(A[2*p])
+		sum[1] += int64(A[2*p+1])
+		p++
 	}
-	if cnt[1] >= 2 {
-		sum -= int64(n)
-		if sum&1 == 1 {
-			return CHEF
-		}
-		return CHEFINA
+	if 2*p < n {
+		sum[1] += int64(A[2*p])
 	}
-	if cnt[1] == 1 {
-		if sum&1 == 1 {
-			return CHEF
-		}
-		// sum is even
-		if cnt[2] > 0 && (sum-int64(n))&1 == 1 {
-			return CHEF
-		}
-
-		return CHEFINA
+	if sum[0] > sum[1] {
+		return sum[0]
 	}
-	// 如果有一个pile是奇数，chef从上面取走一个后，
-	// 减去chef取走的1个，剩余的部分是偶数，所以chef总可以第二个取空pile；
-	// chefina选择偶数的pile，chef也选择；
-	// chefina选择奇数的pile，车费也选择；
-	if sum&1 == 1 {
-		return CHEF
-	}
-
-	return CHEFINA
+	return sum[1]
 }
-
+func reverse(arr []int) {
+	for i, j := 0, len(arr)-1; i < j; i, j = i+1, j-1 {
+		arr[i], arr[j] = arr[j], arr[i]
+	}
+}

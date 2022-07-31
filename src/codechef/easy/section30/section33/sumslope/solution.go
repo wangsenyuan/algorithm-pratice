@@ -98,9 +98,14 @@ func solve(A, B int64) int64 {
 	return countSlope(B) - countSlope(A-1)
 }
 
-const H = 16
+const H = 19
 
 var PW []int64
+
+const X = 1000
+
+var C []int
+var A []bool
 
 func init() {
 	// F[x][i] 表示以x为head，且长度为i的数字，且下个数字y < x的计数
@@ -110,9 +115,73 @@ func init() {
 	for i := 1; i < H; i++ {
 		PW[i] = 10 * PW[i-1]
 	}
+
+	C = make([]int, X)
+	A = make([]bool, X)
+
+	for x := 1; x < X; x++ {
+		a := x / 100
+		b := (x % 100) / 10
+		c := x % 10
+		A[x] = slop(a, b, c)
+		if A[x] {
+			C[x]++
+		}
+		C[x] += C[x-1]
+	}
 }
 
-func countSlope(num int64) int64 {
+func countSlope(n int64) int64 {
+	if n <= 100 {
+		return 0
+	}
+	if n < X {
+		return int64(C[int(n)] - C[100])
+	}
+
+	B := make([]int, H)
+	suf := make([]int64, H)
+	var ptr int
+
+	for n > 0 {
+		B[ptr] = int(n % 10)
+		ptr++
+
+		suf[ptr] = suf[ptr-1] + int64(B[ptr-1]*B[ptr-1])
+
+		n /= 10
+	}
+
+	var ans int64
+	var tail int64
+
+	for i := ptr - 1; i >= 2; i-- {
+		k := i
+		if tail > 0 {
+			ans += (tail - 1) * 570 * PW[k-2]
+			ans += int64(570-C[100]) * PW[k-2]
+		}
+		v := B[k]*100 + B[k-1]*10 + B[k-2]
+
+		if v > 0 {
+			if tail > 0 {
+				ans += int64(C[v-1]) * PW[k-2]
+			} else {
+				if C[v-1] > C[100] {
+					ans += int64(C[v-1]-C[100]) * PW[k-2]
+				}
+			}
+		}
+		if A[v] {
+			ans += suf[k-2] + 1
+		}
+		tail = tail*10 + int64(B[i])
+	}
+
+	return ans
+}
+
+func countSlope1(num int64) int64 {
 	if num <= 100 {
 		return 0
 	}

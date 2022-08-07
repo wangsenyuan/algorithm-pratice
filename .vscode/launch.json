@@ -16,7 +16,7 @@
       "env": {},
       "args": [],
       "showLog": true,
-      "trace": true,
+      "trace": "log",
       "backend": "native"
     }
   ]

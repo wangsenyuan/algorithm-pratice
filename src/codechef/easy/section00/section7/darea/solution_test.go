@@ -95,6 +95,6 @@ func TestSample5(t *testing.T) {
 		{5, 5},
 		{2, 2},
 	}
-	var expect int64 = 55
+	var expect int64 = 56
 	runSample(t, n, P, expect)
 }

@@ -103,19 +103,23 @@ func solve(s string) string {
 	suf := s[n:]
 	s = s[:n]
 
+	if len(s) == 0 {
+		return suf
+	}
+
 	k := count(s, '0')
 
 	if k&1 == 1 {
 		if count(suf, '0') > 0 {
-			return strings.Replace(s, "0", "", -1) + suf[:len(suf)-1]
+			return replace(s, "0", "") + suf[:len(suf)-1]
 		}
-		if n > 0 && s[n-1] == '1' {
+		if s[n-1] == '1' {
 			// drop 1 from suf
-			return strings.Replace(s, "0", "", -1)
+			return replace(s, "0", "")
 		}
 		if n > 1 && s[n-2] == '0' {
 			// 00
-			return strings.Replace(s, "0", "", -1) + "01"
+			return replace(s, "0", "") + "01"
 		}
 
 		x := index(s, '0')
@@ -124,32 +128,43 @@ func solve(s string) string {
 			y++
 		}
 		if y-x != k-1 {
-			return strings.Replace(s, "0", "", -1) + "01"
+			return replace(s, "0", "") + "01"
 		}
-		return strings.Replace(s, "0", "", -1)
+		return replace(s, "0", "")
 	}
-	if rindex(s, 0)-index(s, 0)+1 != k {
-		return strings.Replace(s, "0", "", -1) + suf
+
+	if rindex(s, '0')-index(s, '0')+1 != k {
+		// 只要不在同一个区域内
+		return replace(s, "0", "") + suf
 	}
 
 	if len(suf) >= 3 {
-		return strings.Replace(s, "0", "", -1) + suf[:len(suf)-2]
+		// 100
+		return replace(s, "0", "") + suf[:len(suf)-2]
 	}
+
 	if len(suf) == 2 {
-		if n > 0 && s[n-1] == '1' {
-			return strings.Replace(s, "0", "", -1)
+		// 10
+		if s[n-1] == '1' {
+			// 001 10
+			return replace(s, "0", "")
 		}
-		return strings.Replace(s, "0", "", -1) + "01"
+		// 00 10
+		return replace(s, "0", "") + "01"
 	}
 	if strings.HasSuffix(s, "11") {
-		s = strings.Replace(s, "0", "", -1)
+		s = replace(s, "0", "")
 		return s[:len(s)-1]
 	}
-	if n > 0 && s[n-1] == '1' {
-		s = strings.Replace(s, "0", "", -1)
+	if s[n-1] == '1' {
+		s = replace(s, "0", "")
 		return s[:len(s)-1] + "01"
 	}
-	return strings.Replace(s, "0", "", -1) + "001"
+	return replace(s, "0", "") + "001"
+}
+
+func replace(s string, old string, new string) string {
+	return strings.Replace(s, old, new, -1)
 }
 
 func index(s string, x byte) int {

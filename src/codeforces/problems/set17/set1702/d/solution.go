@@ -16,9 +16,10 @@ func main() {
 
 	for tc > 0 {
 		tc--
-		m := readNum(reader)
-		res := solve(m)
-		buf.WriteString(fmt.Sprintf("%d\n", res))
+		w := readString(reader)
+		p := readNum(reader)
+		res := solve(w, p)
+		buf.WriteString(fmt.Sprintf("%s\n", res))
 	}
 
 	fmt.Print(buf.String())
@@ -27,7 +28,7 @@ func main() {
 func readString(reader *bufio.Reader) string {
 	s, _ := reader.ReadString('\n')
 	for i := 0; i < len(s); i++ {
-		if s[i] == '\n' {
+		if s[i] == '\n' || s[i] == '\r' {
 			return s[:i]
 		}
 	}
@@ -104,12 +105,36 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 	return i
 }
 
-func solve(m int) int {
-	M := int64(m)
-	var cur int64 = 1
-	for cur*10 <= M {
-		cur *= 10
+func solve(w string, p int) string {
+	cnt := make([]int, 27)
+	for i := 0; i < len(w); i++ {
+		cnt[int(w[i]-'a'+1)]++
 	}
 
-	return int(M - cur)
+	var sum int
+	for i := 1; i <= 26; i++ {
+		left := p - sum
+		x := min(left/i, cnt[i])
+		cnt[i] = x
+		sum += i * x
+	}
+
+	var buf bytes.Buffer
+
+	for i := 0; i < len(w); i++ {
+		x := int(w[i] - 'a' + 1)
+		if cnt[x] > 0 {
+			buf.WriteByte(w[i])
+			cnt[x]--
+		}
+	}
+
+	return buf.String()
+}
+
+func min(a, b int) int {
+	if a <= b {
+		return a
+	}
+	return b
 }

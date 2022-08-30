@@ -3,8 +3,10 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"container/heap"
 	"fmt"
 	"os"
+	"sort"
 )
 
 func main() {
@@ -16,9 +18,16 @@ func main() {
 
 	for tc > 0 {
 		tc--
-		m := readNum(reader)
-		res := solve(m)
-		buf.WriteString(fmt.Sprintf("%d\n", res))
+		n := readNum(reader)
+		A := readNNums(reader, n)
+		B := readNNums(reader, n)
+		res := solve(A, B)
+
+		if res {
+			buf.WriteString("YES\n")
+		} else {
+			buf.WriteString("NO\n")
+		}
 	}
 
 	fmt.Print(buf.String())
@@ -27,7 +36,7 @@ func main() {
 func readString(reader *bufio.Reader) string {
 	s, _ := reader.ReadString('\n')
 	for i := 0; i < len(s); i++ {
-		if s[i] == '\n' {
+		if s[i] == '\n' || s[i] == '\r' {
 			return s[:i]
 		}
 	}
@@ -104,12 +113,65 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 	return i
 }
 
-func solve(m int) int {
-	M := int64(m)
-	var cur int64 = 1
-	for cur*10 <= M {
-		cur *= 10
+const H = 31
+
+func solve(A, B []int) bool {
+	n := len(A)
+	// 如果按照bit 来看的话，相当于对于a, 110100, 只需要看 1101 部分，
+	// 是否是b的前缀
+	for i := 0; i < n; i++ {
+		tmp := A[i]
+		for tmp&1 == 0 {
+			tmp >>= 1
+		}
+		// right 0 part irrlevant
+		A[i] = tmp
 	}
 
-	return int(M - cur)
+	// A[i] 不能通过 *2 得到，只能通过 /2得到
+
+	sort.Ints(A)
+
+	pq := make(IntHeap, n)
+
+	copy(pq, B)
+
+	heap.Init(&pq)
+
+	for i := n - 1; i >= 0; i-- {
+		a := A[i]
+		for pq[0] > a {
+			b := heap.Pop(&pq).(int)
+			for b > a {
+				b >>= 1
+			}
+			heap.Push(&pq, b)
+		}
+		if pq[0] < a {
+			return false
+		}
+		heap.Pop(&pq)
+	}
+	return true
+}
+
+// An IntHeap is a min-heap of ints.
+type IntHeap []int
+
+func (h IntHeap) Len() int           { return len(h) }
+func (h IntHeap) Less(i, j int) bool { return h[i] > h[j] }
+func (h IntHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+
+func (h *IntHeap) Push(x interface{}) {
+	// Push and Pop use pointer receivers because they modify the slice's length,
+	// not just its contents.
+	*h = append(*h, x.(int))
+}
+
+func (h *IntHeap) Pop() interface{} {
+	old := *h
+	n := len(old)
+	x := old[n-1]
+	*h = old[0 : n-1]
+	return x
 }

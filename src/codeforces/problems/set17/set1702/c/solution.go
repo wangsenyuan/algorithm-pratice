@@ -16,9 +16,22 @@ func main() {
 
 	for tc > 0 {
 		tc--
-		m := readNum(reader)
-		res := solve(m)
-		buf.WriteString(fmt.Sprintf("%d\n", res))
+		readString(reader)
+
+		n, k := readTwoNums(reader)
+		stations := readNNums(reader, n)
+		queries := make([][]int, k)
+		for i := 0; i < k; i++ {
+			queries[i] = readNNums(reader, 2)
+		}
+		res := solve(stations, queries)
+		for _, cur := range res {
+			if cur {
+				buf.WriteString("YES\n")
+			} else {
+				buf.WriteString("NO\n")
+			}
+		}
 	}
 
 	fmt.Print(buf.String())
@@ -27,7 +40,7 @@ func main() {
 func readString(reader *bufio.Reader) string {
 	s, _ := reader.ReadString('\n')
 	for i := 0; i < len(s); i++ {
-		if s[i] == '\n' {
+		if s[i] == '\n' || s[i] == '\r' {
 			return s[:i]
 		}
 	}
@@ -81,7 +94,15 @@ func readThreeNums(reader *bufio.Reader) (a int, b int, c int) {
 func readNNums(reader *bufio.Reader, n int) []int {
 	res := make([]int, n)
 	x := 0
-	bs, _ := reader.ReadBytes('\n')
+	var bs []byte
+
+	for {
+		bs, _ = reader.ReadBytes('\n')
+		if len(bs) > 1 {
+			break
+		}
+	}
+
 	for i := 0; i < n; i++ {
 		for x < len(bs) && (bs[x] < '0' || bs[x] > '9') && bs[x] != '-' {
 			x++
@@ -104,12 +125,26 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 	return i
 }
 
-func solve(m int) int {
-	M := int64(m)
-	var cur int64 = 1
-	for cur*10 <= M {
-		cur *= 10
+func solve(stations []int, queries [][]int) []bool {
+	n := len(stations)
+	first_occ := make(map[int]int)
+	last_occ := make(map[int]int)
+
+	for i := 0; i < n; i++ {
+		if _, ok := first_occ[stations[i]]; !ok {
+			first_occ[stations[i]] = i + 1
+		}
+		last_occ[stations[i]] = i + 1
 	}
 
-	return int(M - cur)
+	ans := make([]bool, len(queries))
+
+	for i, qry := range queries {
+		a, b := qry[0], qry[1]
+		if first_occ[a] > 0 && first_occ[b] > 0 {
+			ans[i] = first_occ[a] < last_occ[b]
+		}
+	}
+
+	return ans
 }

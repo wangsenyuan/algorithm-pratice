@@ -16,8 +16,8 @@ func main() {
 
 	for tc > 0 {
 		tc--
-		m := readNum(reader)
-		res := solve(m)
+		s := readString(reader)
+		res := solve(s)
 		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 
@@ -27,7 +27,7 @@ func main() {
 func readString(reader *bufio.Reader) string {
 	s, _ := reader.ReadString('\n')
 	for i := 0; i < len(s); i++ {
-		if s[i] == '\n' {
+		if s[i] == '\n' || s[i] == '\r' {
 			return s[:i]
 		}
 	}
@@ -104,12 +104,22 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 	return i
 }
 
-func solve(m int) int {
-	M := int64(m)
-	var cur int64 = 1
-	for cur*10 <= M {
-		cur *= 10
+func solve(s string) int {
+	n := len(s)
+	var res int
+
+	for i := 0; i < n; {
+		mem := make(map[byte]int)
+		for i < n && len(mem) <= 3 {
+			mem[s[i]]++
+			i++
+		}
+		if len(mem) > 3 {
+			i--
+		}
+
+		res++
 	}
 
-	return int(M - cur)
+	return res
 }

@@ -3,6 +3,36 @@ package p2420
 const H = 20
 
 func goodIndices(nums []int, k int) []int {
+	n := len(nums)
+
+	dp := make([]int, n)
+
+	for i := 0; i < n; i++ {
+		dp[i] = 1
+		if i > 0 && nums[i] <= nums[i-1] {
+			dp[i] = 1 + dp[i-1]
+		}
+	}
+
+	fp := make([]int, n)
+	for i := n - 1; i >= 0; i-- {
+		fp[i] = 1
+		if i+1 < n && nums[i] <= nums[i+1] {
+			fp[i] = 1 + fp[i+1]
+		}
+	}
+
+	var res []int
+
+	for i := k; i+1 < n; i++ {
+		if dp[i-1] >= k && fp[i+1] >= k {
+			res = append(res, i)
+		}
+	}
+	return res
+}
+
+func goodIndices1(nums []int, k int) []int {
 	// k <= i <= n - k
 	// k <= n - k, k <= n / 2
 	// i >= k

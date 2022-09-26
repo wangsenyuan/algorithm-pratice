@@ -3,6 +3,29 @@ package p2419
 const H = 22
 
 func longestSubarray(nums []int) int {
+
+	var best int
+	var max_value int
+	var cur int
+	var and int
+
+	for _, num := range nums {
+		if and&num != num {
+			cur = 0
+			and = num
+		}
+		cur++
+
+		if num > max_value {
+			best = cur
+			max_value = num
+		} else if num == max_value {
+			best = max(best, cur)
+		}
+	}
+	return best
+}
+func longestSubarray1(nums []int) int {
 	n := len(nums)
 
 	// 计算以nums[i] 为最大值的长度

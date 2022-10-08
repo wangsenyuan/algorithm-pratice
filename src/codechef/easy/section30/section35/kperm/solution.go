@@ -18,7 +18,7 @@ func main() {
 		tc--
 		n, k := readTwoNums(reader)
 		A := readNNums(reader, n)
-		res := solve(n, k, A)
+		res := solve1(n, k, A)
 		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 
@@ -220,7 +220,7 @@ func solve1(n int, K int, P []int) int {
 	var f func(pos int, k int, even int, par int) int
 
 	f = func(pos int, k int, even int, par int) int {
-		if k < 0 || even < 0 {
+		if k < 0 || even < 0 || even > cnt[pos] {
 			return 0
 		}
 
@@ -232,29 +232,29 @@ func solve1(n int, K int, P []int) int {
 			return 0
 		}
 
-		if P[pos-1] > 0 {
-			if P[pos-1]&1 != par {
-				// not same parity
-				return 0
-			}
+		dp[pos][k][even][par] = 0
 
-			dp[pos][k][even][par] = modAdd(f(pos-1, k, even, par), f(pos-1, k-1, even, 1-par))
+		if P[pos-1] > 0 {
+			if P[pos-1]&1 == par {
+				// valid choice
+				dp[pos][k][even][par] = modAdd(f(pos-1, k, even, par), f(pos-1, k-1, even, 1^par))
+			}
 		} else {
 			// 到目前为止使用的x + 剩余的odd = odds
 			// x + evens - even = cnt[n] - cnt[pos]
 			// x = cnt[n] - cnt[pos] - (evens - even)
 
-			dp[pos][k][even][par] = 0
-
 			if par == 0 {
 				// need to place a even number here
-				x := f(pos-1, k, even-1, par)
-				y := f(pos-1, k-1, even-1, 1-par)
+				x := f(pos-1, k, even-1, 0)
+				y := f(pos-1, k-1, even-1, 1)
 				dp[pos][k][even][par] = modMul(max(0, even), modAdd(x, y))
 			} else {
-				odd := odds - (cnt[n] - cnt[pos]) + (evens - even)
-				x := f(pos-1, k, even, par)
-				y := f(pos-1, k-1, even, 1-par)
+				// odds + evens == cnt[n]
+				// cnt[pos] - even
+				odd := cnt[pos] - even
+				x := f(pos-1, k, even, 1)
+				y := f(pos-1, k-1, even, 0)
 				dp[pos][k][even][par] = modMul(max(0, odd), modAdd(x, y))
 			}
 		}

@@ -3,7 +3,7 @@ package main
 import "testing"
 
 func runSample(t *testing.T, N int, K int, P []int, expect int) {
-	res := solve(N, K, P)
+	res := solve1(N, K, P)
 
 	if res != expect {
 		t.Fatalf("Sample expect %d, but got %d", expect, res)

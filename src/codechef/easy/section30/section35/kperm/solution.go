@@ -18,7 +18,7 @@ func main() {
 		tc--
 		n, k := readTwoNums(reader)
 		A := readNNums(reader, n)
-		res := solve(n, k, A)
+		res := solve1(n, k, A)
 		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 
@@ -228,7 +228,7 @@ func solve1(n int, K int, P []int) int {
 			return dp[pos][k][even][par]
 		}
 
-		if pos == 0 {
+		if pos == 0 || k == 0 {
 			return 0
 		}
 

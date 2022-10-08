@@ -18,7 +18,7 @@ func main() {
 		tc--
 		n, k := readTwoNums(reader)
 		A := readNNums(reader, n)
-		res := solve1(n, k, A)
+		res := solve(n, k, A)
 		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 

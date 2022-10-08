@@ -241,8 +241,8 @@ func solve1(n int, K int, P []int) int {
 			dp[pos][k][even][par] = modAdd(f(pos-1, k, even, par), f(pos-1, k-1, even, 1-par))
 		} else {
 			// 到目前为止使用的x + 剩余的odd = odds
-			// x + evens - even = cnt[n] - cnt[pos-1]
-			// x = cnt[n] - cnt[pos-1] - (evens - even)
+			// x + evens - even = cnt[n] - cnt[pos]
+			// x = cnt[n] - cnt[pos] - (evens - even)
 
 			dp[pos][k][even][par] = 0
 

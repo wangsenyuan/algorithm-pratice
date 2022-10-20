@@ -109,6 +109,7 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 
 	return i
 }
+
 func solve(A []int, m int, n int) bool {
 	if m == 1 || n == 1 {
 		return false

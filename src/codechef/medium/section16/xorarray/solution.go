@@ -139,14 +139,14 @@ func solve(A []int) int {
 		x := A[i] ^ A[i+1]
 		for x > 0 {
 			B[i]++
-			x -= x & -x
+			x >>= 1
 		}
 		if A[i] < A[i+1] {
 			B[i] *= -1
 		}
 	}
 
-	var best int
+	var best int = 1
 	r := -1
 	active := make(map[int]int)
 	for l := 0; l+1 < n; l++ {

@@ -129,7 +129,7 @@ func modInverse(n int) int {
 
 var fact []int
 
-const N = 200010
+const N = 1000010
 
 func init() {
 	fact = make([]int, N+1)

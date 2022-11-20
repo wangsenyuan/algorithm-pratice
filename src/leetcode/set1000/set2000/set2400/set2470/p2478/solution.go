@@ -18,6 +18,31 @@ func modMul(a, b int) int {
 func beautifulPartitions(s string, k int, minLength int) int {
 	n := len(s)
 
+	dp := make([][]int, k+1)
+	for i := 0; i <= k; i++ {
+		dp[i] = make([]int, n+1)
+	}
+
+	dp[0][0] = 1
+	for i := 1; i <= k; i++ {
+		var tot int
+		for j := minLength * i; j <= n; j++ {
+			j0 := j - minLength + 1
+			if isPrime(s[j0-1]) {
+				tot = modAdd(tot, dp[i-1][j0-1])
+			}
+			if !isPrime(s[j-1]) {
+				dp[i][j] = tot
+			}
+		}
+	}
+
+	return dp[k][n]
+}
+
+func beautifulPartitions2(s string, k int, minLength int) int {
+	n := len(s)
+
 	if !isPrime(s[0]) || isPrime(s[n-1]) {
 		return 0
 	}

@@ -192,9 +192,6 @@ func NewNode(begin, end int) *Node {
 }
 
 func (this *Node) push() {
-	if this.begin == this.end {
-		return
-	}
 	if this.left == nil {
 		mid := (this.begin + this.end) / 2
 		this.left = NewNode(this.begin, mid)
@@ -233,10 +230,7 @@ func (this *Node) Add(p int, v int) *Node {
 }
 
 func (this *Node) Query(l int, r int) int {
-	if this == nil {
-		return 0
-	}
-	if this.end < l || r < this.begin {
+	if this == nil || this.end < l || r < this.begin {
 		return 0
 	}
 

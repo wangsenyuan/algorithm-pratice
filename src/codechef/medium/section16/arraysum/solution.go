@@ -147,6 +147,156 @@ func solve(A []int, B []int) int {
 	n := len(A)
 	m := len(B)
 
+	const BLK_SIZE = 10000
+
+	var left [][]int
+	var right [][]int
+	var val [][]int
+
+	var ptr int
+	var sz int
+	next := func() int {
+		if ptr == sz {
+			left = append(left, make([]int, BLK_SIZE))
+			right = append(right, make([]int, BLK_SIZE))
+			val = append(val, make([]int, BLK_SIZE))
+			j := len(left)
+			for i := 0; i < BLK_SIZE; i++ {
+				left[j-1][i] = -1
+				right[j-1][i] = -1
+			}
+
+			sz += BLK_SIZE
+		}
+		ptr++
+		return ptr - 1
+	}
+
+	getVal := func(x int) int {
+		i, j := x/BLK_SIZE, x%BLK_SIZE
+		return val[i][j]
+	}
+
+	getLeft := func(x int) int {
+		i, j := x/BLK_SIZE, x%BLK_SIZE
+		return left[i][j]
+	}
+
+	getRight := func(x int) int {
+		i, j := x/BLK_SIZE, x%BLK_SIZE
+		return right[i][j]
+	}
+
+	setLeft := func(x int, v int) {
+		i, j := x/BLK_SIZE, x%BLK_SIZE
+		left[i][j] = v
+	}
+
+	setRight := func(x int, v int) {
+		i, j := x/BLK_SIZE, x%BLK_SIZE
+		right[i][j] = v
+	}
+
+	setVal := func(x int, v int) {
+		i, j := x/BLK_SIZE, x%BLK_SIZE
+		val[i][j] = v
+	}
+
+	cloneNode := func(i int) int {
+		j := next()
+		setLeft(j, getLeft(i))
+		setRight(j, getRight(i))
+		setVal(j, getVal(i))
+		return j
+	}
+
+	push := func(x int) {
+		if getLeft(x) < 0 {
+			setLeft(x, next())
+			setRight(x, next())
+		}
+	}
+
+	merge := func(x int) {
+		setVal(x, modAdd(getVal(getLeft(x)), getVal(getRight(x))))
+	}
+
+	var add func(i int, begin int, end int, p int, v int) int
+
+	add = func(i int, begin int, end int, p int, v int) int {
+		j := cloneNode(i)
+
+		if begin == end {
+			setVal(j, modAdd(getVal(j), v))
+		} else {
+			push(j)
+			mid := (begin + end) / 2
+			if p <= mid {
+				setLeft(j, add(getLeft(j), begin, mid, p, v))
+			} else {
+				setRight(j, add(getRight(j), mid+1, end, p, v))
+			}
+			merge(j)
+		}
+		return j
+	}
+
+	var query func(i int, begin int, end int, l int, r int) int
+
+	query = func(i int, begin int, end int, l int, r int) int {
+		if end < l || r < begin {
+			return 0
+		}
+		if l <= begin && end <= r {
+			return getVal(i)
+		}
+		var res int
+		mid := (begin + end) / 2
+		if getLeft(i) >= 0 {
+			res = query(getLeft(i), begin, mid, l, r)
+		}
+		if getRight(i) >= 0 {
+			res = modAdd(res, query(getRight(i), mid+1, end, l, r))
+		}
+
+		return res
+	}
+
+	trees := make([]int, n+1)
+	trees[0] = next()
+	// trees[0].Add(0, 0)
+
+	for i := 1; i <= n; i++ {
+		trees[i] = add(trees[i-1], 0, MAX_X, A[i-1], 1)
+	}
+
+	dp := make([]int, n+1)
+	for j := 1; j < m; j++ {
+		for i := j; i <= n; i++ {
+			// A[i-1] + B[j] >= x + B[j-1]
+			// x <= A[i-1] + B[j] - B[j-1]
+			x := A[i-1] + B[j] - B[j-1]
+			dp[i] = query(trees[i-1], 0, MAX_X, 0, x)
+		}
+
+		for i := j; i <= n; i++ {
+			trees[i] = add(trees[i-1], 0, MAX_X, A[i-1], dp[i])
+		}
+	}
+
+	var res int
+
+	for i := m; i <= n; i++ {
+		res = modAdd(res, dp[i])
+	}
+
+	return res
+}
+
+func solve1(A []int, B []int) int {
+	n := len(A)
+	m := len(B)
+
 	trees := make([]*Node, n+1)
 	trees[0] = NewNode(0, MAX_X)
 	// trees[0].Add(0, 0)

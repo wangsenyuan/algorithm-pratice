@@ -147,7 +147,7 @@ func solve(A []int, B []int) int {
 	n := len(A)
 	m := len(B)
 
-	const BLK_SIZE = 10000
+	const BLK_SIZE = 100000
 
 	var left [][]int
 	var right [][]int
@@ -272,12 +272,21 @@ func solve(A []int, B []int) int {
 
 	dp := make([]int, n+1)
 	for j := 1; j < m; j++ {
+		cur := ptr
 		for i := j; i <= n; i++ {
 			// A[i-1] + B[j] >= x + B[j-1]
 			// x <= A[i-1] + B[j] - B[j-1]
 			x := A[i-1] + B[j] - B[j-1]
 			dp[i] = query(trees[i-1], 0, MAX_X, 0, x)
 		}
+
+		for p := cur; p < ptr; p++ {
+			setLeft(p, -1)
+			setRight(p, -1)
+			setVal(p, 0)
+		}
+
+		ptr = cur
 
 		for i := j; i <= n; i++ {
 			trees[i] = add(trees[i-1], 0, MAX_X, A[i-1], dp[i])

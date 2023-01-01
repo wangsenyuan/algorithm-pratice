@@ -11,18 +11,25 @@ func main() {
 	reader := bufio.NewReader(os.Stdin)
 
 	tc := readNum(reader)
-	var buf bytes.Buffer
+	// var buf bytes.Buffer
 	for tc > 0 {
 		tc--
-		s, _ := reader.ReadString('\n')
-		s = s[:len(s) - 1]
+		s := readString(reader)
 		r := solve(s)
-		buf.WriteString(r)
-		buf.WriteByte('\n')
+		fmt.Println(r)
 	}
-	fmt.Print(buf.String())
+	// fmt.Print(buf.String())
 }
 
+func readString(reader *bufio.Reader) string {
+	s, _ := reader.ReadString('\n')
+	for i := 0; i < len(s); i++ {
+		if s[i] == '\n' {
+			return s[:i]
+		}
+	}
+	return s
+}
 
 func readInt(bytes []byte, from int, val *int) int {
 	i := from
@@ -84,7 +91,6 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 	return i
 }
 
-
 func solve(s string) string {
 	if s[0] == 'R' {
 		i := 1
@@ -130,7 +136,7 @@ func convertToLetters(num int) string {
 		num--
 		x := byte(num%26 + 'A')
 		buf.WriteByte(x)
-		num =num / 26
+		num = num / 26
 	}
 	bs := buf.Bytes()
 	reverse(bs)

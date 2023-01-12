@@ -272,7 +272,11 @@ func (node *Node) Query(L int, R int) int64 {
 	return min(a, b)
 }
 
-func min(a, b int64) int64 {
+type Num interface {
+	int | int64
+}
+
+func min[T Num](a, b T) T {
 	if a <= b {
 		return a
 	}

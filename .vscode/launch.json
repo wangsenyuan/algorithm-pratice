@@ -9,7 +9,6 @@
       "type": "go",
       "request": "launch",
       "mode": "debug",
-      "remotePath": "",
       "port": 2345,
       "host": "127.0.0.1",
       "program": "${fileDirname}",
@@ -17,7 +16,8 @@
       "args": [],
       "showLog": true,
       "trace": "log",
-      "backend": "native"
+      "backend": "native",
+      "console": "integratedTerminal"
     }
   ]
 }

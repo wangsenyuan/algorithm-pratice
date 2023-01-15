@@ -24,6 +24,7 @@ func countGood(nums []int, k int) int64 {
 			sum += count(cnt[nums[l]])
 			l++
 			if sum < K {
+				// 保证[l...r]始终是最小good
 				l--
 				sum -= count(cnt[nums[l]])
 				cnt[nums[l]]++

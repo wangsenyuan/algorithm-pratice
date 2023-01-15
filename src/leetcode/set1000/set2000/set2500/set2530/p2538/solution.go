@@ -30,8 +30,9 @@ func maxOutput(n int, edges [][]int, price []int) int64 {
 
 	dfs1(0, 0)
 
+	var res int64
+
 	// dfs2 计算经过u的最大值
-	mx := make([]int64, n)
 	var dfs2 func(p int, u int, sum int64)
 	dfs2 = func(p int, u int, sum int64) {
 		a, b := -1, -1
@@ -48,11 +49,11 @@ func maxOutput(n int, edges [][]int, price []int) int64 {
 		}
 		if a < 0 {
 			// leaf
-			mx[u] = sum
+			res = max(res, sum)
 			return
 		}
-		mx[u] = max(sum, fp[a])
-		
+		res = max(res, max(sum, fp[a]))
+
 		if b < 0 {
 			// only one child
 			dfs2(u, a, sum+int64(price[u]))
@@ -72,12 +73,6 @@ func maxOutput(n int, edges [][]int, price []int) int64 {
 	}
 
 	dfs2(0, 0, 0)
-
-	var res int64
-
-	for i := 0; i < n; i++ {
-		res = max(res, mx[i])
-	}
 
 	return res
 }

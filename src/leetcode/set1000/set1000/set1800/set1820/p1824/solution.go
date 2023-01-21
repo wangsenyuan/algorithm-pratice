@@ -4,36 +4,39 @@ const INF = 1 << 30
 
 func minSideJumps(obstacles []int) int {
 	n := len(obstacles)
-	dp := make([][]int, n)
-	for i := 0; i < n; i++ {
-		dp[i] = make([]int, 3)
-		for j := 0; j < 3; j++ {
-			dp[i][j] = INF
-		}
+	// the min result when frog is at lan i
+	dp := make([]int, 3)
+	for i := 0; i < 3; i++ {
+		dp[i] = INF
 	}
-	dp[0][1] = 0
+	dp[1] = 0
+	fp := make([]int, 3)
+
 	for i := 0; i < n-1; i++ {
 		for j := 0; j < 3; j++ {
-			if dp[i][j] < INF {
+			fp[j] = INF
+		}
+		for j := 0; j < 3; j++ {
+			if dp[j] < INF {
 				for k := 0; k < 3; k++ {
 					if obstacles[i] == 0 || obstacles[i] != k+1 {
 						if obstacles[i+1] == 0 || obstacles[i+1] != k+1 {
-							if j == k {
+							x := dp[j]
+							if j != k {
 								// no slide
-								dp[i+1][k] = min(dp[i+1][k], dp[i][j])
-							} else {
-								// slide from j to k, then move
-								dp[i+1][k] = min(dp[i+1][k], dp[i][j]+1)
+								x++
 							}
+							fp[k] = min(fp[k], x)
 						}
 					}
 				}
 			}
 		}
+		copy(dp, fp)
 	}
 	res := INF
 	for j := 0; j < 3; j++ {
-		res = min(res, dp[n-1][j])
+		res = min(res, dp[j])
 	}
 	if res == INF {
 		return -1

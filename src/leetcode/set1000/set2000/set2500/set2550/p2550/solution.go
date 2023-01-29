@@ -47,7 +47,6 @@ func countQuadruplets(nums []int) int64 {
 				b := get(arr2, nums[j], n)
 				res += int64(a) * int64(b)
 			}
-			set(arr2, nums[k]-1, 1)
 		}
 		set(arr, nums[j]-1, 1)
 	}

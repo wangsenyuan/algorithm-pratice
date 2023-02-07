@@ -110,6 +110,33 @@ func readNNums(reader *bufio.Reader, n int) []int {
 const INF = 1 << 60
 
 func solve(x int, y int, a string, b string) int64 {
+	if xor(a) != xor(b) {
+		return -1
+	}
+	var diff []int
+	diff = append(diff, 0)
+	n := len(a)
+
+	for i := 1; i <= n; i++ {
+		if a[i-1] != b[i-1] {
+			diff = append(diff, i)
+		}
+	}
+
+	if len(diff) == 3 && diff[1]+1 == diff[2] {
+		return int64(min(y*2, x))
+	}
+
+	f := make([]int64, len(diff)+1)
+	f[1] = int64(y)
+
+	for i := 2; i < len(diff); i++ {
+		f[i] = min(f[i-2]+2*int64(x)*int64(diff[i]-diff[i-1]), f[i-1]+int64(y))
+	}
+	return f[len(diff)-1] / 2
+}
+
+func solve2(x int, y int, a string, b string) int64 {
 	if x > y {
 		return solve1(x, y, a, b)
 	}

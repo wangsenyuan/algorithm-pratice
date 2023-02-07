@@ -114,7 +114,6 @@ func solve(x int, y int, a string, b string) int64 {
 		return -1
 	}
 	var diff []int
-	diff = append(diff, 0)
 	n := len(a)
 
 	for i := 1; i <= n; i++ {
@@ -123,17 +122,27 @@ func solve(x int, y int, a string, b string) int64 {
 		}
 	}
 
-	if len(diff) == 3 && diff[1]+1 == diff[2] {
+	if len(diff) == 0 {
+		return 0
+	}
+
+	if len(diff) == 2 && diff[0]+1 == diff[1] {
 		return int64(min(y*2, x))
 	}
-
-	f := make([]int64, len(diff)+1)
-	f[1] = int64(y)
-
-	for i := 2; i < len(diff); i++ {
-		f[i] = min(f[i-2]+2*int64(x)*int64(diff[i]-diff[i-1]), f[i-1]+int64(y))
+	// dp[i] = min(dp[i-2] + x * (diff[i] - diff[i-1]), dp[i-1] + y) for even i
+	// dp[i] = min(dp[i-2] + x * (diff[i] - diff[i-1]), dp[i-1]) for odd i
+	var u int64
+	var v int64
+	for i := 1; i < len(diff); i++ {
+		w := u + int64(x)*int64(diff[i]-diff[i-1])
+		if i&1 == 1 {
+			w = min(w, v+int64(y))
+		} else {
+			w = min(w, v)
+		}
+		u, v = v, w
 	}
-	return f[len(diff)-1] / 2
+	return v
 }
 
 func solve2(x int, y int, a string, b string) int64 {

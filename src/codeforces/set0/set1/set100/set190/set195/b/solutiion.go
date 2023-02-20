@@ -117,6 +117,43 @@ func readNNums(reader *bufio.Reader, n int) []int {
 }
 
 func solve(n int, m int) []int {
+
+	res := make([]int, n)
+	var i int
+	lf := (m + 1) / 2
+	rg := lf
+	var expect int
+	if m&1 == 0 {
+		rg++
+	} else {
+		res[0] = lf
+		lf--
+		rg++
+		i = 1
+		expect = 1
+	}
+
+	for i < m && i < n {
+		if i&1 == expect {
+			res[i] = lf
+			lf--
+		} else {
+			res[i] = rg
+			rg++
+		}
+
+		i++
+	}
+
+	for i < n {
+		res[i] = res[i-m]
+		i++
+	}
+
+	return res
+}
+
+func solve1(n int, m int) []int {
 	// n balls, m baskets
 	mid := (m + 1) / 2
 

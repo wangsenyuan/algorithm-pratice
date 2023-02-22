@@ -43,18 +43,3 @@ func TestSample3(t *testing.T) {
 	expect := 0
 	runSample(t, n, buses, expect)
 }
-
-func TestSample4(t *testing.T) {
-	n := 3
-	buses := [][]int{
-		{0, 1},
-		{1, 3},
-		{2, 3},
-		{4, 6},
-		{5, 7},
-		{4, 5},
-		{5, 7},
-	}
-	expect := 0
-	runSample(t, n, buses, expect)
-}

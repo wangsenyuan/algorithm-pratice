@@ -131,7 +131,7 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 
 // const MAX_P = 5001
 const MAX_S = 50010
-const H = 66
+const H = 63
 
 func getIndex(x byte) int {
 	if x >= 'a' && x <= 'z' {

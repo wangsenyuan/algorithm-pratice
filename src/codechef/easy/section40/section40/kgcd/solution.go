@@ -151,17 +151,17 @@ func solve(A []int, k int64) []int {
 		}
 	}
 	v1, v2 := coprime(arr, len(A))
-	i := findIndex(A, v1*ans)
-	j := findIndex(A, v2*ans)
+	i := findIndex(A, v1*ans, -1)
+	j := findIndex(A, v2*ans, i)
 	if i > j {
 		i, j = j, i
 	}
 	return []int{ans, i + 1, j + 1}
 }
 
-func findIndex(arr []int, v int) int {
+func findIndex(arr []int, v int, avoid int) int {
 	for i, num := range arr {
-		if num == v {
+		if num == v && avoid != i {
 			return i
 		}
 	}

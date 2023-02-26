@@ -79,43 +79,49 @@ func solve(a int, b int, k int) int {
 	// a + 1, .... a + l ....
 	// a + 2, .... a + l + 1
 	var primes []int
-	for x := a; x <= b; x++ {
-		if isPrime(x) {
-			primes = append(primes, x)
+
+	set := make([]bool, b+1)
+
+	for x := 2; x <= b; x++ {
+		if !set[x] {
+			if x >= a {
+				primes = append(primes, x)
+			}
+			if b/x < x {
+				continue
+			}
+			for y := x * x; y <= b; y += x {
+				set[y] = true
+			}
 		}
 	}
-
-	check := func(l int) bool {
-		var front, end int
-		for x := a; x <= b-l+1; x++ {
-			y := x + l - 1
-			for end < len(primes) && primes[end] <= y {
-				end++
-			}
-
-			for front < len(primes) && primes[front] < x {
-				front++
-			}
-			if end-front < k {
-				return false
-			}
-		}
-		return true
-	}
-	if len(primes) < k {
+	n := len(primes)
+	if n < k {
 		return -1
 	}
-	l, r := 1, b-a+1
-
-	for l < r {
-		mid := (l + r) / 2
-		if check(mid) {
-			r = mid
-		} else {
-			l = mid + 1
+	var res int
+	var front int
+	for x := a; x <= b; x++ {
+		for front < n && primes[front] < x {
+			front++
 		}
+		if front+k > n {
+			break
+		}
+		end := front + k
+		res = max(res, primes[end-1]-x+1)
 	}
-	return r
+
+	res = max(res, b-primes[n-k]+1)
+
+	return res
+}
+
+func max(a, b int) int {
+	if a >= b {
+		return a
+	}
+	return b
 }
 
 func isPrime(num int) bool {

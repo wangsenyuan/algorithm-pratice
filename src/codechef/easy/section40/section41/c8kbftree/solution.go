@@ -2,18 +2,37 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"os"
 )
 
 func main() {
 	reader := bufio.NewReader(os.Stdin)
-	n := readNum(reader)
-	F := readNNums(reader, 1<<n)
-	G := readNNums(reader, 1<<n)
-	H := readNNums(reader, 1<<n)
-	res := solve(n, F, G, H)
-	fmt.Println(res)
+	var buf bytes.Buffer
+	tc := readNum(reader)
+
+	for tc > 0 {
+		tc--
+		n := readNum(reader)
+		E := make([][]int, n-1)
+		for i := 0; i < n-1; i++ {
+			E[i] = readNNums(reader, 3)
+		}
+		res := solve(n, E)
+		if len(res) == 0 {
+			buf.WriteString("-1\n")
+		} else {
+			for i := 0; i < len(res); i++ {
+				for j := 0; j < len(res[i]); j++ {
+					buf.WriteString(fmt.Sprintf("%d ", res[i][j]))
+				}
+			}
+			buf.WriteByte('\n')
+		}
+	}
+
+	fmt.Print(buf.String())
 }
 
 func readString(reader *bufio.Reader) string {
@@ -115,73 +134,80 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 	return i
 }
 
-const MOD = 1e9 + 7
+const H = 20
 
-func add(a, b int) int {
-	a += b
-	if a >= MOD {
-		a -= MOD
+func solve(n int, E [][]int) [][]int {
+	// value(a, b) = path_value(a) ^ path_value(b)
+	// where path_value = xor values from root to a
+	// pf(a) ^ pf(b) = pf(c) ^ pf(d)
+	// 如果有两个点的pf相同，则只要找到任意一个第三个点即可
+	// 现在假设不存在相同的pf
+	// a ^ b = c ^ d
+	// a ^ b ^ c = 0 也是可以的，因为X[0] = 0, 可以选择d = 0
+	// 但是如何找到三个值它们的 xor = 0的呢?
+
+	g := NewGraph(n, 2*n)
+
+	for _, e := range E {
+		u, v, w := e[0]-1, e[1]-1, e[2]
+		g.AddEdge(u, v, w)
+		g.AddEdge(v, u, w)
 	}
-	return a
-}
+	X := make([]int, n)
+	var dfs func(p int, u, x int)
 
-func sub(a, b int) int {
-	return add(a, MOD-b)
-}
-
-func mul(a, b int) int {
-	return int(int64(a) * int64(b) % MOD)
-}
-
-func addSos(dp []int, n int) {
-	for i := 0; i < n; i++ {
-		for j := 0; j < 1<<n; j++ {
-			if (j>>i)&1 == 1 {
-				dp[j] = add(dp[j], dp[j^(1<<i)])
+	dfs = func(p int, u, x int) {
+		X[u] = x
+		for i := g.nodes[u]; i > 0; i = g.next[i] {
+			v := g.to[i]
+			if p != v {
+				dfs(u, v, g.val[i]^x)
 			}
 		}
 	}
-}
 
-func subSos(dp []int, n int) {
-	for i := 0; i < n; i++ {
-		for j := 0; j < 1<<n; j++ {
-			if (j>>i)&1 == 1 {
-				dp[j] = sub(dp[j], dp[j^(1<<i)])
-			}
-		}
-	}
-}
-
-func solve(n int, F, G, H []int) int {
-	// R(D) = sum(F(A) * G(B) * H(C))
-	// D 是 A | B | C 集合的子集
-	// Sum(R(D))
-	// 考虑D = 1, 只包含第0个元素的集合，
-	// 那么A, B, C 中只要有一个包含第0个元素，即可
-	// 假设确定了A，那么sum(F(A) * G(B) * H(C)) = F(A) * sum(G(B) * H(C))
-	// (sum(F) - sum(A`))) * sum(G) * sum(H), A` = 不包含
-	addSos(F, n)
-	addSos(G, n)
-	addSos(H, n)
-	dp := make([]int, 1<<n)
-	for i := 0; i < 1<<n; i++ {
-		dp[i] = mul(F[i], mul(G[i], H[i]))
-	}
-	subSos(dp, n)
+	dfs(0, 0, 0)
+	// len(che) at most 1 << 20,
+	che := make(map[int]Pair)
 
 	for i := 0; i < n; i++ {
-		for j := 0; j < 1<<n; j++ {
-			if (j>>i)&1 == 0 {
-				dp[j] = add(dp[j], dp[j^(1<<i)])
+		for j := i + 1; j < n; j++ {
+			tmp := X[i] ^ X[j]
+			if v, ok := che[tmp]; ok {
+				return [][]int{{v.first + 1, v.second + 1}, {i + 1, j + 1}}
 			}
+			che[tmp] = Pair{i, j}
 		}
 	}
-	var res int
 
-	for i := 0; i < 1<<n; i++ {
-		res = add(res, dp[i])
-	}
+	return nil
+}
 
-	return res
+type Pair struct {
+	first  int
+	second int
+}
+
+type Graph struct {
+	nodes []int
+	next  []int
+	to    []int
+	val   []int
+	cur   int
+}
+
+func NewGraph(n int, e int) *Graph {
+	nodes := make([]int, n)
+	next := make([]int, e+1)
+	to := make([]int, e+1)
+	val := make([]int, e+1)
+	return &Graph{nodes, next, to, val, 0}
+}
+
+func (g *Graph) AddEdge(u, v, w int) {
+	g.cur++
+	g.next[g.cur] = g.nodes[u]
+	g.nodes[u] = g.cur
+	g.to[g.cur] = v
+	g.val[g.cur] = w
 }

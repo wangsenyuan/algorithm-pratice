@@ -2,18 +2,27 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"os"
 )
 
 func main() {
 	reader := bufio.NewReader(os.Stdin)
-	n := readNum(reader)
-	F := readNNums(reader, 1<<n)
-	G := readNNums(reader, 1<<n)
-	H := readNNums(reader, 1<<n)
-	res := solve(n, F, G, H)
-	fmt.Println(res)
+	var buf bytes.Buffer
+	tc := readNum(reader)
+
+	for tc > 0 {
+		tc--
+
+		n := readNum(reader)
+		A := readNNums(reader, n)
+		res := solve(A)
+
+		buf.WriteString(fmt.Sprintf("%d\n", res))
+	}
+
+	fmt.Print(buf.String())
 }
 
 func readString(reader *bufio.Reader) string {
@@ -115,7 +124,27 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 	return i
 }
 
-const MOD = 1e9 + 7
+const MOD = 1000000007
+
+func solve(A []int) int {
+	// cnt(mem) >= k
+	n := len(A)
+
+	cnt := make([]int, n+1)
+	for _, a := range A {
+		if a <= n {
+			cnt[a]++
+		}
+	}
+	var ans int
+	cur := 1
+	for i := 1; i <= n; i++ {
+		cur = mul(cur, cnt[i])
+		ans = add(ans, cur)
+	}
+
+	return ans
+}
 
 func add(a, b int) int {
 	a += b
@@ -131,57 +160,4 @@ func sub(a, b int) int {
 
 func mul(a, b int) int {
 	return int(int64(a) * int64(b) % MOD)
-}
-
-func addSos(dp []int, n int) {
-	for i := 0; i < n; i++ {
-		for j := 0; j < 1<<n; j++ {
-			if (j>>i)&1 == 1 {
-				dp[j] = add(dp[j], dp[j^(1<<i)])
-			}
-		}
-	}
-}
-
-func subSos(dp []int, n int) {
-	for i := 0; i < n; i++ {
-		for j := 0; j < 1<<n; j++ {
-			if (j>>i)&1 == 1 {
-				dp[j] = sub(dp[j], dp[j^(1<<i)])
-			}
-		}
-	}
-}
-
-func solve(n int, F, G, H []int) int {
-	// R(D) = sum(F(A) * G(B) * H(C))
-	// D 是 A | B | C 集合的子集
-	// Sum(R(D))
-	// 考虑D = 1, 只包含第0个元素的集合，
-	// 那么A, B, C 中只要有一个包含第0个元素，即可
-	// 假设确定了A，那么sum(F(A) * G(B) * H(C)) = F(A) * sum(G(B) * H(C))
-	// (sum(F) - sum(A`))) * sum(G) * sum(H), A` = 不包含
-	addSos(F, n)
-	addSos(G, n)
-	addSos(H, n)
-	dp := make([]int, 1<<n)
-	for i := 0; i < 1<<n; i++ {
-		dp[i] = mul(F[i], mul(G[i], H[i]))
-	}
-	subSos(dp, n)
-
-	for i := 0; i < n; i++ {
-		for j := 0; j < 1<<n; j++ {
-			if (j>>i)&1 == 0 {
-				dp[j] = add(dp[j], dp[j^(1<<i)])
-			}
-		}
-	}
-	var res int
-
-	for i := 0; i < 1<<n; i++ {
-		res = add(res, dp[i])
-	}
-
-	return res
 }

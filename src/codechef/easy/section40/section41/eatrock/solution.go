@@ -184,7 +184,6 @@ func solve(X []int, W []int) int {
 		return rs[i].first < rs[j].first
 	})
 
-	dp := make([]int, n)
 	// dp[i] = dp[j] + pow(2, j) * dist(j, i) =
 
 	//for i := range rs {
@@ -217,20 +216,14 @@ func solve(X []int, W []int) int {
 		d := dis_sum.Get(n - 1)
 		e := dis_sum.Get(j)
 		f := sub(d, e)
-		dp[i] = add(sum, sub(mul(b, x), e))
-		dp[i] = add(dp[i], sub(f, mul(c, x)))
-		sum = add(sum, dp[i])
+		dp := add(sum, sub(mul(b, x), e))
+		dp = add(dp, sub(f, mul(c, x)))
+		sum = add(sum, dp)
 		pw_sum.Add(j, pow(2, i))
 		dis_sum.Add(j, mul(x, pow(2, i)))
 	}
 
-	var res int
-
-	for i := 0; i < n; i++ {
-		res = add(res, dp[i])
-	}
-
-	ans := mul(res, inverse(pow(2, n)))
+	ans := mul(sum, inverse(pow(2, n)))
 	return ans
 }
 

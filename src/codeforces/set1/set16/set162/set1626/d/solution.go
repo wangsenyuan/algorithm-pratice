@@ -17,12 +17,10 @@ func main() {
 
 	for tc > 0 {
 		tc--
-		n, m := readTwoNums(reader)
-		res := solve(n, m)
-		for i := 0; i < len(res); i++ {
-			buf.WriteString(fmt.Sprintf("%d ", res[i]))
-		}
-		buf.WriteByte('\n')
+		n := readNum(reader)
+		A := readNNums(reader, n)
+		res := solve(A)
+		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 
 	fmt.Print(buf.String())
@@ -31,7 +29,7 @@ func main() {
 func readString(reader *bufio.Reader) string {
 	s, _ := reader.ReadString('\n')
 	for i := 0; i < len(s); i++ {
-		if s[i] == '\n' {
+		if s[i] == '\n' || s[i] == '\r' {
 			return s[:i]
 		}
 	}
@@ -107,52 +105,74 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 
 	return i
 }
-func solve(n int, m int) []int {
-	dist := make([]int, n*m)
 
-	var corners = [][]int{
-		{0, 0},
-		{0, m - 1},
-		{n - 1, 0},
-		{n - 1, m - 1},
-	}
+const N = 2*1e5 + 10
 
-	max_min_distance := func(x int, y int) int {
-		res := 0
-		for i := 0; i < 4; i++ {
-			res = max(res, distance([]int{x, y}, corners[i]))
-		}
+var L [N]int
 
-		return res
-	}
-
-	for i := 0; i < n; i++ {
-		for j := 0; j < m; j++ {
-			dist[i*m+j] = max_min_distance(i, j)
+func init() {
+	L[1] = 1
+	for i := 2; i < N; i++ {
+		L[i] = L[i-1]
+		if i-1 == L[i-1] {
+			L[i] *= 2
 		}
 	}
-
-	sort.Ints(dist)
-
-	return dist
 }
 
-func max(a, b int) int {
-	if a >= b {
+func solve(A []int) int {
+	n := len(A)
+	if n == 1 {
+		return 2
+	}
+	sort.Ints(A)
+	// pick (x, y), count( < x) = pow(2, i)
+	// count(< y) - count( < x) = pow(2, j)
+	// N - count( < y) = pow(2, k)
+	// 一个n * n的算法是可以正确给出答案的，但是太慢了
+	// 某个i后面的都算做第三段 (A[i] > A[i-1]) 这个需要邀请的人数是确定的
+	// 某个i前面的都算作第一段 (A[i] < A[i+1]) 这个也很容易计算,
+	// dp[i] = a
+	// fp[j] = min(dp[i] + h - (j - i)) h 是大于等于(j-i)的最小的pow(2, ?)
+	//       =   = h1 - i + h2 - (j - i)
+	//       =   = h1 + h2 - j (其实和i是没关系的)
+	//   h1 + h2 最小
+	// h2 依赖于i的选择
+	// 假设 i从left到right移动,dp[i] = h1, dp[i+1] = h1 (偶然 dp[i+1] = 2 * h1 when i = h1)
+	// 对于左边的i，有一个规律是 1, 2, 4, 4, 8, 8, 8，8 ..
+	// 假设选定了h1, 那么i最好选择 dp[i] = h1, but dp[i+1] = 2 * h1的那个位置
+	best := L[n] + 2
+	pos := make([]int, 2*n)
+
+	for y := 1; y < n; y++ {
+		if A[y-1] == A[y] {
+			// not able to split at position y
+			continue
+		}
+		tmp := 1 + L[y]
+
+		for h1 := 1; h1 < L[y]; h1 *= 2 {
+			i := pos[h1]
+			if i == 0 {
+				continue
+			}
+			tmp = min(tmp, h1+L[y-i])
+		}
+		pos[L[y]] = y
+
+		tmp += L[n-y]
+
+		if best > tmp {
+			best = tmp
+		}
+	}
+
+	return best - n
+}
+
+func min(a, b int) int {
+	if a <= b {
 		return a
 	}
 	return b
-}
-
-func abs(num int) int {
-	if num < 0 {
-		return -num
-	}
-	return num
-}
-
-func distance(a, b []int) int {
-	dx := abs(a[0] - b[0])
-	dy := abs(a[1] - b[1])
-	return dx + dy
 }

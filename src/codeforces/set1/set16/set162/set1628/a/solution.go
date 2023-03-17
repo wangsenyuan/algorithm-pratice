@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"os"
 )
@@ -9,12 +10,23 @@ import (
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 
-	n := readNum(reader)
-	A := readNNums(reader, n)
+	var buf bytes.Buffer
 
-	res := solve(A)
+	tc := readNum(reader)
 
-	fmt.Println(res)
+	for tc > 0 {
+		tc--
+		n := readNum(reader)
+		A := readNNums(reader, n)
+		res := solve(A)
+		buf.WriteString(fmt.Sprintf("%d\n", len(res)))
+		for i := 0; i < len(res); i++ {
+			buf.WriteString(fmt.Sprintf("%d ", res[i]))
+		}
+		buf.WriteByte('\n')
+	}
+
+	fmt.Print(buf.String())
 }
 
 func readString(reader *bufio.Reader) string {
@@ -97,87 +109,58 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 	return i
 }
 
-func solve(A []int) int {
-	var mx int
-	for _, x := range A {
-		if x > mx {
-			mx = x
-		}
-	}
+func solve(A []int) []int {
+	// b[0] = mex(A)
+	n := len(A)
 
-	in := make([]bool, mx+1)
-	for _, x := range A {
-		in[x] = true
-	}
-	// i * 4, i * 6
-	// 它们的gcd = i * 2
-	// 但是 i * 4 和 i * 3, 它们的gcd = i
-	// 对于某个i，如果存在a % i = 0, b % i = 0 且 gcd(a / i, b / i) = 1
-	// i的倍数比较好找， a += i
-	// 但是如何找到另外一个 b使得 gcd(a, b) = i
-	best := make([]int, mx+1)
-
-	var cnt int
-	for i := mx; i > 0; i-- {
-		for j := i; j <= mx; j += i {
-			if in[j] {
-				best[i] = gcd(best[i], j)
+	var mex int
+	cnt := make([]int, n+1)
+	for i := 0; i < n; i++ {
+		if A[i] <= n {
+			cnt[A[i]]++
+			for cnt[mex] > 0 {
+				mex++
 			}
 		}
-		if best[i] == i {
-			cnt++
-		}
 	}
 
-	return cnt - len(A)
-}
+	var res []int
+	cnt2 := make([]int, n+1)
+	var mex2 int
+	for l, r := 0, 0; r < n; r++ {
+		if A[r] <= n {
+			cnt2[A[r]]++
+			for cnt2[mex2] > 0 {
+				mex2++
+			}
+			if mex2 == mex {
+				res = append(res, mex)
 
-func solve1(A []int) int {
-	var mx int
-	for _, x := range A {
-		if x > mx {
-			mx = x
-		}
-	}
-	mx *= 2
-	ok := make([]bool, mx)
-	for _, x := range A {
-		ok[x] = true
-	}
-
-	// i * 4, i * 6
-	// 它们的gcd = i * 2
-	// 但是 i * 4 和 i * 3, 它们的gcd = i
-	// 对于某个i，如果存在a % i = 0, b % i = 0 且 gcd(a / i, b / i) = 1
-	// i的倍数比较好找， a += i
-	// 但是如何找到另外一个 b使得 gcd(a, b) = i
-	var cnt int
-	for i := mx - 1; i > 0; i-- {
-		if ok[i] {
-			cnt++
-			continue
-		}
-		prev := -1
-		for j := 2; j < mx/i; j++ {
-			if ok[i*j] {
-				if prev != -1 && gcd(prev, j) == 1 {
-					ok[i] = true
-					break
+				for l <= r {
+					cnt[A[l]]--
+					cnt2[A[l]]--
+					if cnt[A[l]] == 0 {
+						mex = min(mex, A[l])
+					}
+					l++
 				}
-				prev = j
+				mex2 = 0
 			}
 		}
-		if ok[i] {
-			cnt++
-		}
 	}
-
-	return cnt - len(A)
+	return res
 }
 
-func gcd(a, b int) int {
-	for b > 0 {
-		a, b = b, a%b
+func min(a, b int) int {
+	if a <= b {
+		return a
 	}
-	return a
+	return b
+}
+
+func max(a, b int) int {
+	if a >= b {
+		return a
+	}
+	return b
 }

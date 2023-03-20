@@ -154,7 +154,7 @@ func solve(n int, m int, ladders [][]int, X []int) (bool, int64) {
 		dp[i] = INF
 	}
 	for _, end := range ends[1] {
-		dp[end.id] = int64(end.pos-1)*int64(X[0]) - int64(ladders[end.id][4])
+		dp[end.id] = min(dp[end.id], int64(end.pos-1)*int64(X[0])-int64(ladders[end.id][4]))
 	}
 
 	// y + dist * x - h

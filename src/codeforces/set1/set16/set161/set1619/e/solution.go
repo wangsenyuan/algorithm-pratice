@@ -2,20 +2,37 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"os"
+	"sort"
 )
 
 func main() {
 	reader := bufio.NewReader(os.Stdin)
-	nums := readNInt64s(reader, 2)
-	x, y := nums[0], nums[1]
-	res := solve(x, y)
-	if res {
-		fmt.Println("YES")
-	} else {
-		fmt.Println("NO")
+	var buf bytes.Buffer
+	tc := readNum(reader)
+
+	for tc > 0 {
+		tc--
+		n := readNum(reader)
+		nums := readNNums(reader, n)
+		res := solve(nums)
+		for _, num := range res {
+			buf.WriteString(fmt.Sprintf("%d ", num))
+		}
+		buf.WriteByte('\n')
 	}
+	fmt.Print(buf.String())
+}
+func readString(reader *bufio.Reader) string {
+	s, _ := reader.ReadString('\n')
+	for i := 0; i < len(s); i++ {
+		if s[i] == '\n' || s[i] == '\r' {
+			return s[:i]
+		}
+	}
+	return s
 }
 
 func readNInt64s(reader *bufio.Reader, n int) []int64 {
@@ -117,51 +134,60 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 	return i
 }
 
-func solve(x, y int64) bool {
-	if x == y {
-		return true
-	}
+func solve(A []int) []int64 {
+	n := len(A)
+	// A[i] 只能增加，不能减少
 
-	arr := []int64{(x << 1) | 1, reverse(reverse(x))}
+	sort.Ints(A)
 
-	for _, z := range arr {
-		if check(y, z) || check(y, reverse(z)) {
-			return true
+	var B []int
+
+	for i := 1; i <= n; i++ {
+		if i == n || A[i] > A[i-1] {
+			B = append(B, A[i-1])
 		}
 	}
-	return false
-}
 
-func reverse(x int64) int64 {
-	var res int64
-	for x > 0 {
-		res = (res << 1) | (x & 1)
-		x >>= 1
-	}
-	return res
-}
-
-func check(y int64, nx int64) bool {
-	var r int
-	x := nx
-
-	var l int
-	for nx > 0 {
-		nx >>= 1
-		l++
+	// 如果要使得mex = x, 那么所有小于x的数字必须出现，且 = x的数字必须加1
+	cnt := make([]int, n+1)
+	for i := 0; i < n && A[i] <= n; i++ {
+		cnt[A[i]]++
 	}
 
-	for y > x && x > 0 {
-		if y&x == x {
-			z := y >> (l + r)
-			if (z+1)&z == 0 && (z<<(l+r))|x == y {
-				return true
+	stack := make([]int, n+1)
+	var p int
+
+	var sum int64
+
+	res := make([]int64, n+1)
+
+	for i := 0; i <= n; i++ {
+		res[i] = -1
+	}
+
+	for x, i := 0, 0; x <= n; x++ {
+		// all need to add 1
+		if x > 0 && cnt[x-1] == 0 {
+			// to fill x - 1
+			if p == 0 {
+				// no nums to fill this gap
+				break
 			}
+			sum += int64(x - 1 - stack[p-1])
+			p--
 		}
 
-		x = (x << 1) | 1
-		r++
+		res[x] = sum + int64(cnt[x])
+
+		if i < len(B) && x == B[i] {
+			for cnt[x] > 1 {
+				cnt[x]--
+				stack[p] = x
+				p++
+			}
+			i++
+		}
 	}
 
-	return y == x
+	return res
 }

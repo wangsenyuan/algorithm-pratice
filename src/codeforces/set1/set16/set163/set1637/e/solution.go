@@ -135,7 +135,7 @@ func solve(A []int, E [][]int) int64 {
 	// 如果在 x, cnt[x], cnt[y]都确定的情况下，
 	// 找到最大的y即可
 	// x, cnt[x]是确定的，cnt[y] <= cnt[x]， 似乎是有限的几个
-	// 最多有 Logn 不同的cnt[x]
+	// 最多有 sqrt(n) 不同的cnt[x]
 	adj := make(map[int][]int)
 
 	addEdge := func(u int, v int) {

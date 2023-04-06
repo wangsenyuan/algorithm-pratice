@@ -18,3 +18,10 @@ func TestSample1(t *testing.T) {
 	var expect int64 = 13
 	runSample(t, n, S, expect)
 }
+
+func TestSample2(t *testing.T) {
+	n := 5
+	S := "DRDRDRDR"
+	var expect int64 = 9
+	runSample(t, n, S, expect)
+}

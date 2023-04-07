@@ -122,6 +122,82 @@ const INF = 1e9
 const N_INF = -INF
 
 func solve(S []int, Q [][]int) []int {
+	n := len(S)
+
+	// R[i] = right-position of i, having S[j] - (n - 1 - j) == S[i] - (n - 1 - i)
+	R := make([]int, n)
+	R[n-1] = n - 1
+	pos := make(map[int]int)
+	for i := n - 1; i >= 0; i-- {
+		R[i] = n - 1
+		if j, ok := pos[S[i]]; ok {
+			R[i] = j - 1
+		}
+		if j, ok := pos[S[i]-1]; ok {
+			R[i] = min(R[i], R[j])
+		}
+
+		pos[S[i]] = i
+	}
+
+	// first for value, second for pos
+	type Pair struct {
+		first  int
+		second int
+	}
+
+	max_pair := func(a, b Pair) Pair {
+		if a.first > b.first || a.first == b.first && a.second < b.second {
+			return a
+		}
+
+		return b
+	}
+	arr := make([]Pair, 2*n)
+
+	for i := n; i < 2*n; i++ {
+		arr[i] = Pair{S[i-n], i - n}
+	}
+
+	for i := n - 1; i > 0; i-- {
+		arr[i] = max_pair(arr[2*i], arr[2*i+1])
+	}
+
+	get := func(l int, r int) Pair {
+		l += n
+		r += n
+		res := Pair{0, 0}
+		for l < r {
+			if l&1 == 1 {
+				res = max_pair(res, arr[l])
+				l++
+			}
+			if r&1 == 1 {
+				r--
+				res = max_pair(res, arr[r])
+			}
+			l >>= 1
+			r >>= 1
+		}
+		return res
+	}
+	res := make([]int, len(Q))
+
+	for i, cur := range Q {
+		l, r := cur[0], cur[1]
+		l--
+		r--
+		p := get(l, r+1)
+		res[i] = p.first + 1
+		if R[p.second] >= r {
+			res[i] = p.first
+		}
+	}
+
+	return res
+}
+
+func solve1(S []int, Q [][]int) []int {
 	// 如果 D >= max(S[l...r]) + 1
 	// 显然可以完成目标
 	// D = max(S[l...r] 是否ok？ (1)

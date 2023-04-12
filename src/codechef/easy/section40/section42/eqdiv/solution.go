@@ -154,7 +154,7 @@ func calculateDp(n int, k int) {
 		b := dp[i-1].Copy()
 		b.LeftShift(cost[i])
 		a.Union(b)
-		// dp[i] = dp[i-1] << cost[i] | dp[i-1] >> cost[i
+		// dp[i] = dp[i-1] << cost[i] | dp[i-1] >> cost[i]
 		dp[i] = a
 	}
 

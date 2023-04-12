@@ -94,6 +94,30 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 }
 
 func solve(A []int, x int) int {
+	n := len(A)
+	for i := 0; i < n; i++ {
+		A[i] -= x
+	}
+
+	dp := make([]int, n)
+	dp[0] = 1
+	for i := 1; i < n; i++ {
+		if A[i]+A[i-1] < 0 && dp[i-1] == 1 {
+			dp[i] = 0
+		} else if i >= 2 && A[i-2]+A[i-1]+A[i] < 0 && dp[i-2] == 1 && dp[i-1] == 1 {
+			dp[i] = 0
+		} else {
+			dp[i] = 1
+		}
+	}
+	var sum int
+	for i := 0; i < n; i++ {
+		sum += dp[i]
+	}
+	return sum
+}
+
+func solve1(A []int, x int) int {
 	// l...r 中间，要们
 	// 1）至少有一个元素没有被选
 	// 2) sum(r) - sum(l - 1) < x * (r - l + 1)

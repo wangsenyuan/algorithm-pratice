@@ -132,7 +132,6 @@ func solve(n int, E [][]int, k int) int64 {
 	P := make([]int, n)
 	in := make([]int, n)
 	out := make([]int, n)
-	sz := make([]int, n)
 
 	var dfs func(p int, u int)
 
@@ -144,29 +143,24 @@ func solve(n int, E [][]int, k int) int64 {
 		in[u] = time
 		ord[time] = u
 		time++
-		sz[u]++
 		for i := g.nodes[u]; i > 0; i = g.next[i] {
 			v := g.to[i]
 			if p != v {
 				H[v] = H[u] + 1
 				dfs(u, v)
-				sz[u] += sz[v]
 			}
 		}
 		out[u] = time
 	}
 
-	H[0] = 1
 	dfs(-1, 0)
 
-	wi := make([]int, n)
-	ht := make([]int, n)
+	arr := make([]int, n)
 	for i := 0; i < n; i++ {
-		wi[i] = sz[0] - H[ord[i]]
-		ht[i] = H[ord[i]]
+		arr[i] = H[ord[i]]
 	}
 
-	root := BuildTree(wi, ht)
+	root := BuildTree(arr)
 
 	var best int64 = math.MinInt64
 
@@ -174,25 +168,19 @@ func solve(n int, E [][]int, k int) int64 {
 
 	pq := make(PQ, 0, n)
 
-	flag := make([]bool, n)
+	mark := make([]bool, n)
 
 	heap.Push(&pq, root.Get(0, n-1))
 
-	for r := 0; r < k; r++ {
+	for r := 1; r <= k; r++ {
 		if pq.Len() > 0 {
-			cur := heap.Pop(&pq).(Vertex)
+			cur := heap.Pop(&pq).(Pair)
 			// cur.first is the height, cur.second is the pos
-			u := ord[cur.id]
+			u := ord[cur.second]
 
-			pr := u
-
-			for P[pr] >= 0 && !flag[P[pr]] {
-				pr = P[pr]
-			}
-
-			for P[u] >= 0 && !flag[P[u]] {
+			for P[u] >= 0 && !mark[P[u]] {
 				p := P[u]
-				flag[p] = true
+				mark[p] = true
 
 				w++
 
@@ -201,87 +189,87 @@ func solve(n int, E [][]int, k int) int64 {
 					if v == P[p] || v == u {
 						continue
 					}
-
-					root.Update(in[v], out[v]-1, Pair{-sz[pr] + sz[v] + H[v], -H[v]})
+					h := root.Get(in[v], in[v]).first
+					root.Update(in[v], out[v]-1, -h)
 					tmp := root.Get(in[v], out[v]-1)
 					heap.Push(&pq, tmp)
 				}
 
 				u = p
 			}
-			b := n - w - (r + 1)
-			tmp := int64(w) * int64(r+1-b)
-			if tmp > best {
-				best = tmp
-			}
-		} else {
-			w--
-			// turn one white to red
-			b := n - w - (r + 1)
-			tmp := int64(w) * int64(r+1-b)
-			if tmp > best {
-				best = tmp
-			}
 		}
+		// r * (n - r) - b * (n - b)
 
+		b := max(min(n-w-r, n/2), 0)
+
+		tmp := int64(r)*int64(n-r) - int64(b)*int64(n-b)
+
+		best = max2(best, tmp)
 	}
 
 	return best
 }
 
-const INF = 1e9
-
-type Vertex struct {
-	weight int
-	height int
-	id     int
-}
-
-func min_vertix(a, b Vertex) Vertex {
-	if a.weight < b.weight || a.weight == b.weight && a.height > b.height {
+func max2(a, b int64) int64 {
+	if a >= b {
 		return a
 	}
 	return b
 }
 
-func (this Vertex) change(v, h int) Vertex {
-	return Vertex{this.weight + v, this.height + h, this.id}
+func min(a, b int) int {
+	if a <= b {
+		return a
+	}
+	return b
 }
+
+func max(a, b int) int {
+	if a >= b {
+		return a
+	}
+	return b
+}
+
+const INF = 1e9
 
 type Pair struct {
 	first  int
 	second int
 }
 
-func (this Pair) Add(that Pair) Pair {
-	return Pair{this.first + that.first, this.second + that.second}
+func max_pair(a, b Pair) Pair {
+	if a.first > b.first {
+		return a
+	}
+	return b
 }
 
-func (this Pair) IsNil() bool {
-	return this.first == 0 && this.second == 0
+func (this Pair) addFirst(v int) Pair {
+	return Pair{this.first + v, this.second}
 }
 
 type Tree struct {
-	key  []Vertex
-	lazy []Pair
+	key  []Pair
+	lazy []int
 	sz   int
 }
 
-func BuildTree(weight []int, height []int) *Tree {
-	n := len(weight)
-	key := make([]Vertex, 4*n)
-	lazy := make([]Pair, 4*n)
+func BuildTree(arr []int) *Tree {
+	n := len(arr)
+	key := make([]Pair, 4*n)
+	lazy := make([]int, 4*n)
 	var build func(i int, l int, r int)
 
 	build = func(i int, l int, r int) {
 		if l == r {
-			key[i] = Vertex{weight[l], height[l], l}
+			key[i] = Pair{arr[l], l}
 			return
 		}
 		mid := (l + r) / 2
 		build(i*2, l, mid)
 		build(i*2+1, mid+1, r)
-		key[i] = min_vertix(key[2*i], key[2*i+1])
+		key[i] = max_pair(key[2*i], key[2*i+1])
 	}
 
 	build(1, 0, n-1)
@@ -289,20 +277,20 @@ func BuildTree(weight []int, height []int) *Tree {
 	return &Tree{key, lazy, n}
 }
 
-func (t *Tree) updateLazy(i int, v Pair) {
-	t.lazy[i] = t.lazy[i].Add(v)
-	t.key[i] = t.key[i].change(v.first, v.second)
+func (t *Tree) updateLazy(i int, v int) {
+	t.lazy[i] += v
+	t.key[i] = t.key[i].addFirst(v)
 }
 
 func (t *Tree) push(i int, l int, r int) {
-	if l < r && !t.lazy[i].IsNil() {
+	if l < r && t.lazy[i] != 0 {
 		t.updateLazy(2*i, t.lazy[i])
 		t.updateLazy(2*i+1, t.lazy[i])
-		t.lazy[i] = Pair{0, 0}
+		t.lazy[i] = 0
 	}
 }
 
-func (t *Tree) Update(L int, R int, v Pair) {
+func (t *Tree) Update(L int, R int, v int) {
 	var loop func(i int, l int, r int)
 	loop = func(i int, l int, r int) {
 		if R < l || r < L {
@@ -317,17 +305,17 @@ func (t *Tree) Update(L int, R int, v Pair) {
 		mid := (l + r) / 2
 		loop(2*i, l, mid)
 		loop(2*i+1, mid+1, r)
-		t.key[i] = min_vertix(t.key[i*2], t.key[2*i+1])
+		t.key[i] = max_pair(t.key[i*2], t.key[2*i+1])
 	}
 
 	loop(1, 0, t.sz-1)
 }
 
-func (t *Tree) Get(L int, R int) Vertex {
-	var loop func(i int, l int, r int) Vertex
-	loop = func(i int, l int, r int) Vertex {
+func (t *Tree) Get(L int, R int) Pair {
+	var loop func(i int, l int, r int) Pair
+	loop = func(i int, l int, r int) Pair {
 		if R < l || r < L {
-			return Vertex{INF, 0, -1}
+			return Pair{-INF, -1}
 		}
 		t.push(i, l, r)
 		if L <= l && r <= R {
@@ -336,7 +324,7 @@ func (t *Tree) Get(L int, R int) Vertex {
 		mid := (l + r) / 2
 		a := loop(i*2, l, mid)
 		b := loop(i*2+1, mid+1, r)
-		return min_vertix(a, b)
+		return max_pair(a, b)
 	}
 
 	return loop(1, 0, t.sz-1)
@@ -363,14 +351,14 @@ func (g *Graph) AddEdge(u, v int) {
 	g.to[g.cur] = v
 }
 
-type PQ []Vertex
+type PQ []Pair
 
 func (pq PQ) Len() int {
 	return len(pq)
 }
 
 func (pq PQ) Less(i, j int) bool {
-	return min_vertix(pq[i], pq[j]) == pq[i]
+	return pq[i].first > pq[j].first
 }
 
 func (pq PQ) Swap(i, j int) {
@@ -378,7 +366,7 @@ func (pq PQ) Swap(i, j int) {
 }
 
 func (pq *PQ) Push(x interface{}) {
-	it := x.(Vertex)
+	it := x.(Pair)
 	*pq = append(*pq, it)
 }
 

@@ -1,32 +1,40 @@
 package p2680
 
+const H = 30
+
 func maximumOr(nums []int, k int) int64 {
 	n := len(nums)
+	// 还是要贪心
+	cnt := make([]int, H)
+	var best int64
 
-	dp := make([]int64, k+1)
-	fp := make([]int64, k+1)
-	var or int
 	for i := 0; i < n; i++ {
-		or |= nums[i]
-		for j := 0; j <= k; j++ {
-			fp[j] = 0
+		// 如果高的k位一致的情况下，选择最小的那个数移动
+		num := nums[i]
+		for j := 0; j < H; j++ {
+			cnt[j] += (num >> j) & 1
 		}
-		fp[0] = int64(or)
-		tmp := int64(nums[i])
-
-		for a := 0; a <= k; a++ {
-			for b := 0; a+b <= k; b++ {
-				fp[a+b] = max(fp[a+b], tmp|dp[b])
-			}
-			tmp *= 2
-		}
-		copy(dp, fp)
-		for j := 1; j <= k; j++ {
-			dp[j] = max(dp[j], dp[j-1])
-		}
+		best |= int64(num)
 	}
 
-	return dp[k]
+	for i := 0; i < n; i++ {
+		num := nums[i]
+		for j := 0; j < H; j++ {
+			cnt[j] -= (num >> j) & 1
+		}
+
+		tmp := int64(num) << k
+
+		for j := 0; j < H; j++ {
+			if cnt[j] > 0 {
+				tmp |= 1 << j
+			}
+			cnt[j] += (num >> j) & 1
+		}
+		best = max(best, tmp)
+	}
+
+	return best
 }
 
 func max(a, b int64) int64 {

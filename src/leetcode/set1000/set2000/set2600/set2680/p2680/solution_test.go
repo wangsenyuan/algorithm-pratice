@@ -23,3 +23,10 @@ func TestSample2(t *testing.T) {
 	var expect int64 = 35
 	runSample(t, nums, k, expect)
 }
+
+func TestSample3(t *testing.T) {
+	nums := []int{10, 8, 4}
+	k := 1
+	var expect int64 = 30
+	runSample(t, nums, k, expect)
+}

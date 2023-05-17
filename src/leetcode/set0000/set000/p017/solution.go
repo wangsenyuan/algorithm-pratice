@@ -1,6 +1,4 @@
-package main
-
-import "fmt"
+package p017
 
 var board = make(map[byte]string)
 
@@ -38,8 +36,4 @@ func letterCombinations(digits string) []string {
 	}
 	dfs(0, "")
 	return result
-}
-
-func main() {
-	fmt.Printf("%s\n", letterCombinations("23"))
 }

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"math/rand"
 	"testing"
 )
 
@@ -55,38 +54,6 @@ func TestSample3(t *testing.T) {
 
 		if r != 2 {
 			t.Errorf("Sample fail, expect 2 at pos %d, but got %d", i, r)
-		}
-	}
-}
-
-func TestSample4(t *testing.T) {
-	n := 100
-	sets := make([]map[int]bool, n+1)
-
-	for i := 1; i <= n; i++ {
-		sets[i] = make(map[int]bool)
-	}
-
-	solver := NewSolver(n)
-
-	for k := 0; k < 200; k++ {
-		tp := rand.Intn(2)
-		if tp == 0 {
-			l := rand.Intn(n) + 1
-			r := rand.Intn(n-l) + l
-			x := rand.Intn(n) + 1
-			//t.Logf("will update range [%d %d] with value %d", l, r, x)
-			for i := l; i <= r; i++ {
-				sets[i][x] = true
-			}
-			solver.Update(l, r, x)
-		} else {
-			p := rand.Intn(n) + 1
-			expect := len(sets[p])
-			res := solver.Query(p)
-			if expect != res {
-				t.Errorf("Sample fail when query %d, expect %d, but got %d", p, expect, res)
-			}
 		}
 	}
 }

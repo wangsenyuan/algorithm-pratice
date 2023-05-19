@@ -147,3 +147,13 @@ func TestSample8(t *testing.T) {
 	expect := 4
 	runSample(t, n, E, expect)
 }
+
+func TestSample9(t *testing.T) {
+	n := 4
+	E := [][]int{
+		{1, 2},
+		{1, 2},
+	}
+	expect := 2
+	runSample(t, n, E, expect)
+}

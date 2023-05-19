@@ -186,6 +186,7 @@ func solve(n int, E [][]int) (int, [][]int) {
 	}
 
 	var trees []int
+	var singles []int
 
 	for i := 0; i < n; i++ {
 		j := set.Find(i)
@@ -193,21 +194,37 @@ func solve(n int, E [][]int) (int, [][]int) {
 			trees = append(trees, in[i])
 			edge_count[j]++
 		}
+		if i == j && len(nodes[j]) == 0 {
+			singles = append(singles, i)
+		}
 	}
 
 	rem := make([]bool, len(use))
-	for id := 0; id < len(free); id++ {
+	var id int
+	for ; id < len(free) && id < len(trees); id++ {
 		a, b := free[id][0], free[id][1]
-		if id < len(trees) {
-			j := trees[id]
-			c, d := use[j][0], use[j][1]
-			rem[j] = true
-			use = append(use, []int{a, c})
-			use = append(use, []int{b, d})
-			set.Union(a, c)
-		} else {
-			use = append(use, free[id])
-		}
+		j := trees[id]
+		c, d := use[j][0], use[j][1]
+		rem[j] = true
+		use = append(use, []int{a, c})
+		use = append(use, []int{b, d})
+		set.Union(a, c)
+	}
+
+	for i := 0; id < len(free) && i+1 < len(singles); i += 2 {
+		a, b := free[id][0], free[id][1]
+		c := singles[i]
+		d := singles[i+1]
+		use = append(use, []int{a, c})
+		use = append(use, []int{b, d})
+		set.Union(a, c)
+		set.Union(b, d)
+		id++
+	}
+
+	for id < len(free) {
+		use = append(use, free[id])
+		id++
 	}
 
 	var roots []int

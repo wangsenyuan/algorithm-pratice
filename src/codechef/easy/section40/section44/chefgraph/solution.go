@@ -183,19 +183,22 @@ func querySmall(n int, u int, v int) (int, []int) {
 	N := 1 << n
 	var best int
 	var state int
+	var cnt int = N
 	for mask := 1; mask < N; mask++ {
 		if (mask>>u)&1 == 0 || (mask>>v)&1 == 0 {
 			continue
 		}
-		var tmp int
+		var tmp, cur int
 		for i := 0; i < n; i++ {
 			if (mask>>i)&1 == 1 {
 				tmp ^= (i + 1)
+				cur++
 			}
 		}
-		if tmp > best {
+		if tmp > best || tmp == best && cnt > cur {
 			best = tmp
 			state = mask
+			cnt = cur
 		}
 	}
 

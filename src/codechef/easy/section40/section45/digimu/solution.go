@@ -161,7 +161,7 @@ func count(num int64) int64 {
 	dfs = func(i int, eq int, rem int, mask int, prev5 bool) int64 {
 		if i == n {
 			for d := 3; d <= 9; d += 2 {
-				if d != 5 && mask&1<<(((d-1)/2)-1) > 0 && rem%d == 0 {
+				if d != 5 && mask&(1<<(((d-1)/2)-1)) > 0 && rem%d == 0 {
 					return 0
 				}
 			}

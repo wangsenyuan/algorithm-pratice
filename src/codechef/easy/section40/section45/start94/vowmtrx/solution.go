@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"os"
 )
@@ -9,14 +10,28 @@ import (
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 
-	n, m := readTwoNums(reader)
+	tc := readNum(reader)
+	var buf bytes.Buffer
 
-	a := readString(reader)[:n]
-	b := readString(reader)[:m]
+	for tc > 0 {
+		tc--
+		n, m := readTwoNums(reader)
+		s := readString(reader)[:n]
+		res := solve(s, m)
+		buf.WriteString(fmt.Sprintf("%d\n", res))
+	}
 
-	res := solve(a, b)
+	fmt.Print(buf.String())
+}
 
-	fmt.Println(res)
+func readString(reader *bufio.Reader) string {
+	s, _ := reader.ReadString('\n')
+	for i := 0; i < len(s); i++ {
+		if s[i] == '\n' || s[i] == '\r' {
+			return s[:i]
+		}
+	}
+	return s
 }
 
 func readNInt64s(reader *bufio.Reader, n int) []int64 {
@@ -46,16 +61,6 @@ func readInt64(bytes []byte, from int, val *int64) int {
 	}
 	*val = tmp * sign
 	return i
-}
-
-func readString(reader *bufio.Reader) string {
-	s, _ := reader.ReadString('\n')
-	for i := 0; i < len(s); i++ {
-		if s[i] == '\n' || s[i] == '\r' {
-			return s[:i]
-		}
-	}
-	return s
 }
 
 func readInt(bytes []byte, from int, val *int) int {
@@ -105,53 +110,41 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func readUint64(bytes []byte, from int, val *uint64) int {
-	i := from
+const MOD = 1e9 + 7
 
-	var tmp uint64
-	for i < len(bytes) && bytes[i] >= '0' && bytes[i] <= '9' {
-		tmp = tmp*10 + uint64(bytes[i]-'0')
-		i++
+func add(a, b int) int {
+	a += b
+	if a >= MOD {
+		a -= MOD
 	}
-	*val = tmp
-
-	return i
+	return a
 }
 
-func solve(A, B string) int {
-	n := len(A)
-	m := len(B)
-	dp := make([][]int, n+1)
-	for i := 0; i <= n; i++ {
-		dp[i] = make([]int, m+1)
-	}
+func mul(a, b int) int {
+	return int(int64(a) * int64(b) % MOD)
+}
 
-	var res int
-
-	for i := 1; i <= n; i++ {
-		for j := 1; j <= m; j++ {
-			if A[i-1] == B[j-1] {
-				dp[i][j] = dp[i-1][j-1] + 2
-			} else {
-				dp[i][j] = max(0, max(dp[i-1][j], dp[i][j-1])-1)
+func solve(s string, k int) int {
+	n := len(s)
+	prev := -1
+	res := 1
+	for i := 0; i < n; {
+		cnt := k
+		for i < n && cnt > 0 {
+			if isVowel(s[i]) {
+				if cnt == k && prev >= 0 {
+					res = mul(res, i-prev)
+				}
+				cnt--
+				prev = i
 			}
-			res = max(res, dp[i][j])
+			i++
 		}
 	}
 
 	return res
 }
 
-func max(a, b int) int {
-	if a >= b {
-		return a
-	}
-	return b
-}
-
-func min(a, b int) int {
-	if a <= b {
-		return a
-	}
-	return b
+func isVowel(x byte) bool {
+	return x == 'a' || x == 'e' || x == 'i' || x == 'o' || x == 'u'
 }

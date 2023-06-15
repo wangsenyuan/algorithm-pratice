@@ -9,14 +9,10 @@ import (
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 
-	n, m := readTwoNums(reader)
+	n := readNum(reader)
+	A := readNNums(reader, n)
 
-	a := readString(reader)[:n]
-	b := readString(reader)[:m]
-
-	res := solve(a, b)
-
-	fmt.Println(res)
+	fmt.Println(solve(A))
 }
 
 func readNInt64s(reader *bufio.Reader, n int) []int64 {
@@ -118,39 +114,35 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 	return i
 }
 
-func solve(A, B string) int {
-	n := len(A)
-	m := len(B)
-	dp := make([][]int, n+1)
-	for i := 0; i <= n; i++ {
-		dp[i] = make([]int, m+1)
-	}
+const H = 30
 
-	var res int
+func solve(A []int) int {
 
-	for i := 1; i <= n; i++ {
-		for j := 1; j <= m; j++ {
-			if A[i-1] == B[j-1] {
-				dp[i][j] = dp[i-1][j-1] + 2
-			} else {
-				dp[i][j] = max(0, max(dp[i-1][j], dp[i][j-1])-1)
-			}
-			res = max(res, dp[i][j])
+	var dfs func(arr []int, d int) int
+
+	dfs = func(arr []int, d int) int {
+		if len(arr) <= 1 {
+			return len(arr)
 		}
+		var a, b []int
+		for _, x := range arr {
+			if (x>>d)&1 == 1 {
+				a = append(a, x)
+			} else {
+				b = append(b, x)
+			}
+		}
+		if len(a) == 0 || len(b) == 0 {
+			return dfs(arr, d-1)
+		}
+		return 1 + max(dfs(a, d-1), dfs(b, d-1))
 	}
 
-	return res
+	return len(A) - dfs(A, H)
 }
 
 func max(a, b int) int {
 	if a >= b {
-		return a
-	}
-	return b
-}
-
-func min(a, b int) int {
-	if a <= b {
 		return a
 	}
 	return b

@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"os"
 )
@@ -9,14 +10,28 @@ import (
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 
-	n, m := readTwoNums(reader)
+	tc := readNum(reader)
+	var buf bytes.Buffer
 
-	a := readString(reader)[:n]
-	b := readString(reader)[:m]
+	for tc > 0 {
+		tc--
+		n := readNum(reader)
+		s := readString(reader)[:n]
+		res := solve(s)
+		buf.WriteString(fmt.Sprintf("%d\n", res))
+	}
 
-	res := solve(a, b)
+	fmt.Print(buf.String())
+}
 
-	fmt.Println(res)
+func readString(reader *bufio.Reader) string {
+	s, _ := reader.ReadString('\n')
+	for i := 0; i < len(s); i++ {
+		if s[i] == '\n' {
+			return s[:i]
+		}
+	}
+	return s
 }
 
 func readNInt64s(reader *bufio.Reader, n int) []int64 {
@@ -46,16 +61,6 @@ func readInt64(bytes []byte, from int, val *int64) int {
 	}
 	*val = tmp * sign
 	return i
-}
-
-func readString(reader *bufio.Reader) string {
-	s, _ := reader.ReadString('\n')
-	for i := 0; i < len(s); i++ {
-		if s[i] == '\n' || s[i] == '\r' {
-			return s[:i]
-		}
-	}
-	return s
 }
 
 func readInt(bytes []byte, from int, val *int) int {
@@ -105,53 +110,56 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func readUint64(bytes []byte, from int, val *uint64) int {
-	i := from
+const MOD = 1e9 + 7
 
-	var tmp uint64
-	for i < len(bytes) && bytes[i] >= '0' && bytes[i] <= '9' {
-		tmp = tmp*10 + uint64(bytes[i]-'0')
-		i++
+func add(a, b int) int {
+	a += b
+	if a >= MOD {
+		a -= MOD
 	}
-	*val = tmp
-
-	return i
+	return a
 }
 
-func solve(A, B string) int {
-	n := len(A)
-	m := len(B)
-	dp := make([][]int, n+1)
-	for i := 0; i <= n; i++ {
-		dp[i] = make([]int, m+1)
-	}
+func mul(a, b int) int {
+	return int(int64(a) * int64(b) % MOD)
+}
 
-	var res int
-
-	for i := 1; i <= n; i++ {
-		for j := 1; j <= m; j++ {
-			if A[i-1] == B[j-1] {
-				dp[i][j] = dp[i-1][j-1] + 2
-			} else {
-				dp[i][j] = max(0, max(dp[i-1][j], dp[i][j-1])-1)
-			}
-			res = max(res, dp[i][j])
+func pow(a, b int) int {
+	res := 1
+	for b > 0 {
+		if b&1 == 1 {
+			res = mul(res, a)
 		}
+		a = mul(a, a)
+		b >>= 1
 	}
-
 	return res
 }
 
-func max(a, b int) int {
-	if a >= b {
-		return a
-	}
-	return b
-}
+func solve(s string) int {
+	// 遇到4的时候，如果前面有40， 那么就组成了404
+	// 遇到0的时候，如果前面有4，就会变成40
+	n := len(s)
+	var m int
 
-func min(a, b int) int {
-	if a <= b {
-		return a
+	dp := make([]int, 3)
+
+	for i := 0; i < n; i++ {
+		if s[i] == '4' {
+			dp[2] = add(dp[2], dp[1])
+			dp[0] = add(dp[0], pow(2, m))
+		} else if s[i] == '0' {
+			dp[1] = add(dp[1], dp[0])
+		} else {
+			a, b, c := dp[0], dp[1], dp[2]
+			// place 0
+			dp[1] = add(dp[0], mul(2, dp[1]))
+			// place 4
+			dp[2] = add(b, mul(2, c))
+			dp[0] = add(mul(2, a), pow(2, m))
+			m++
+		}
 	}
-	return b
+
+	return dp[2]
 }

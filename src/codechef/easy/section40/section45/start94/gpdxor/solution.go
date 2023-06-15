@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"os"
 )
@@ -9,14 +10,31 @@ import (
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 
-	n, m := readTwoNums(reader)
+	tc := readNum(reader)
+	var buf bytes.Buffer
 
-	a := readString(reader)[:n]
-	b := readString(reader)[:m]
+	for tc > 0 {
+		tc--
+		n, m := readTwoNums(reader)
+		A := make([][]int, n)
+		for i := 0; i < n; i++ {
+			A[i] = readNNums(reader, m)
+		}
+		res := solve(A)
+		buf.WriteString(fmt.Sprintf("%d\n", res))
+	}
 
-	res := solve(a, b)
+	fmt.Print(buf.String())
+}
 
-	fmt.Println(res)
+func readString(reader *bufio.Reader) string {
+	s, _ := reader.ReadString('\n')
+	for i := 0; i < len(s); i++ {
+		if s[i] == '\n' {
+			return s[:i]
+		}
+	}
+	return s
 }
 
 func readNInt64s(reader *bufio.Reader, n int) []int64 {
@@ -46,16 +64,6 @@ func readInt64(bytes []byte, from int, val *int64) int {
 	}
 	*val = tmp * sign
 	return i
-}
-
-func readString(reader *bufio.Reader) string {
-	s, _ := reader.ReadString('\n')
-	for i := 0; i < len(s); i++ {
-		if s[i] == '\n' || s[i] == '\r' {
-			return s[:i]
-		}
-	}
-	return s
 }
 
 func readInt(bytes []byte, from int, val *int) int {
@@ -105,52 +113,58 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func readUint64(bytes []byte, from int, val *uint64) int {
-	i := from
+const H = 30
 
-	var tmp uint64
-	for i < len(bytes) && bytes[i] >= '0' && bytes[i] <= '9' {
-		tmp = tmp*10 + uint64(bytes[i]-'0')
-		i++
-	}
-	*val = tmp
-
-	return i
-}
-
-func solve(A, B string) int {
+func solve(A [][]int) int64 {
 	n := len(A)
-	m := len(B)
-	dp := make([][]int, n+1)
-	for i := 0; i <= n; i++ {
-		dp[i] = make([]int, m+1)
+	m := len(A[0])
+	// 是 sum，
+	// sum(a ^ b)
+	sum := make([]int, H)
+	row := make([][]int, n)
+	col := make([][]int, m)
+	for i := 0; i < n; i++ {
+		row[i] = make([]int, H)
 	}
-
-	var res int
-
-	for i := 1; i <= n; i++ {
-		for j := 1; j <= m; j++ {
-			if A[i-1] == B[j-1] {
-				dp[i][j] = dp[i-1][j-1] + 2
-			} else {
-				dp[i][j] = max(0, max(dp[i-1][j], dp[i][j-1])-1)
+	for j := 0; j < m; j++ {
+		col[j] = make([]int, H)
+	}
+	for i := 0; i < n; i++ {
+		for j := 0; j < m; j++ {
+			x := A[i][j]
+			for d := 0; d < H; d++ {
+				sum[d] += (x >> d) & 1
+				row[i][d] += (x >> d) & 1
+				col[j][d] += (x >> d) & 1
 			}
-			res = max(res, dp[i][j])
 		}
 	}
 
-	return res
-}
+	var best int64
 
-func max(a, b int) int {
-	if a >= b {
-		return a
+	N := int64(n)
+	M := int64(m)
+
+	for i := 0; i < n; i++ {
+		for j := 0; j < m; j++ {
+			var tmp int64
+			for d := 0; d < H; d++ {
+				cnt1 := sum[d] - row[i][d] - col[j][d]
+				if (A[i][j]>>d)&1 == 1 {
+					cnt1++
+					tmp += (N*M - N - M + 1 - int64(cnt1)) * (1 << d)
+				} else {
+					tmp += int64(cnt1) * (1 << d)
+				}
+			}
+			best = max(best, tmp)
+		}
 	}
-	return b
+	return best
 }
 
-func min(a, b int) int {
-	if a <= b {
+func max(a, b int64) int64 {
+	if a >= b {
 		return a
 	}
 	return b

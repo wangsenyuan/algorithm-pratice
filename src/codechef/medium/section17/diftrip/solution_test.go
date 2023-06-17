@@ -19,3 +19,15 @@ func TestSample1(t *testing.T) {
 	var expect int64 = 3
 	runSample(t, n, E, expect)
 }
+
+func TestSample2(t *testing.T) {
+	n := 5
+	E := [][]int{
+		{1, 2},
+		{2, 3},
+		{3, 4},
+		{4, 5},
+	}
+	var expect int64 = 11
+	runSample(t, n, E, expect)
+}

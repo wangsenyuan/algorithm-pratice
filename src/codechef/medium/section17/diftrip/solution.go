@@ -113,11 +113,11 @@ func readNNums(reader *bufio.Reader, n int) []int {
 const H = 18
 
 func solve(n int, E [][]int) int64 {
-	g := NewGraph(n, len(E)*2)
-	deg := make([]int, n)
+	g := NewGraph(n+1, len(E)*2)
+	deg := make([]int, n+1)
 
 	for _, e := range E {
-		u, v := e[0]-1, e[1]-1
+		u, v := e[0], e[1]
 		deg[u]++
 		deg[v]++
 		g.AddEdge(u, v)
@@ -126,13 +126,14 @@ func solve(n int, E [][]int) int64 {
 
 	var dfs func(p int, u int)
 
-	fa := make([][]int, n)
-	depth := make([]int, n)
+	fa := make([][]int, n+1)
+	depth := make([]int, n+1)
 	dfs = func(p int, u int) {
 		fa[u] = make([]int, H)
 		fa[u][0] = p
 		for i := 1; i < H; i++ {
-			fa[u][i] = fa[fa[u][i-1]][i-1]
+			x := fa[u][i-1]
+			fa[u][i] = fa[x][i-1]
 		}
 
 		for i := g.nodes[u]; i > 0; i = g.next[i] {
@@ -143,13 +144,13 @@ func solve(n int, E [][]int) int64 {
 			}
 		}
 	}
+	fa[0] = make([]int, H)
+	depth[1] = 1
 
-	depth[0] = 1
+	dfs(0, 1)
 
-	dfs(0, 0)
-
-	pos := make([][]int, n)
-	for i := 0; i < n; i++ {
+	pos := make([][]int, n+1)
+	for i := 0; i <= n; i++ {
 		pos[i] = make([]int, H)
 		pos[i][0] = deg[i]
 	}
@@ -158,18 +159,20 @@ func solve(n int, E [][]int) int64 {
 
 	for step := 1; step < H; step++ {
 		for i := 0; i < n; i++ {
-			first := pos[i][step-1]
+			first := pos[i+1][step-1]
 			second := -1
-			if depth[i] > (1 << (step - 1)) {
-				second = pos[fa[i][step-1]][step-1]
+			if depth[i+1] > (1 << (step - 1)) {
+				second = pos[fa[i+1][step-1]][step-1]
 			}
-			its[i] = Item{first, second, i}
+			its[i] = Item{first, second, i + 1}
 		}
 		sort.Slice(its, func(i, j int) bool {
-			return its[i].first < its[j].first || its[i].first == its[j].first && its[i].second < its[j].second
+			return its[i].first < its[j].first ||
+				its[i].first == its[j].first && its[i].second < its[j].second ||
+				its[i].first == its[j].first && its[i].second == its[j].second && its[i].id < its[j].id
 		})
 
-		pos[its[0].id][step] = 0
+		pos[its[0].id][step] = 1
 		for i := 1; i < n; i++ {
 			pos[its[i].id][step] = pos[its[i-1].id][step]
 			if its[i].first != its[i-1].first || its[i].second != its[i-1].second {
@@ -188,6 +191,9 @@ func solve(n int, E [][]int) int64 {
 				ln += 1 << k
 				u = fa[u][k]
 				v = fa[v][k]
+				if u == 0 || v == 0 {
+					break
+				}
 			}
 		}
 		return ln
@@ -226,7 +232,7 @@ func NewGraph(n int, e int) *Graph {
 	nodes := make([]int, n)
 	next := make([]int, e+1)
 	to := make([]int, e+1)
-	return &Graph{nodes, next, to, -1}
+	return &Graph{nodes, next, to, 0}
 }
 
 func (g *Graph) AddEdge(u, v int) {

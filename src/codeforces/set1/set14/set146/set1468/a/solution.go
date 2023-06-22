@@ -10,23 +10,17 @@ import (
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 
-	tc := 1
-
+	tc := readNum(reader)
 	var buf bytes.Buffer
 
 	for tc > 0 {
 		tc--
-		n, k, m := readThreeNums(reader)
+		n := readNum(reader)
 		A := readNNums(reader, n)
-		Q := make([][]int, m)
-		for i := 0; i < m; i++ {
-			Q[i] = readNNums(reader, 2)
-		}
-		res := solve(A, k, Q)
-		for _, x := range res {
-			buf.WriteString(fmt.Sprintf("%d\n", x))
-		}
+		res := solve(A)
+		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
+
 	fmt.Print(buf.String())
 }
 
@@ -116,80 +110,80 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func readUint64(bytes []byte, from int, val *uint64) int {
-	i := from
-
-	var tmp uint64
-	for i < len(bytes) && bytes[i] >= '0' && bytes[i] <= '9' {
-		tmp = tmp*10 + uint64(bytes[i]-'0')
-		i++
-	}
-	*val = tmp
-
-	return i
-}
-
-const MOD = 1_000_000_007
-
-func add(a, b int) int {
-	a += b
-	if a >= MOD {
-		a -= MOD
-	}
-	return a
-}
-
-func sub(a, b int) int {
-	return add(a, MOD-b)
-}
-
-func mul(a, b int) int {
-	return int(int64(a) * int64(b) % MOD)
-}
-
-func solve(A []int, k int, Q [][]int) []int {
+func solve(A []int) int {
+	A = append([]int{0}, A...)
 	n := len(A)
-	// dp[i][j] = count of good paths after j moves ending at i
-	dp := make([][]int, n)
-	for i := 0; i < n; i++ {
-		dp[i] = make([]int, k+1)
-		dp[i][0] = 1
-	}
+	arr := make([]int, 2*n)
 
-	for j := 1; j <= k; j++ {
-		for i := 0; i < n; i++ {
-			if i-1 >= 0 {
-				dp[i][j] = add(dp[i][j], dp[i-1][j-1])
-			}
-			if i+1 < n {
-				dp[i][j] = add(dp[i][j], dp[i+1][j-1])
-			}
+	update := func(p int, v int) {
+		p += n
+		arr[p] = max(arr[p], v)
+		for p > 1 {
+			arr[p>>1] = max(arr[p], arr[p^1])
+			p >>= 1
 		}
 	}
 
-	cnt := make([]int, n)
+	get := func(l int, r int) int {
+		var res int
+		l += n
+		r += n
+		for l < r {
+			if l&1 == 1 {
+				res = max(res, arr[l])
+				l++
+			}
+			if r&1 == 1 {
+				r--
+				res = max(res, arr[r])
+			}
+			l >>= 1
+			r >>= 1
+		}
+		return res
+	}
+
+	next := make([]int, n)
+	stack := make([]int, n)
+	var it int
 	for i := 0; i < n; i++ {
-		for j := 0; j <= k; j++ {
-			cnt[i] = add(cnt[i], mul(dp[i][j], dp[i][k-j]))
+		next[i] = -1
+		for it > 0 && A[stack[it-1]] <= A[i] {
+			next[stack[it-1]] = i
+			it--
+		}
+		stack[it] = i
+		it++
+	}
+
+	type Pair struct {
+		first  int
+		second int
+	}
+
+	pending := make([][]Pair, n)
+
+	for i := 0; i < n; i++ {
+		cur := get(0, A[i]+1) + 1
+		update(A[i], cur)
+		for _, p := range pending[i] {
+			update(p.first, p.second)
+		}
+		if next[i] != -1 {
+			j := next[i]
+			if len(pending[j]) == 0 {
+				pending[j] = make([]Pair, 0, 1)
+			}
+			pending[j] = append(pending[j], Pair{A[i], cur + 1})
 		}
 	}
 
-	ans := make([]int, len(Q))
+	return get(0, n) - 1
+}
 
-	var sum int
-
-	for i := 0; i < n; i++ {
-		sum = add(sum, mul(A[i], cnt[i]))
+func max(a, b int) int {
+	if a >= b {
+		return a
 	}
-
-	for i, cur := range Q {
-		j, x := cur[0], cur[1]
-		j--
-		sum = sub(sum, mul(A[j], cnt[j]))
-		A[j] = x
-		sum = add(sum, mul(A[j], cnt[j]))
-		ans[i] = sum
-	}
-
-	return ans
+	return b
 }

@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"math"
 	"os"
 	"sort"
 )
@@ -125,6 +124,23 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
+type Pair struct {
+	first  int
+	second int
+}
+
+const MAX_M = 2_000_10
+const BLOCK_SIZE = 180
+
+var W [MAX_M]int
+var fx [MAX_M][]Pair
+
+func init() {
+	for i := 0; i < MAX_M; i++ {
+		fx[i] = make([]Pair, 0, 1)
+	}
+}
+
 func solve(sets [][]int) []int {
 	nums := make(map[int]int)
 
@@ -134,7 +150,7 @@ func solve(sets [][]int) []int {
 		}
 	}
 	m := len(nums)
-	d := int(math.Sqrt(float64(m)))
+	//d := int(math.Sqrt(float64(m)))
 
 	arr := make([]int, 0, len(nums))
 	for num := range nums {
@@ -153,40 +169,38 @@ func solve(sets [][]int) []int {
 		for j := 0; j < len(sets[i]); j++ {
 			sets[i][j] = nums[sets[i][j]]
 		}
-		if len(sets[i]) >= d {
+		if len(sets[i]) >= BLOCK_SIZE {
 			large = append(large, i)
 		} else {
 			small = append(small, i)
 		}
 	}
-	w := make([]int, m)
+	//w := make([]int, m)
 	for _, i := range large {
 		for _, x := range sets[i] {
-			w[x]++
+			W[x] = 1
 		}
+		var ans []int
 		for j := 0; j < n; j++ {
 			if i == j {
 				continue
 			}
 			var cnt int
 			for k := 0; k < len(sets[j]) && cnt < 2; k++ {
-				cnt += w[sets[j][k]]
+				cnt += W[sets[j][k]]
 			}
 			if cnt == 2 {
-				return []int{i + 1, j + 1}
+				ans = []int{i + 1, j + 1}
+				break
 			}
 		}
 		for _, x := range sets[i] {
-			w[x]--
+			W[x] = 0
+		}
+		if len(ans) > 0 {
+			return ans
 		}
 	}
-
-	type Pair struct {
-		first  int
-		second int
-	}
-
-	fx := make([][]Pair, m)
 
 	for _, i := range small {
 		sort.Ints(sets[i])
@@ -194,25 +208,27 @@ func solve(sets [][]int) []int {
 			x := sets[i][j]
 			for k := j + 1; k < len(sets[i]); k++ {
 				y := sets[i][k]
-				if len(fx[x]) == 0 {
-					fx[x] = make([]Pair, 0, 1)
-				}
 				fx[x] = append(fx[x], Pair{y, i})
 			}
 		}
 	}
 
-	for i := 0; i < m; i++ {
-		sort.Slice(fx[i], func(a, b int) bool {
-			return fx[i][a].first < fx[i][b].first
-		})
+	var ans []int
 
-		for j := 1; j < len(fx[i]); j++ {
-			if fx[i][j].first == fx[i][j-1].first {
-				return []int{fx[i][j].second + 1, fx[i][j-1].second + 1}
+	for i := 0; i < m; i++ {
+		if len(ans) == 0 {
+			sort.Slice(fx[i], func(a, b int) bool {
+				return fx[i][a].first < fx[i][b].first
+			})
+			for j := 1; j < len(fx[i]); j++ {
+				if fx[i][j].first == fx[i][j-1].first {
+					ans = []int{fx[i][j].second + 1, fx[i][j-1].second + 1}
+					break
+				}
 			}
 		}
+		fx[i] = fx[i][:0]
 	}
 
-	return nil
+	return ans
 }

@@ -113,10 +113,11 @@ func solve(S []string, Q []string) []int64 {
 			if trie[pos][x] == -1 {
 				trie[pos][x] = len(trie)
 				trie = append(trie, addNode(26))
-				pv = append(pv, addNode(20))
+				cur := addNode(20)
+				pv = append(pv, cur)
 				p := pos
 				for k := 0; k < 20; k++ {
-					pv[len(pv)-1][k] = p
+					cur[k] = p
 					if p != -1 {
 						p = pv[p][k]
 					}
@@ -163,10 +164,11 @@ func solve(S []string, Q []string) []int64 {
 				if trie[pos][c] == -1 {
 					trie[pos][c] = len(trie)
 					trie = append(trie, addNode(26))
-					pv = append(pv, addNode(20))
+					cur := addNode(20)
+					pv = append(pv, cur)
 					p := pos
 					for k := 0; k < 20; k++ {
-						pv[len(pv)-1][k] = p
+						cur[k] = p
 						if p != -1 {
 							p = pv[p][k]
 						}
@@ -225,7 +227,6 @@ func solve(S []string, Q []string) []int64 {
 			}
 			tr.Add(in[pos], z)
 			tr.Add(out[pos], -z)
-			continue
 		} else if que[i][0] == 2 {
 			x := que[i][1]
 			t[x] = tr.Get(in[tail[x]])
@@ -261,27 +262,4 @@ func (t *Fenwick) Get(x int) int64 {
 		x = (x & (x + 1)) - 1
 	}
 	return res
-}
-
-func (t *Fenwick) GetRange(x int, y int) int64 {
-	res := t.Get(y)
-	if x > 0 {
-		res -= t.Get(x - 1)
-	}
-	return res
-}
-
-func (t *Fenwick) LowerBound(v int64) int {
-	h := 1
-	for len(t.node) >= (h << 1) {
-		h <<= 1
-	}
-	var x int
-	for k := h; k > 0; k >>= 1 {
-		if x+k <= len(t.node) && t.node[x+k-1] < v {
-			v -= t.node[x+k-1]
-			x += k
-		}
-	}
-	return x
 }

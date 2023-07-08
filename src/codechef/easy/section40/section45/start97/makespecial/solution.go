@@ -15,10 +15,17 @@ func main() {
 
 	for tc > 0 {
 		tc--
-		n, q := readTwoNums(reader)
-		L, R := make([]int, q), make([]int, q)
-		for i := 0; i < q; i++ {
-			L[i], R[i] = readTwoNums(reader)
+		var n int64
+		var m int
+		s, _ := reader.ReadBytes('\n')
+		pos := readInt64(s, 0, &n)
+		readInt(s, pos+1, &m)
+		L := make([]int64, m)
+		R := make([]int64, m)
+		for i := 0; i < m; i++ {
+			s, _ := reader.ReadBytes('\n')
+			pos = readInt64(s, 0, &L[i])
+			readInt64(s, pos+1, &R[i])
 		}
 		res := solve(n, L, R)
 		for _, x := range res {
@@ -115,14 +122,18 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func solve(n int, L []int, R []int) []int {
+func solve(n int64, L []int64, R []int64) []int64 {
 	var k int
-	for 1<<k < n {
+	for int64(1)<<k < n {
 		k++
 	}
-	p := 1 << k
+	p := int64(1) << k
 
-	res := make([]int, len(L))
+	if p == n {
+		p *= 2
+	}
+
+	res := make([]int64, len(L))
 
 	for i := 0; i < len(L); i++ {
 		l, r := L[i], R[i]

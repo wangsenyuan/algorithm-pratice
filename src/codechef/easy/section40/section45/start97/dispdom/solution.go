@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"math"
 	"os"
 )
 
@@ -107,73 +106,26 @@ const Bob = "Bob"
 const Draw = "Draw"
 
 func solve(n int, k int, d int, s string) string {
-	if k == 1 {
-		var cnt int
-		for i := 0; i < n; i++ {
-			if s[i] == '0' {
-				cnt++
-			}
-		}
-		// 始终有机会进行操作
-		if cnt >= d {
-			return Draw
-		}
-		if cnt&2 == 0 {
-			return Bob
-		}
-		return Alice
-	}
-
-	dp := make(map[int][]int)
-	N := 1 << n
-	K := (1 << k) - 1
-
-	var dfs func(mask int) []int
-
-	dfs = func(mask int) []int {
-		if v, ok := dp[mask]; ok {
-			return v
-		}
-		res := []int{0, 0}
-		var mn = math.MinInt32
-		var mx int
-		add := K
-		for add <= N {
-			if mask&add == 0 {
-				get := dfs(mask | add)
-				res[0] |= get[0] ^ 1
-				if get[0] != 0 {
-					mx = max(mx, get[1]+1)
-				} else {
-					mn = min(mn, get[1]+1)
-				}
-			}
-			add *= 2
-		}
-		if res[0] != 0 {
-			res[1] = mn
-		} else {
-			res[1] = mx
-		}
-		dp[mask] = res
-		return res
-	}
-	var base int
+	var blk int
+	var free int
 	for i := 0; i < n; i++ {
-		x := int(s[i] - '0')
-		base |= x << i
-	}
-	ans := dfs(base)
-	if ans[0] == 0 {
-		if ans[1] < d {
-			return Bob
+		if s[i] == '0' {
+			free++
+		} else {
+			free = 0
 		}
+		if free == k {
+			blk++
+			free = 0
+		}
+	}
+	if blk >= d || d == 1 {
 		return Draw
 	}
-	if ans[1] < d {
-		return Alice
+	if blk%2 == 0 {
+		return Bob
 	}
-	return Draw
+	return Alice
 }
 
 func max(a, b int) int {

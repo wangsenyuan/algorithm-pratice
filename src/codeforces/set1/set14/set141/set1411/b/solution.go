@@ -16,15 +16,43 @@ func main() {
 
 	for tc > 0 {
 		tc--
-		n, x, y := readThreeNums(reader)
-		res := solve(n, x, y)
-		for i := 0; i < n; i++ {
-			buf.WriteString(fmt.Sprintf("%d ", res[i]))
-		}
-		buf.WriteByte('\n')
+		n := readNInt64s(reader, 1)[0]
+		res := solve(n)
+		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 
 	fmt.Print(buf.String())
+}
+
+func readNInt64s(reader *bufio.Reader, n int) []int64 {
+	res := make([]int64, n)
+	s, _ := reader.ReadBytes('\n')
+	if len(s) == 0 || len(s) == 1 && s[0] == '\n' {
+		return readNInt64s(reader, n)
+	}
+	var pos int
+
+	for i := 0; i < n; i++ {
+		pos = readInt64(s, pos, &res[i]) + 1
+	}
+
+	return res
+}
+
+func readInt64(bytes []byte, from int, val *int64) int {
+	i := from
+	var sign int64 = 1
+	if bytes[i] == '-' {
+		sign = -1
+		i++
+	}
+	var tmp int64
+	for i < len(bytes) && bytes[i] >= '0' && bytes[i] <= '9' {
+		tmp = tmp*10 + int64(bytes[i]-'0')
+		i++
+	}
+	*val = tmp * sign
+	return i
 }
 
 func readInt(bytes []byte, from int, val *int) int {
@@ -74,34 +102,25 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func solve(n int, x int, y int) []int {
-	// x < y
-	// y - x = d * m
-	res := make([]int, n)
-	// cnt > n
-	for d := 1; ; d++ {
-		if (y-x)%d == 0 {
-			cnt := (y-x)/d + 1
-			if cnt <= n {
-				// 如果最小值是1, 或者
-				// 1 + n * d
-				// y = a + m * d
-				for a := 1; ; a++ {
-					if (y-a)%d == 0 && (y-a)/d < n {
-						for i := 0; i < n; i++ {
-							res[i] = a + i*d
-						}
-						return res
-					}
-				}
-			}
+func solve(n int64) int64 {
+	// 2,3, 4, 5, 6, 7, 8
+	// 然后找出最小公倍数，然后找出最小的数 *2比n大
+
+	tmp := n
+
+	for tmp > 0 {
+		d := tmp % 10
+		if d > 1 && n%d != 0 {
+			return solve(n + 1)
 		}
+		tmp /= 10
 	}
+	return n
 }
 
-func max(a, b int) int {
-	if a >= b {
-		return a
+func gcd(a, b int) int {
+	for b > 0 {
+		a, b = b, a%b
 	}
-	return b
+	return a
 }

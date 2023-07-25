@@ -16,15 +16,41 @@ func main() {
 
 	for tc > 0 {
 		tc--
-		n, x, y := readThreeNums(reader)
-		res := solve(n, x, y)
-		for i := 0; i < n; i++ {
-			buf.WriteString(fmt.Sprintf("%d ", res[i]))
-		}
-		buf.WriteByte('\n')
+		nums := readNInt64s(reader, 2)
+		res := solve(nums[0], int(nums[1]))
+		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 
 	fmt.Print(buf.String())
+}
+
+func readNInt64s(reader *bufio.Reader, n int) []int64 {
+	res := make([]int64, n)
+	s, _ := reader.ReadBytes('\n')
+
+	var pos int
+
+	for i := 0; i < n; i++ {
+		pos = readInt64(s, pos, &res[i]) + 1
+	}
+
+	return res
+}
+
+func readInt64(bytes []byte, from int, val *int64) int {
+	i := from
+	var sign int64 = 1
+	if bytes[i] == '-' {
+		sign = -1
+		i++
+	}
+	var tmp int64
+	for i < len(bytes) && bytes[i] >= '0' && bytes[i] <= '9' {
+		tmp = tmp*10 + int64(bytes[i]-'0')
+		i++
+	}
+	*val = tmp * sign
+	return i
 }
 
 func readInt(bytes []byte, from int, val *int) int {
@@ -74,34 +100,31 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func solve(n int, x int, y int) []int {
-	// x < y
-	// y - x = d * m
-	res := make([]int, n)
-	// cnt > n
-	for d := 1; ; d++ {
-		if (y-x)%d == 0 {
-			cnt := (y-x)/d + 1
-			if cnt <= n {
-				// 如果最小值是1, 或者
-				// 1 + n * d
-				// y = a + m * d
-				for a := 1; ; a++ {
-					if (y-a)%d == 0 && (y-a)/d < n {
-						for i := 0; i < n; i++ {
-							res[i] = a + i*d
-						}
-						return res
-					}
-				}
-			}
-		}
+func solve(n int64, s int) int64 {
+	// s = 162
+	if digitsSum(n) <= s {
+		return 0
 	}
+	var ans int64
+	var pw int64 = 1
+	for {
+		cur := (n / pw) % 10
+		add := pw * (10 - cur)
+		n += add
+		ans += add
+		if digitsSum(n) <= s {
+			break
+		}
+		pw *= 10
+	}
+	return ans
 }
 
-func max(a, b int) int {
-	if a >= b {
-		return a
+func digitsSum(n int64) int {
+	var res int
+	for n > 0 {
+		res += int(n % 10)
+		n /= 10
 	}
-	return b
+	return res
 }

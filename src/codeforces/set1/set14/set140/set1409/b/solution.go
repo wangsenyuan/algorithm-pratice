@@ -16,12 +16,9 @@ func main() {
 
 	for tc > 0 {
 		tc--
-		n, x, y := readThreeNums(reader)
-		res := solve(n, x, y)
-		for i := 0; i < n; i++ {
-			buf.WriteString(fmt.Sprintf("%d ", res[i]))
-		}
-		buf.WriteByte('\n')
+		nums := readNNums(reader, 5)
+		res := solve(nums)
+		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 
 	fmt.Print(buf.String())
@@ -74,29 +71,31 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func solve(n int, x int, y int) []int {
-	// x < y
-	// y - x = d * m
-	res := make([]int, n)
-	// cnt > n
-	for d := 1; ; d++ {
-		if (y-x)%d == 0 {
-			cnt := (y-x)/d + 1
-			if cnt <= n {
-				// 如果最小值是1, 或者
-				// 1 + n * d
-				// y = a + m * d
-				for a := 1; ; a++ {
-					if (y-a)%d == 0 && (y-a)/d < n {
-						for i := 0; i < n; i++ {
-							res[i] = a + i*d
-						}
-						return res
-					}
-				}
-			}
-		}
+func solve(nums []int) int64 {
+	a, b, x, y, n := nums[0], nums[1], nums[2], nums[3], nums[4]
+	//如果能达到x, y,则 最小值就是 x * y
+	if a-x+b-y <= n {
+		return int64(x) * int64(y)
 	}
+	// x <= y
+	u, v := max(a-n, x), max(b-n, y)
+	if u <= v {
+		m := a - u
+		n -= m
+		v = max(y, b-n)
+	} else {
+		m := b - v
+		n -= m
+		u = max(x, a-n)
+	}
+	return int64(u) * int64(v)
+}
+
+func min(a, b int) int {
+	if a <= b {
+		return a
+	}
+	return b
 }
 
 func max(a, b int) int {

@@ -17,15 +17,8 @@ func main() {
 	for tc > 0 {
 		tc--
 		n, k := readTwoNums(reader)
-
-		rocks := make([][]int, k)
-
-		for i := 0; i < k; i++ {
-			rocks[i] = readNNums(reader, 2)
-		}
-
-		res := solve(n, rocks)
-
+		nums := readNNums(reader, n)
+		res := solve(nums, k)
 		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 
@@ -79,60 +72,44 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func solve(n int, rocks [][]int) int {
-	// (a, b) =>
-	m := len(rocks)
-	// 如果形成了一个环，那么就是size(cycle) + 1
-	// 否则的话就是
-	row := make([]int, n)
-	for i := 0; i < n; i++ {
-		row[i] = -1
-	}
-	var good int
-	for i := 0; i < m; i++ {
-		rock := rocks[i]
-		rock[0]--
-		rock[1]--
-		if rock[0] == rock[1] {
-			good++
-		}
-		row[rock[0]] = i
-	}
+func solve(A []int, k int) int {
 
-	vis := make([]int, m)
+	n := len(A)
 
-	par := make([]int, n)
-
-	var cycles int
-
-	var dfs func(u int, cur int)
-
-	dfs = func(u int, cur int) {
-		vis[u] = cur
-		rock := rocks[u]
-		r, c := rock[0], rock[1]
-		if r == c {
-			// already in the place
-			return
-		}
-		v := row[c]
-
-		if v >= 0 && vis[v] == cur {
-			cycles++
-			return
-		}
-		if v < 0 || vis[v] != 0 {
-			return
-		}
-		par[v] = u
-		dfs(v, cur)
-	}
-
-	for i := 0; i < m; i++ {
-		if vis[i] == 0 {
-			dfs(i, i+1)
+	// 如果 A[i] == A[i-1], 它们可以按照同样的规则区分
+	// A[i] > A[i-1] 肯定会增加一个数
+	var cnt int
+	for i := 1; i <= n; i++ {
+		if i == n || A[i] > A[i-1] {
+			cnt++
 		}
 	}
 
-	return cycles + m - good
+	if cnt <= k {
+		return 1
+	}
+	if k == 1 {
+		return -1
+	}
+	// 至少需要两个数组
+	// 考虑处理到A[i]时，A[i] > A[i-1],把A[i]分到前面不同的分组后, 尽量保持和A[i-1]的划分一致（这样可以不增加新的数字)
+	// 剩下 A[i] - A[i-1]， 这时有两个选择，一个选择时把它加到最后一个数组中, B中， 此时B的计数+1
+	//  1, 2, 3, 4  & k = 2
+	//  [1] => [1, 2] => [1, 2, 2], [0, 0, 1] => [1, 2, 2, 2], [0, 0, 1, 1], [0, 0, 0, 1]
+	m := 1
+	var dist = 1
+	for i := 1; i < n; i++ {
+		if A[i] == A[i-1] {
+			continue
+		}
+		// A[i] > A[i-1]
+		if dist == k {
+			m++
+			// 前面的需要使用0补充
+			dist = 1
+		}
+		dist++
+	}
+
+	return m
 }

@@ -109,36 +109,17 @@ func solve(A []int) []int {
 	// half 1, half 0, and h is odd
 	// 比如[1,0,1,0,1,0]
 	res := make([]int, h+1)
-	// 需要 h - 1 个0
-	// 只要有个地方有连续的1即可
-	// 110001
-	// 001110
-	// 要么连续的1， 要么连续的0
-	for i := 0; i+1 < n; i++ {
-		if A[i] == A[i+1] {
-			// 保留它们的情况下，其他的去它们的相反
-			var j, k int
-			for j < i && k < h-1 {
-				if A[j] != A[i] {
-					res[k] = A[j]
-					k++
-				}
-				j++
-			}
-			res[k] = A[i]
-			res[k+1] = A[i+1]
-			k += 2
-			for k <= h {
-				res[k] = 1 - A[i]
-				k++
-			}
-			return res
-		}
+	var x int
+	if A[0] == A[1] || A[0] == A[2] {
+		x = A[0]
+	} else {
+		// A[1] == A[2]
+		x = A[1]
 	}
-	res[0] = A[0]
-	res[1] = A[0]
+	res[0] = x
+	res[1] = x
 	for i := 2; i <= h; i++ {
-		res[i] = 1 - A[0]
+		res[i] = 1 - x
 	}
 
 	return res

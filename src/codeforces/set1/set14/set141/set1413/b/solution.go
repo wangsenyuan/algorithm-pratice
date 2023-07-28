@@ -23,7 +23,7 @@ func main() {
 			rows[i] = readNNums(reader, m)
 		}
 		cols := make([][]int, m)
-		for i := 0; i < n; i++ {
+		for i := 0; i < m; i++ {
 			cols[i] = readNNums(reader, n)
 		}
 		res := solve(n, m, rows, cols)

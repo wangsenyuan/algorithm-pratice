@@ -1,15 +1,4 @@
-package main
-
-import "fmt"
-
-func main() {
-	nums1 := make([]int, 4)
-	nums1[0] = 1
-	nums1[1] = 3
-	nums2 := []int{2, 4}
-	merge(nums1, 2, nums2, 2)
-	fmt.Printf("%v\n", nums1)
-}
+package p088
 
 func merge(nums1 []int, m int, nums2 []int, n int) {
 	if n == 0 {

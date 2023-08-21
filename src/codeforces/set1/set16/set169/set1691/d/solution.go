@@ -105,37 +105,34 @@ func solve(A []int) bool {
 	pref := make([]int64, n)
 	stack := make([]int, n)
 	L := make([]int, n)
+	R := make([]int, n)
+
 	var p int
 	for i := 0; i < n; i++ {
 		pref[i] = int64(A[i])
 		if i > 0 {
 			pref[i] += pref[i-1]
 		}
-		L[i] = -1
+		R[i] = n
 		for p > 0 && A[stack[p-1]] < A[i] {
+			R[stack[p-1]] = i
 			p--
-		}
-		if p > 0 {
-			L[i] = stack[p-1]
 		}
 		stack[p] = i
 		p++
 	}
 	pt := NewSegTree(pref)
 	p = 0
-	R := make([]int, n)
 	suf := make([]int64, n)
 	for i := n - 1; i >= 0; i-- {
 		suf[i] = int64(A[i])
 		if i+1 < n {
 			suf[i] += suf[i+1]
 		}
-		R[i] = n
+		L[i] = -1
 		for p > 0 && A[stack[p-1]] < A[i] {
+			L[stack[p-1]] = i
 			p--
-		}
-		if p > 0 {
-			R[i] = stack[p-1]
 		}
 		stack[p] = i
 		p++

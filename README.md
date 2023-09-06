@@ -26,3 +26,10 @@ This project is [Apache License 2.0](https://github.com/wangsenyuan/golang-prati
 
 ***
 _This README was generated with ❤️ by [readme-md-generator](https://github.com/kefranabg/readme-md-generator)_
+
+
+update go version
+```
+    go mod edit -go 1.21
+    go mod tidy
+```

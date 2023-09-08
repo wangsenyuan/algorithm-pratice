@@ -113,6 +113,64 @@ const inf = 1 << 20
 func solve(mat [][]int) int {
 	n := len(mat)
 	m := len(mat[0])
+	sum := make([][]int, n)
+	for i := 0; i < n; i++ {
+		sum[i] = make([]int, m)
+	}
+
+	check := func(l int) bool {
+		for i := 0; i < n; i++ {
+			for j := 0; j < m; j++ {
+				if mat[i][j] >= l {
+					sum[i][j] = 1
+				} else {
+					sum[i][j] = 0
+				}
+				if i > 0 {
+					sum[i][j] += sum[i-1][j]
+				}
+				if j > 0 {
+					sum[i][j] += sum[i][j-1]
+				}
+				if i > 0 && j > 0 {
+					sum[i][j] -= sum[i-1][j-1]
+				}
+				if i >= l-1 && j >= l-1 {
+					tmp := sum[i][j]
+					if i-l >= 0 {
+						tmp -= sum[i-l][j]
+					}
+					if j-l >= 0 {
+						tmp -= sum[i][j-l]
+					}
+					if i-l >= 0 && j-l >= 0 {
+						tmp += sum[i-l][j-l]
+					}
+					if tmp == l*l {
+						return true
+					}
+				}
+			}
+		}
+		return false
+	}
+
+	l, r := 1, min(inf, m, n)+1
+
+	for l < r {
+		mid := (l + r) / 2
+		if !check(mid) {
+			r = mid
+		} else {
+			l = mid + 1
+		}
+	}
+	return r - 1
+}
+
+func solve1(mat [][]int) int {
+	n := len(mat)
+	m := len(mat[0])
 	// 需要直到在[l][l]中的最小值
 	// 如何快速的直到在给定l时，[i...i+l][j...j+l]中的最小值
 	// 假设先找出了第一个l矩阵的最小值

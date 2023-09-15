@@ -10,60 +10,43 @@ import (
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 
-	tc := readNum(reader)
+	tc := 1
+
 	var buf bytes.Buffer
 
 	for tc > 0 {
 		tc--
 		n := readNum(reader)
-		A := readNNums(reader, n)
-		B := readNNums(reader, n)
-		res := solve(A, B)
-		buf.WriteString(fmt.Sprintf("%d\n", res))
+		b := readNNums(reader, n)
+		res := solve(b)
+		for i := 0; i < n; i++ {
+			for j := 0; j < n; j++ {
+				buf.WriteString(fmt.Sprintf("%d ", res[i][j]))
+			}
+			buf.WriteByte('\n')
+		}
 	}
-
 	fmt.Print(buf.String())
 }
 
 func readString(reader *bufio.Reader) string {
 	s, _ := reader.ReadString('\n')
 	for i := 0; i < len(s); i++ {
-		if s[i] == '\n' {
+		if s[i] == '\n' || s[i] == '\r' {
 			return s[:i]
 		}
 	}
 	return s
 }
 
-func readNInt64s(reader *bufio.Reader, n int) []int64 {
-	res := make([]int64, n)
-	s, _ := reader.ReadBytes('\n')
-	if len(s) == 0 || len(s) == 1 && s[0] == '\n' {
-		return readNInt64s(reader, n)
-	}
-	var pos int
+func normalize(s string) string {
 
-	for i := 0; i < n; i++ {
-		pos = readInt64(s, pos, &res[i]) + 1
+	for i := len(s); i > 0; i-- {
+		if s[i-1] >= 'a' && s[i-1] <= 'z' {
+			return s[:i]
+		}
 	}
-
-	return res
-}
-
-func readInt64(bytes []byte, from int, val *int64) int {
-	i := from
-	var sign int64 = 1
-	if bytes[i] == '-' {
-		sign = -1
-		i++
-	}
-	var tmp int64
-	for i < len(bytes) && bytes[i] >= '0' && bytes[i] <= '9' {
-		tmp = tmp*10 + int64(bytes[i]-'0')
-		i++
-	}
-	*val = tmp * sign
-	return i
+	return ""
 }
 
 func readInt(bytes []byte, from int, val *int) int {
@@ -84,9 +67,6 @@ func readInt(bytes []byte, from int, val *int) int {
 
 func readNum(reader *bufio.Reader) (a int) {
 	bs, _ := reader.ReadBytes('\n')
-	if len(bs) == 0 || bs[0] == '\n' {
-		return readNum(reader)
-	}
 	readInt(bs, 0, &a)
 	return
 }
@@ -116,37 +96,23 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func solve(A []int, B []int) int {
-	// gcd(L, B[i], R),
-	n := len(A)
-	pref := make([]int, n+1)
+func solve(b []int) [][]int {
+	n := len(b)
 
-	for i, a := range A {
-		pref[i+1] = gcd(pref[i], a)
-	}
-	ans := pref[n]
-
-	var suf int
-
-	for i := n - 1; i >= 0; i-- {
-		tmp := gcd(gcd(pref[i], B[i]), suf)
-		ans = max(ans, tmp)
-		suf = gcd(suf, A[i])
+	res := make([][]int, n)
+	for i := 0; i < n; i++ {
+		res[i] = make([]int, n)
+		for j := 0; j < n; j++ {
+			res[i][j] = (i * j) % n
+		}
 	}
 
-	return ans
-}
-
-func gcd(a, b int) int {
-	for b > 0 {
-		a, b = b, a%b
+	for i := 0; i < n; i++ {
+		extra := (b[i] - res[i][i] + n) % n
+		for j := 0; j < n; j++ {
+			res[i][j] = (res[i][j] + extra) % n
+		}
 	}
-	return a
-}
 
-func max(a, b int) int {
-	if a >= b {
-		return a
-	}
-	return b
+	return res
 }

@@ -12,35 +12,25 @@ func main() {
 
 	tc := readNum(reader)
 	var buf bytes.Buffer
-
 	for tc > 0 {
 		tc--
-		n := readNum(reader)
-		A := readNNums(reader, n)
-		B := readNNums(reader, n)
-		res := solve(A, B)
-		buf.WriteString(fmt.Sprintf("%d\n", res))
+		n, k := readTwoNums(reader)
+		b := readNNums(reader, k)
+		res := solve(n, k, b)
+		if res {
+			buf.WriteString("YES\n")
+		} else {
+			buf.WriteString("NO\n")
+		}
 	}
 
 	fmt.Print(buf.String())
 }
 
-func readString(reader *bufio.Reader) string {
-	s, _ := reader.ReadString('\n')
-	for i := 0; i < len(s); i++ {
-		if s[i] == '\n' {
-			return s[:i]
-		}
-	}
-	return s
-}
-
 func readNInt64s(reader *bufio.Reader, n int) []int64 {
 	res := make([]int64, n)
 	s, _ := reader.ReadBytes('\n')
-	if len(s) == 0 || len(s) == 1 && s[0] == '\n' {
-		return readNInt64s(reader, n)
-	}
+
 	var pos int
 
 	for i := 0; i < n; i++ {
@@ -66,6 +56,26 @@ func readInt64(bytes []byte, from int, val *int64) int {
 	return i
 }
 
+func readString(reader *bufio.Reader) string {
+	s, _ := reader.ReadString('\n')
+	for i := 0; i < len(s); i++ {
+		if s[i] == '\n' || s[i] == '\r' {
+			return s[:i]
+		}
+	}
+	return s
+}
+
+func normalize(s string) string {
+
+	for i := len(s); i > 0; i-- {
+		if s[i-1] >= 'a' && s[i-1] <= 'z' {
+			return s[:i]
+		}
+	}
+	return ""
+}
+
 func readInt(bytes []byte, from int, val *int) int {
 	i := from
 	sign := 1
@@ -84,9 +94,6 @@ func readInt(bytes []byte, from int, val *int) int {
 
 func readNum(reader *bufio.Reader) (a int) {
 	bs, _ := reader.ReadBytes('\n')
-	if len(bs) == 0 || bs[0] == '\n' {
-		return readNum(reader)
-	}
 	readInt(bs, 0, &a)
 	return
 }
@@ -116,37 +123,29 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func solve(A []int, B []int) int {
-	// gcd(L, B[i], R),
-	n := len(A)
-	pref := make([]int, n+1)
-
-	for i, a := range A {
-		pref[i+1] = gcd(pref[i], a)
+func solve(n int, k int, b []int) bool {
+	// b[0] = s[n-k]
+	// b[1] = s[n-k+1] = s[n-k] + a[n-k+1] = b[0] + a[n-k+1]
+	// b[2] = s[n-k+2] = b[1] + a[n-k+2]
+	// 先判断后面的
+	if k == 1 {
+		return true
 	}
-	ans := pref[n]
-
-	var suf int
-
-	for i := n - 1; i >= 0; i-- {
-		tmp := gcd(gcd(pref[i], B[i]), suf)
-		ans = max(ans, tmp)
-		suf = gcd(suf, A[i])
+	if k > 1 {
+		cur := b[1] - b[0]
+		for i := 2; i < k; i++ {
+			tmp := b[i] - b[i-1]
+			if tmp < cur {
+				return false
+			}
+			cur = tmp
+		}
 	}
-
-	return ans
-}
-
-func gcd(a, b int) int {
-	for b > 0 {
-		a, b = b, a%b
+	// 全部是最后一个，看最后一个是否能比最后一个小
+	cur := b[1] - b[0]
+	sum := b[0]
+	for i := n - k - 1; i >= 0; i-- {
+		sum -= cur
 	}
-	return a
-}
-
-func max(a, b int) int {
-	if a >= b {
-		return a
-	}
-	return b
+	return sum <= cur
 }

@@ -1,10 +1,4 @@
-package main
-
-import "fmt"
-
-func main() {
-	fmt.Println(rob([]int{1, 2, 1}))
-}
+package p213
 
 func rob(nums []int) int {
 	if len(nums) < 1 {

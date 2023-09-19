@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"bytes"
 	"fmt"
 	"os"
 )
@@ -10,19 +9,13 @@ import (
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 
-	tc := readNum(reader)
-	var buf bytes.Buffer
-	for tc > 0 {
-		tc--
-		n := readNum(reader)
-		res := solve(n)
-		for i := 0; i < 3; i++ {
-			buf.WriteString(fmt.Sprintf("%d ", res[i]))
-		}
-		buf.WriteByte('\n')
+	n := readNum(reader)
+	board := make([]string, 2)
+	for i := 0; i < 2; i++ {
+		board[i] = readString(reader)[:n]
 	}
-
-	fmt.Print(buf.String())
+	res := solve(board)
+	fmt.Println(res)
 }
 
 func readNInt64s(reader *bufio.Reader, n int) []int64 {
@@ -121,95 +114,50 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-const mod = 998244353
-
-func add(a, b int) int {
-	a += b
-	if a >= mod {
-		a -= mod
-	}
-	return a
-}
-
-func sub(a, b int) int {
-	return add(a, mod-b)
-}
-
-func mul(a, b int) int {
-	return int(int64(a) * int64(b) % mod)
-}
-
-func pow(a, b int) int {
-	r := 1
-	for b > 0 {
-		if b&1 == 1 {
-			r = mul(r, a)
-		}
-		a = mul(a, a)
-		b >>= 1
-	}
-	return r
-}
-
-const N = 110
-
-var F [N]int
-var I [N]int
-
-func init() {
-	F[0] = 1
-	for i := 1; i < N; i++ {
-		F[i] = mul(i, F[i-1])
-	}
-
-	I[N-1] = pow(F[N-1], mod-2)
-	for i := N - 2; i >= 0; i-- {
-		I[i] = mul(i+1, I[i+1])
-	}
-}
-
-func nCr(a, b int) int {
-	if a < b || b < 0 {
+func solve(board []string) int {
+	n := len(board[0])
+	if n == 1 {
 		return 0
 	}
-	return mul(F[a], mul(I[b], I[a-b]))
-}
 
-func solve(n int) []int {
-	if n == 2 {
-		return []int{1, 0, 1}
+	dp := make([][][]int, n+1)
+	for i := 0; i <= n; i++ {
+		dp[i] = make([][]int, 2)
+		for j := 0; j < 2; j++ {
+			dp[i][j] = make([]int, 2)
+			for k := 0; k < 2; k++ {
+				dp[i][j][k] = -n
+			}
+		}
+	}
+	if board[1][0] == '1' {
+		dp[0][0][1] = 1
+	}
+	dp[0][0][0] = 0
+
+	getValue := func(i, j int) int {
+		return int(board[i][j] - '0')
 	}
 
-	tmp := solve(n - 2)
-	a := nCr(n-1, n/2)
-	a = add(a, tmp[1])
-	b := nCr(n-2, n/2)
-	b = add(b, tmp[0])
-
-	return []int{a, b, 1}
-}
-
-func solve1(n int) []int {
-	res := make([]int, 3)
-	res[2] = 1
-	// 一共进行h轮
-	h := n / 2
-
-	for i := 0; i < h; i++ {
-		if i == 0 {
-			res[0] = add(res[0], nCr(n-1, h-1))
-		}
-		tmp := mul(2, nCr(n-2*i-2, h-i))
-		// 减去最大的三张牌都在一个人手中
-		tmp = sub(tmp, nCr(n-2*i-3, h-i))
-		if i&1 == 0 {
-			// bob wins in next round only when he has the biggest, at lease one of (n - 1 or n - 2)
-			// 还有n - 1 或者 n - 2中的一个
-			res[1] = add(res[1], tmp)
-		} else {
-			res[0] = add(res[0], tmp)
+	for i := 0; i < n-1; i++ {
+		for j := 0; j < 2; j++ {
+			j0 := getValue(j, i+1)
+			j1 := getValue(1^j, i+1)
+			dp[i+1][j^1][0] = max(dp[i+1][j^1][0], dp[i][j][1]+j1)
+			dp[i+1][j][j1] = max(dp[i+1][j][j1], dp[i][j][0]+j1+j0)
+			dp[i+1][j][0] = max(dp[i+1][j][0], dp[i][j][0]+j0)
 		}
 	}
 
+	return max(dp[n-1][0][0], dp[n-1][0][1], dp[n-1][1][0], dp[n-1][1][1])
+}
+
+func max(arr ...int) int {
+	res := arr[0]
+	for i := 1; i < len(arr); i++ {
+		if res < arr[i] {
+			res = arr[i]
+		}
+	}
 	return res
 }

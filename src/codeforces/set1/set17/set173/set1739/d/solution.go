@@ -14,12 +14,10 @@ func main() {
 	var buf bytes.Buffer
 	for tc > 0 {
 		tc--
-		n := readNum(reader)
-		res := solve(n)
-		for i := 0; i < 3; i++ {
-			buf.WriteString(fmt.Sprintf("%d ", res[i]))
-		}
-		buf.WriteByte('\n')
+		n, k := readTwoNums(reader)
+		P := readNNums(reader, n-1)
+		res := solve(n, k, P)
+		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 
 	fmt.Print(buf.String())
@@ -121,95 +119,86 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-const mod = 998244353
-
-func add(a, b int) int {
-	a += b
-	if a >= mod {
-		a -= mod
+func solve(n int, k int, P []int) int {
+	// 可以二分吗？
+	// 貌似是满足二分的条件的，就是如果能得到k高度的树，也必然可以得到k+1高度的树
+	// 但是如何进行检查呢？因为如果把节点u连接到1，所有u里面的节点的高度都减少了？
+	// dfs ?
+	if n == 1 {
+		return 0
 	}
-	return a
-}
+	g := NewGraph(n, 2*n)
 
-func sub(a, b int) int {
-	return add(a, mod-b)
-}
+	for i := 1; i < n; i++ {
+		g.AddEdge(P[i-1]-1, i)
+		g.AddEdge(i, P[i-1]-1)
+	}
 
-func mul(a, b int) int {
-	return int(int64(a) * int64(b) % mod)
-}
-
-func pow(a, b int) int {
-	r := 1
-	for b > 0 {
-		if b&1 == 1 {
-			r = mul(r, a)
+	var dfs func(p int, u int, h int) int
+	var cnt int
+	dfs = func(p int, u int, h int) int {
+		var cur int
+		for i := g.nodes[u]; i > 0; i = g.next[i] {
+			v := g.to[i]
+			if p != v {
+				tmp := dfs(u, v, h)
+				if tmp >= h && u != 0 {
+					cnt++
+				} else {
+					cur = max(cur, tmp)
+				}
+			}
 		}
-		a = mul(a, a)
-		b >>= 1
+		return cur + 1
+	}
+
+	check := func(expectDepth int) bool {
+		// 似乎对于一条路径来说，从深处处理，貌似能减少操作的次数
+		cnt = 0
+		dfs(0, 0, expectDepth)
+		return cnt <= k
+	}
+
+	l, r := 1, dfs(0, 0, n)
+
+	for l < r {
+		mid := (l + r) / 2
+		if check(mid) {
+			r = mid
+		} else {
+			l = mid + 1
+		}
 	}
 	return r
 }
 
-const N = 110
-
-var F [N]int
-var I [N]int
-
-func init() {
-	F[0] = 1
-	for i := 1; i < N; i++ {
-		F[i] = mul(i, F[i-1])
+func max(a, b int) int {
+	if a >= b {
+		return a
 	}
-
-	I[N-1] = pow(F[N-1], mod-2)
-	for i := N - 2; i >= 0; i-- {
-		I[i] = mul(i+1, I[i+1])
-	}
+	return b
 }
 
-func nCr(a, b int) int {
-	if a < b || b < 0 {
-		return 0
-	}
-	return mul(F[a], mul(I[b], I[a-b]))
+type Graph struct {
+	nodes []int
+	next  []int
+	to    []int
+	cur   int
 }
 
-func solve(n int) []int {
-	if n == 2 {
-		return []int{1, 0, 1}
-	}
-
-	tmp := solve(n - 2)
-	a := nCr(n-1, n/2)
-	a = add(a, tmp[1])
-	b := nCr(n-2, n/2)
-	b = add(b, tmp[0])
-
-	return []int{a, b, 1}
+func NewGraph(n, e int) *Graph {
+	g := new(Graph)
+	g.nodes = make([]int, n)
+	g.next = make([]int, e+10)
+	g.to = make([]int, e+10)
+	// start from 2, reverse of edge i is i ^ 1
+	g.cur = 0
+	return g
 }
 
-func solve1(n int) []int {
-	res := make([]int, 3)
-	res[2] = 1
-	// 一共进行h轮
-	h := n / 2
-
-	for i := 0; i < h; i++ {
-		if i == 0 {
-			res[0] = add(res[0], nCr(n-1, h-1))
-		}
-		tmp := mul(2, nCr(n-2*i-2, h-i))
-		// 减去最大的三张牌都在一个人手中
-		tmp = sub(tmp, nCr(n-2*i-3, h-i))
-		if i&1 == 0 {
-			// bob wins in next round only when he has the biggest, at lease one of (n - 1 or n - 2)
-			// 还有n - 1 或者 n - 2中的一个
-			res[1] = add(res[1], tmp)
-		} else {
-			res[0] = add(res[0], tmp)
-		}
-	}
-
-	return res
+func (g *Graph) AddEdge(u, v int) {
+	g.cur++
+	g.next[g.cur] = g.nodes[u]
+	g.nodes[u] = g.cur
+	g.to[g.cur] = v
 }

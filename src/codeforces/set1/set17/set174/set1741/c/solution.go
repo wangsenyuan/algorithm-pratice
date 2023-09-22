@@ -10,7 +10,7 @@ import (
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 
-	tc := 1
+	tc := readNum(reader)
 
 	var buf bytes.Buffer
 
@@ -21,7 +21,6 @@ func main() {
 		res := solve(A)
 		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
-
 	fmt.Print(buf.String())
 }
 
@@ -35,33 +34,14 @@ func readString(reader *bufio.Reader) string {
 	return s
 }
 
-func readNInt64s(reader *bufio.Reader, n int) []int64 {
-	res := make([]int64, n)
-	s, _ := reader.ReadBytes('\n')
+func normalize(s string) string {
 
-	var pos int
-
-	for i := 0; i < n; i++ {
-		pos = readInt64(s, pos, &res[i]) + 1
+	for i := len(s); i > 0; i-- {
+		if s[i-1] >= 'a' && s[i-1] <= 'z' {
+			return s[:i]
+		}
 	}
-
-	return res
-}
-
-func readInt64(bytes []byte, from int, val *int64) int {
-	i := from
-	var sign int64 = 1
-	if bytes[i] == '-' {
-		sign = -1
-		i++
-	}
-	var tmp int64
-	for i < len(bytes) && bytes[i] >= '0' && bytes[i] <= '9' {
-		tmp = tmp*10 + int64(bytes[i]-'0')
-		i++
-	}
-	*val = tmp * sign
-	return i
+	return ""
 }
 
 func readInt(bytes []byte, from int, val *int) int {
@@ -113,54 +93,46 @@ func readNNums(reader *bufio.Reader, n int) []int {
 
 func solve(a []int) int {
 	n := len(a)
-	// 第一个观测是，被打破的两块区域的距离不会超过2
-	//  (超过2的单独处理）
-	// 如果是a, b => 最快的话
-	// 当 a > b时，攻击a,
-	first := -1
-	second := -1
+	// at least n
+	var sum int
+	for _, x := range a {
+		sum += x
+	}
+
+	var pref int
+
+	best := n
+
 	for i := 0; i < n; i++ {
-		if first < 0 || a[first] >= a[i] {
-			second = first
-			first = i
-		} else if second < 0 || a[second] >= a[i] {
-			second = i
+		if best < i+1 {
+			break
 		}
-	}
-	ans := (a[first]+1)/2 + (a[second]+1)/2
+		pref += a[i]
+		if sum%pref != 0 {
+			continue
+		}
+		cur := i + 1
 
-	process := func(x, y int) int {
-		if x < y {
-			x, y = y, x
+		for j := i + 1; j < n; {
+			var cnt int
+			var tmp int
+			for j < n && tmp+a[j] <= pref {
+				tmp += a[j]
+				cnt++
+				j++
+			}
+			if tmp != pref {
+				cur = -1
+				break
+			}
+			cur = max(cur, cnt)
 		}
-		cnt := min(x-y, (x+1)/2)
-		cur := cnt
-		x -= 2 * cnt
-		y -= cnt
-		if x > 0 && y > 0 {
-			cur += (x + y + 2) / 3
-		}
-		return cur
-	}
-
-	process2 := func(a, b, c int) int {
-		if a < c {
-			a, c = c, a
-		}
-		return (a-c+1)/2 + c
-	}
-
-	for i := 0; i+1 < n; i++ {
-		// try destroy i, and i + 1
-		tmp := process(a[i], a[i+1])
-		ans = min(tmp, ans)
-		if i > 0 {
-			tmp = process2(a[i-1], a[i], a[i+1])
-			ans = min(tmp, ans)
+		if cur > 0 {
+			best = min(best, cur)
 		}
 	}
 
-	return ans
+	return best
 }
 
 func max(a, b int) int {
@@ -169,6 +141,7 @@ func max(a, b int) int {
 	}
 	return b
 }
+
 func min(a, b int) int {
 	if a <= b {
 		return a

@@ -27,3 +27,15 @@ func TestSample3(t *testing.T) {
 	expect := 4
 	runSample(t, a, expect)
 }
+
+func TestSample4(t *testing.T) {
+	a := []int{2, 10}
+	expect := 5
+	runSample(t, a, expect)
+}
+
+func TestSample5(t *testing.T) {
+	a := []int{11, 1}
+	expect := 6
+	runSample(t, a, expect)
+}

@@ -1,48 +1,25 @@
 package main
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
-func runSample(t *testing.T, grid []string, expect bool) {
-	res := solve(grid)
+func runSample(t *testing.T, rows [][]int, Q []int, expect []int) {
+	res := solve(rows, Q)
 
-	if res != expect {
-		t.Fatalf("Sample expect %t, but got %t", expect, res)
+	if !reflect.DeepEqual(res, expect) {
+		t.Fatalf("Sample expect %v, but got %v", expect, res)
 	}
 }
 
 func TestSample1(t *testing.T) {
-	grid := []string{
-		"........**",
-		".**......*",
-		"..*..*....",
-		".....**...",
-		"...*.....*",
-		"..**....**",
+	rows := [][]int{
+		{1, 5},
+		{10, 11},
+		{8, 8},
 	}
-	expect := true
-	runSample(t, grid, expect)
-}
-
-func TestSample2(t *testing.T) {
-	grid := []string{
-		"....*...**",
-		".**......*",
-		"..*..*....",
-		".....**...",
-		"...*.....*",
-		"..**....**",
-	}
-	expect := false
-	runSample(t, grid, expect)
-}
-
-func TestSample3(t *testing.T) {
-	grid := []string{
-		".*..",
-		"**..",
-		"..**",
-		"..*.",
-	}
-	expect := false
-	runSample(t, grid, expect)
+	Q := []int{12, 5}
+	expect := []int{2, 3}
+	runSample(t, rows, Q, expect)
 }

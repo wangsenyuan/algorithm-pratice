@@ -1,19 +1,8 @@
-package main
+package p121
 
 import (
-	"fmt"
 	"math"
 )
-
-func main() {
-	//fmt.Println(maxProfit([]int{7, 1, 5, 3, 6, 4}))
-	//fmt.Println(maxProfit([]int{7, 6, 5, 4, 3, 2, 1}))
-	//fmt.Println(maxProfit([]int{1, 2, 3, 4, 5, 6}))
-	//fmt.Println(maxProfit([]int{1, 1, 1, 1, 1}))
-	//fmt.Println(maxProfit([]int{2, 1, 2, 0, 1}))
-	//fmt.Println(maxProfit([]int{3, 2, 6, 5, 0, 3}))
-	fmt.Println(maxProfit([]int{2, 1, 2, 1, 0, 1, 2}))
-}
 
 func maxProfit(prices []int) int {
 	buy, sell := math.MinInt32, 0

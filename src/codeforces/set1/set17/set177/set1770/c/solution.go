@@ -1,5 +1,7 @@
 package main
 
+import "sort"
+
 import (
 	"bufio"
 	"bytes"
@@ -15,16 +17,15 @@ func main() {
 	var buf bytes.Buffer
 
 	for tc > 0 {
+		tc--
 		n := readNum(reader)
-		nums := readNNums(reader, n)
-		res := solve(nums, tc)
-
+		p := readNNums(reader, n)
+		res := solve(p)
 		if res {
 			buf.WriteString("YES\n")
 		} else {
 			buf.WriteString("NO\n")
 		}
-		tc--
 	}
 	fmt.Print(buf.String())
 }
@@ -96,80 +97,63 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-const X = 100_010
+func solve(a []int) bool {
+	// gcd(a + x, b + x) = 1
+	// 如果gcd(a, b) = 1, 是不是加任何x都是成立的?
+	// gcd(a, b) = gcd(a - b, b)
+	// gcd(a + x, b + x) = gcd(a - b, b + x)
+	// 假设对于b来说，所有比它大的数，和它的差，组成一个数列
+	// 假设是 d, 然后得到d的因数列表（要排除1）
+	n := len(a)
+	sort.Ints(a)
+	for i := 0; i+1 < n; i++ {
+		if a[i] == a[i+1] {
+			return false
+		}
+	}
 
-var primes []int
-var lpf []int
-var ind [X]int
-
-func init() {
-	lpf = make([]int, X)
-	for i := 2; i < X; i++ {
-		if lpf[i] == 0 {
-			lpf[i] = i
+	var primes []int
+	set := make([]bool, n+1)
+	for i := 2; i <= n; i++ {
+		if !set[i] {
 			primes = append(primes, i)
+			set[i] = true
 		}
 		for j := 0; j < len(primes); j++ {
-			if primes[j]*i >= X {
+			if i*primes[j] > n {
 				break
 			}
-			lpf[primes[j]*i] = primes[j]
+			set[i*primes[j]] = true
 			if i%primes[j] == 0 {
 				break
 			}
 		}
 	}
+
+	cnt := make([]int, n+1)
+	for _, p := range primes {
+		for i := 0; i < n; i++ {
+			x := a[i] % p
+			cnt[x]++
+		}
+
+		mv := cnt[0]
+		for i := 0; i < p; i++ {
+			mv = min(mv, cnt[i])
+			cnt[i] = 0
+		}
+
+		if mv >= 2 {
+			return false
+		}
+	}
+
+	return true
 }
 
-func solve(a []int, tc int) bool {
-	set := make(map[int]bool)
-	check := func(x int) bool {
-		if x == 1 {
-			return false
-		}
-
-		if x < X && lpf[x] == x {
-			// a prime number
-			if ind[x] == tc {
-				return true
-			}
-			ind[x] = tc
-			return false
-		}
-		for i := 0; i < len(primes) && primes[i]*primes[i] <= x; i++ {
-			if x%primes[i] == 0 {
-				if ind[primes[i]] == tc {
-					return true
-				}
-				ind[primes[i]] = tc
-				for x%primes[i] == 0 {
-					x /= primes[i]
-				}
-			}
-		}
-		if x == 1 {
-			return false
-		}
-		if x < X {
-			if ind[x] == tc {
-				return true
-			}
-			ind[x] = tc
-		} else {
-			// x >= X
-			if set[x] {
-				return true
-			}
-			set[x] = true
-		}
-		return false
+func min(a, b int) int {
+	if a <= b {
+		return a
 	}
-
-	for _, x := range a {
-		if check(x) {
-			return true
-		}
-	}
-
-	return false
+	return b
 }

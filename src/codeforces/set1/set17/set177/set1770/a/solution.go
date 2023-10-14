@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"container/heap"
 	"fmt"
 	"os"
 )
@@ -15,16 +16,12 @@ func main() {
 	var buf bytes.Buffer
 
 	for tc > 0 {
-		n := readNum(reader)
-		nums := readNNums(reader, n)
-		res := solve(nums, tc)
-
-		if res {
-			buf.WriteString("YES\n")
-		} else {
-			buf.WriteString("NO\n")
-		}
 		tc--
+		n, m := readTwoNums(reader)
+		a := readNNums(reader, n)
+		b := readNNums(reader, m)
+		res := solve(a, b)
+		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 	fmt.Print(buf.String())
 }
@@ -96,80 +93,43 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-const X = 100_010
-
-var primes []int
-var lpf []int
-var ind [X]int
-
-func init() {
-	lpf = make([]int, X)
-	for i := 2; i < X; i++ {
-		if lpf[i] == 0 {
-			lpf[i] = i
-			primes = append(primes, i)
-		}
-		for j := 0; j < len(primes); j++ {
-			if primes[j]*i >= X {
-				break
-			}
-			lpf[primes[j]*i] = primes[j]
-			if i%primes[j] == 0 {
-				break
-			}
-		}
+func solve(a []int, b []int) int {
+	// 尽可能保留大的数
+	pq := make(IntHeap, 0, len(a))
+	var sum int
+	for _, x := range a {
+		sum += x
+		heap.Push(&pq, x)
 	}
+
+	for i := 0; i < len(b); i++ {
+		x := pq[0]
+		sum -= x
+		heap.Pop(&pq)
+		sum += b[i]
+		heap.Push(&pq, b[i])
+	}
+
+	return sum
 }
 
-func solve(a []int, tc int) bool {
-	set := make(map[int]bool)
-	check := func(x int) bool {
-		if x == 1 {
-			return false
-		}
+// An IntHeap is a min-heap of ints.
+type IntHeap []int
 
-		if x < X && lpf[x] == x {
-			// a prime number
-			if ind[x] == tc {
-				return true
-			}
-			ind[x] = tc
-			return false
-		}
-		for i := 0; i < len(primes) && primes[i]*primes[i] <= x; i++ {
-			if x%primes[i] == 0 {
-				if ind[primes[i]] == tc {
-					return true
-				}
-				ind[primes[i]] = tc
-				for x%primes[i] == 0 {
-					x /= primes[i]
-				}
-			}
-		}
-		if x == 1 {
-			return false
-		}
-		if x < X {
-			if ind[x] == tc {
-				return true
-			}
-			ind[x] = tc
-		} else {
-			// x >= X
-			if set[x] {
-				return true
-			}
-			set[x] = true
-		}
-		return false
-	}
+func (h IntHeap) Len() int           { return len(h) }
+func (h IntHeap) Less(i, j int) bool { return h[i] < h[j] }
+func (h IntHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
 
-	for _, x := range a {
-		if check(x) {
-			return true
-		}
-	}
+func (h *IntHeap) Push(x interface{}) {
+	// Push and Pop use pointer receivers because they modify the slice's length,
+	// not just its contents.
+	*h = append(*h, x.(int))
+}
 
-	return false
+func (h *IntHeap) Pop() interface{} {
+	old := *h
+	n := len(old)
+	x := old[n-1]
+	*h = old[0 : n-1]
+	return x
 }

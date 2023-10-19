@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"bytes"
-	"container/heap"
 	"fmt"
 	"os"
 	"sort"
@@ -230,48 +229,6 @@ func solve1(segs [][]int, m int) int {
 	}
 
 	return best
-}
-
-type Item struct {
-	id    int
-	value int
-	index int
-}
-
-type PQ []*Item
-
-func (pq PQ) Len() int {
-	return len(pq)
-}
-
-func (pq PQ) Less(i, j int) bool {
-	return pq[i].value < pq[j].value
-}
-
-func (pq PQ) Swap(i, j int) {
-	pq[i], pq[j] = pq[j], pq[i]
-	pq[i].index = i
-	pq[j].index = j
-}
-
-func (pq *PQ) Push(x interface{}) {
-	it := x.(*Item)
-	it.index = len(*pq)
-	*pq = append(*pq, it)
-}
-
-func (pq *PQ) Pop() interface{} {
-	old := *pq
-	n := len(old)
-	res := old[n-1]
-	*pq = old[:n-1]
-	res.index = -1
-	return res
-}
-
-func (pq *PQ) update(it *Item, value int) {
-	it.value = value
-	heap.Fix(pq, it.index)
 }
 
 func max(a, b int) int {

@@ -6,7 +6,6 @@ import (
 	"container/heap"
 	"fmt"
 	"os"
-	"sort"
 	"strings"
 )
 
@@ -213,12 +212,9 @@ func solve1(workers []string, holidays []int, projects [][]int) []int {
 	// 每个人都排在下一个能够work的天数里
 	workDays := make(map[int][]int)
 
-	pq := make(IntHeap, 0, 1)
-
 	addActive := func(workerId int, day int) {
 		if workDays[day] == nil {
 			workDays[day] = make([]int, 0, 1)
-			heap.Push(&pq, day)
 		}
 		workDays[day] = append(workDays[day], workerId)
 	}
@@ -240,24 +236,17 @@ func solve1(workers []string, holidays []int, projects [][]int) []int {
 
 	ans := make([]int, len(projects))
 
-	sort.Ints(holidays)
-	for i := 0; i < len(holidays); i++ {
-		holidays[i]--
-	}
-
 	cnt := len(projects)
 
 	pending := make([]int, len(projects))
 
 	var hi int
 
-	for pq.Len() > 0 && cnt > 0 {
-		now := heap.Pop(&pq).(int)
-
+	for now := 0; cnt > 0; now++ {
 		var needBreak bool
 
-		for hi < len(holidays) && holidays[hi] <= now {
-			needBreak = holidays[hi] == now
+		if hi < len(holidays) && now+1 == holidays[hi] {
+			needBreak = true
 			hi++
 		}
 

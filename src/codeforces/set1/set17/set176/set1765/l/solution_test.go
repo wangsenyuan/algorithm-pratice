@@ -6,7 +6,7 @@ import (
 )
 
 func runSample(t *testing.T, workers []string, holidays []int, projects [][]int, expect []int) {
-	res := solve(workers, holidays, projects)
+	res := solve1(workers, holidays, projects)
 
 	if !reflect.DeepEqual(res, expect) {
 		t.Fatalf("Sample expect %v, but got %v", expect, res)

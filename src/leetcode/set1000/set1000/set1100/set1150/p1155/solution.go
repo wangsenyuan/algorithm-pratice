@@ -2,7 +2,36 @@ package p1155
 
 const MOD = 1e9 + 7
 
-func numRollsToTarget(d int, f int, target int) int {
+func add(a, b int) int {
+	a += b
+	if a >= MOD {
+		a -= MOD
+	}
+	return a
+}
+
+func sub(a, b int) int {
+	return add(a, MOD-b)
+}
+
+func numRollsToTarget(n int, k int, target int) int {
+	target -= n
+	dp := make([]int, target+1)
+	dp[0] = 1
+
+	for i := 0; i < n; i++ {
+		for x := 1; x <= target; x++ {
+			dp[x] = add(dp[x], dp[x-1])
+		}
+		for x := target; x >= k; x-- {
+			dp[x] = sub(dp[x], dp[x-k])
+		}
+	}
+
+	return dp[target]
+}
+
+func numRollsToTarget3(d int, f int, target int) int {
 	dp := make([]int64, target+1)
 	fp := make([]int64, target+1)
 

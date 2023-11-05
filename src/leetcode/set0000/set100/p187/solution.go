@@ -1,45 +1,44 @@
-package main
-
-import (
-	"fmt"
-	"sort"
-)
-
-func main() {
-	repeat := findRepeatedDnaSequences("AAAAACCCCCAAAAACCCCCCAAAAAGGGTTT")
-	for _, x := range repeat {
-		fmt.Println(x)
-	}
-}
+package p187
 
 func findRepeatedDnaSequences(s string) []string {
 	if len(s) < 10 {
 		return nil
 	}
-	strs := make([]string, len(s)-9)
+	records := make(map[int64]int)
 
-	for i := 0; i < len(s); i++ {
-		j := i + 10
-		if j > len(s) {
-			break
+	n := len(s)
+	var num int64
+	var base int64 = 1
+
+	getValue := func(x byte) int64 {
+		if x == 'A' {
+			return 0
 		}
-		strs[i] = s[i:j]
+		if x == 'T' {
+			return 1
+		}
+		if x == 'C' {
+			return 2
+		}
+		return 3
 	}
 
-	sort.Strings(strs)
-
-	var res []string
-	i := 0
-	for i < len(strs) {
-		j := i + 1
-		for j < len(strs) && strs[j] == strs[i] {
-			j++
+	for i := 0; i < 10; i++ {
+		// ATCG
+		num = num*4 + getValue(s[i])
+		base *= 4
+	}
+	base /= 4
+	var ans []string
+	records[num]++
+	for i := 1; i+10 <= n; i++ {
+		num -= getValue(s[i-1]) * base
+		num = num*4 + getValue(s[i+9])
+		if records[num] == 1 {
+			ans = append(ans, s[i:i+10])
 		}
-		if j-i > 1 {
-			res = append(res, strs[i])
-		}
-		i = j
+		records[num]++
 	}
 
-	return res
+	return ans
 }

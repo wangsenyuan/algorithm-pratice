@@ -126,6 +126,54 @@ func readNNums(reader *bufio.Reader, n int) []int {
 }
 
 func solve(table [][]int) int64 {
+	prev := make(map[int]Pair)
+	var res int64
+
+	n := len(table)
+	m := len(table[0])
+
+	for i := 0; i < n; i++ {
+		for j := 0; j < m; j++ {
+			num := table[i][j]
+
+			if v, ok := prev[num]; ok {
+				res += int64(i)*int64(v.first) - int64(v.second)
+			}
+		}
+		for j := 0; j < m; j++ {
+			num := table[i][j]
+			if v, ok := prev[num]; ok {
+				prev[num] = Pair{v.first + 1, v.second + i}
+			} else {
+				prev[num] = Pair{1, i}
+			}
+		}
+	}
+
+	prev = make(map[int]Pair)
+
+	for j := 0; j < m; j++ {
+		for i := 0; i < n; i++ {
+			num := table[i][j]
+			if v, ok := prev[num]; ok {
+				res += int64(j)*int64(v.first) - int64(v.second)
+			}
+		}
+
+		for i := 0; i < n; i++ {
+			num := table[i][j]
+			if v, ok := prev[num]; ok {
+				prev[num] = Pair{v.first + 1, v.second + j}
+			} else {
+				prev[num] = Pair{1, j}
+			}
+		}
+	}
+
+	return res
+}
+
+func solve1(table [][]int) int64 {
 	//  对于color x的cells, (x0, y0), (x1, y1), (x2, y2)...
 	// x 和 y是独立的
 

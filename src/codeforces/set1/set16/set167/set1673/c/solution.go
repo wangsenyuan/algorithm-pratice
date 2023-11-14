@@ -123,6 +123,7 @@ func add(a, b int) int {
 const MAX_X = 40004
 
 var dp [MAX_X]int
+var fp [MAX_X]int
 
 func init() {
 	var palindromeNums []int
@@ -149,8 +150,8 @@ func init() {
 		for x := palindromeNums[i]; x < MAX_X; x++ {
 			dp[x] = add(dp[x], dp[x-palindromeNums[i]])
 		}
-		//dp[1] = add(dp[1], 1)
 	}
+
 }
 
 func reverse(num int) int {

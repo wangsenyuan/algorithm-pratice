@@ -2,9 +2,41 @@ package p2931
 
 import "sort"
 
-const H = 31
+const H = 21
 
 func maximumStrongPairXor(nums []int) int {
+	sort.Ints(nums)
+	n := len(nums)
+	// 从高位到低位，当前的结果为ans
+	// y ^ x & mask = ans
+	var ans int
+
+	for i := H - 1; i >= 0; i-- {
+		mem := make(map[int]int)
+
+		better := ans | (1 << i)
+		ok := false
+		for l, r := 0, 0; r < n; r++ {
+			for l < r && 2*nums[l] < nums[r] {
+				mem[nums[l]>>i]--
+				l++
+			}
+			if mem[(nums[r]>>i)^(better>>i)] > 0 {
+				ok = true
+				break
+			}
+			mem[(nums[r]>>i)]++
+		}
+
+		if ok {
+			ans = better
+		}
+	}
+
+	return ans
+}
+
+func maximumStrongPairXor1(nums []int) int {
 	sort.Ints(nums)
 	// y - x <= x
 	// y <= 2 * x

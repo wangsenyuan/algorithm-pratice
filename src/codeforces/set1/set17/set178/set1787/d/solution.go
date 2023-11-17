@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"fmt"
 	"os"
-	"sort"
 )
 
 func main() {
@@ -92,44 +91,78 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func solve(a []int) int {
-	sort.Ints(a)
-	// 假设i参与，必须至少有a[i] + 1（自己)参与
-	// 如果 a[i] = 0,i肯定会参与
-	// 如果i参与了，i-1可以不参与吗？
-	// 如果 a[i-1] < a[i]， 肯定时不行的
-	// 因为i参与了，意味这至少有a[i]个, 那么符合i-1的条件， i-1也必须参与
-	// 如果 a[i-1] == a[i] 也时如此
-	// 但是如果 a[i] 不参加，那么 a[i+1] 肯定也不参加
-	// 6 0 3 3 6 7 2 7
-	// 0,2, 3, 3, 6, 6, 7, 7
-	// 0
-	// 0, 2, 3, 3
-	// 0, 2, 3, 3, 6, 6, 7, 7
-	var res int
-	n := len(a)
-	res++
+func solve(b []int) int {
+	n := len(b)
 
-	for i := n - 2; i >= 0; i-- {
-		// i个人去参加
-		if a[i] >= i+1 {
-			// i不能独立参加
-			continue
+	a := make([]int, n+1)
+	g := NewGraph(n+2, n)
+
+	for i := 1; i <= n; i++ {
+		a[i] = min(b[i-1]+i, n+1)
+		if a[i] <= 0 {
+			a[i] = n + 1
 		}
-		// a[i] <= i + 1 i可以作为一个分界点参加
-		if a[i+1] > i+1 {
-			res++
+		g.AddEdge(a[i], i)
+	}
+
+	vis := make([]int, n+2)
+	sz := make([]int, n+2)
+
+	var dfs func(u int)
+
+	dfs = func(u int) {
+		vis[u]++
+		for i := g.nodes[u]; i > 0; i = g.next[i] {
+			v := g.to[i]
+			dfs(v)
+			sz[u] += sz[v]
+		}
+		sz[u]++
+	}
+
+	dfs(n + 1)
+
+	var ans int
+	if vis[1] == 1 {
+		for j := 1; j != n+1; j = a[j] {
+			ans -= sz[j] + (n - sz[n+1] + 1)
+		}
+		ans += n * (2*n + 1)
+	} else {
+		for j := 1; vis[j] != 2; j = a[j] {
+			ans += (n + sz[n+1])
+			vis[j] = 2
 		}
 	}
-	if a[0] > 0 {
-		res++
-	}
-	return res
+
+	return ans
 }
 
-func max(a, b int) int {
-	if a >= b {
+func min(a, b int) int {
+	if a <= b {
 		return a
 	}
 	return b
+}
+
+type Graph struct {
+	nodes []int
+	next  []int
+	to    []int
+	cur   int
+}
+
+func NewGraph(n int, e int) *Graph {
+	nodes := make([]int, n)
+	e++
+	next := make([]int, e)
+	to := make([]int, e)
+	return &Graph{nodes, next, to, 0}
+}
+
+func (g *Graph) AddEdge(u, v int) {
+	g.cur++
+	g.next[g.cur] = g.nodes[u]
+	g.nodes[u] = g.cur
+	g.to[g.cur] = v
 }

@@ -18,7 +18,7 @@ func main() {
 	res := solve(n, checks)
 
 	if len(res) == 0 {
-		fmt.Println("NO\n")
+		fmt.Println("NO")
 		return
 	}
 	var buf bytes.Buffer

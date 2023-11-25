@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"sort"
 )
 
 func main() {
@@ -16,13 +17,13 @@ func main() {
 
 	for tc > 0 {
 		tc--
-		s := readString(reader)
-		res := solve(s)
-		if res {
-			buf.WriteString("YES\n")
-		} else {
-			buf.WriteString("NO\n")
+		n, m := readTwoNums(reader)
+		mat := make([][]int, n)
+		for i := 0; i < n; i++ {
+			mat[i] = readNNums(reader, m)
 		}
+		res := solve(mat)
+		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 
 	fmt.Print(buf.String())
@@ -114,52 +115,32 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func solve(s string) bool {
-	// + 入栈
-	// - 出栈
-	// 1 表示栈是一个连续的非递减区间
-	// 0 表示栈不是一个连续的非递减区间
-	// 假设到高度i时为1， 但是到高度i+1为0， 那么必然有 stack[i+1] < stack[i]
-	// 如果存在0的情况，在未出栈前，不能再有1，必须全是0
-	// 所以，只需要记录最高的1的位置
-	n := len(s)
-	var top int
-	// 第一次出现0的位置
-	p0 := -1
-	// 最后一次出现1的位置
-	p1 := -1
-	//
-	for i := 0; i < n; i++ {
-		if s[i] == '+' {
-			top++
-		} else if s[i] == '-' {
-			top--
-			if p1 == top {
-				// 当前是1的位置，需要递减
-				p1--
-			}
-			if p0 == top {
-				// 没有0了
-				p0 = -1
-			}
-		} else if s[i] == '1' {
-			if p0 >= 0 {
-				// 已经存在0了
-				return false
-			}
-			// 到目前为止都是1，非递减序列
-			p1 = top - 1
-		} else {
-			// p0
-			if p0 < 0 {
-				p0 = top - 1
-			}
-			if p0 <= p1 || p0 == 0 {
-				// 只有一个元素时，肯定是非递减的
-				return false
-			}
+func solve(mat [][]int) int {
+	grid := transpose(mat)
+	var res int
+	for i := 0; i < len(grid); i++ {
+		sort.Ints(grid[i])
+		var sum int
+		for j := 0; j < len(grid[0]); j++ {
+			res += j*grid[i][j] - sum
+			sum += grid[i][j]
 		}
 	}
 
-	return true
+	return res
+}
+
+func transpose(mat [][]int) [][]int {
+	n := len(mat)
+	m := len(mat[0])
+	res := make([][]int, m)
+	for i := 0; i < m; i++ {
+		res[i] = make([]int, n)
+	}
+	for i := 0; i < n; i++ {
+		for j := 0; j < m; j++ {
+			res[j][i] = mat[i][j]
+		}
+	}
+	return res
 }

@@ -7,7 +7,7 @@ func minimumAddedCoins(coins []int, target int) int {
 	n := len(coins)
 	var sum int
 	var res int
-	for i := 0; i < n; i++ {
+	for i := 0; i < n && sum < target; i++ {
 		for coins[i] > sum+1 {
 			res++
 			sum += sum + 1

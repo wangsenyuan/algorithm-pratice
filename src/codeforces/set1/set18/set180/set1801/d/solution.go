@@ -126,6 +126,8 @@ func solve(p int, n int, E [][]int, W []int) int {
 	}
 
 	dp := make([][]*State, n)
+	pq := make(PriorityQueue, n*n)
+
 	for i := 0; i < n; i++ {
 		dp[i] = make([]*State, n)
 		for j := 0; j < n; j++ {
@@ -134,25 +136,27 @@ func solve(p int, n int, E [][]int, W []int) int {
 			dp[i][j].best = j
 			dp[i][j].numShows = inf
 			dp[i][j].money = 0
+			dp[i][j].index = i*n + j
+			pq[i*n+j] = dp[i][j]
 		}
 	}
 
-	pq := make(PriorityQueue, 0, n*n)
+	heap.Init(&pq)
 
 	push := func(i int, j int, x int, m int) {
-		if dp[i][j].numShows < x || dp[i][j].numShows == x && dp[i][j].money > m {
-			// have a better solution already
+		if dp[i][j].index < 0 || dp[i][j].numShows < x || dp[i][j].numShows == x && dp[i][j].money > m {
 			return
 		}
-		dp[i][j].numShows = x
-		dp[i][j].money = m
-		heap.Push(&pq, dp[i][j])
+		pq.update(dp[i][j], x, m)
 	}
 
 	push(0, 0, 0, p)
 
 	for pq.Len() > 0 {
 		cur := heap.Pop(&pq).(*State)
+		if cur.numShows >= inf {
+			break
+		}
 		if !dp[cur.id][cur.best].Equals(cur) {
 			continue
 		}

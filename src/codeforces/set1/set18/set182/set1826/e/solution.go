@@ -2,26 +2,25 @@ package main
 
 import (
 	"bufio"
-	"container/heap"
 	"fmt"
+	"os"
 	"sort"
 )
 
+var buf []int
+
 func main() {
-	var n, m int
-	fmt.Scan(&n, &m)
-	p := make([]int, m)
-	for i := 0; i < m; i++ {
-		fmt.Scan(&p[i])
-	}
+	reader := bufio.NewReader(os.Stdin)
 
-	arr := make([]int, m)
+	buf = make([]int, 5010)
 
-	res := solve(n, m, p, func() []int {
-		for i := 0; i < m; i++ {
-			fmt.Scan(&arr[i])
-		}
-		return arr
+	n, m := readTwoNums(reader)
+	p := readNNums(reader, m)
+	x := make([]int, m)
+	copy(x, p)
+
+	res := solve(n, m, x, func() []int {
+		return readNNums(reader, m)
 	})
 	fmt.Println(res)
 }
@@ -61,16 +60,16 @@ func readThreeNums(reader *bufio.Reader) (a int, b int, c int) {
 }
 
 func readNNums(reader *bufio.Reader, n int) []int {
-	res := make([]int, n)
+	//res := make([]int, n)
 	x := 0
 	bs, _ := reader.ReadBytes('\n')
 	for i := 0; i < n; i++ {
 		for x < len(bs) && (bs[x] < '0' || bs[x] > '9') && bs[x] != '-' {
 			x++
 		}
-		x = readInt(bs, x, &res[i])
+		x = readInt(bs, x, &buf[i])
 	}
-	return res
+	return buf[:n]
 }
 func solve(n int, m int, p []int, f func() []int) int {
 	sets := make([]*BitSet, m)
@@ -113,59 +112,22 @@ func solve(n int, m int, p []int, f func() []int) int {
 		}
 	}
 
-	g := NewGraph(m, m*m)
-	deg := make([]int, m)
-	for i := 0; i < m; i++ {
+	dp := make([]int, m)
+	copy(dp, p)
+
+	for _, it := range id {
+		i := it.second
 		for j := 0; j < m; j++ {
-			if i != j && sets[i].IsSet(j) {
-				g.AddEdge(j, i)
-				deg[i]++
+			if sets[i].IsSet(j) {
+				dp[i] = max(dp[i], dp[j]+p[i])
 			}
 		}
 	}
-
-	// 越前面的越小
-
-	item := make([]*Item, m)
-	for i := 0; i < m; i++ {
-		item[i] = new(Item)
-		item[i].id = i
-		item[i].value = p[i]
-		item[i].index = -1
-	}
-
-	pq := make(PriorityQueue, 0, m)
 
 	var best int
-
 	for i := 0; i < m; i++ {
-		if deg[i] == 0 {
-			heap.Push(&pq, item[i])
-		}
-		// 即使，无法找到2个人以上的队伍，也可以只安排最有价值的人参加
-		best = max(best, p[i])
+		best = max(best, dp[i])
 	}
-
-	for pq.Len() > 0 {
-		// it is dag, so no loop back
-		cur := heap.Pop(&pq).(*Item)
-		u := cur.id
-
-		best = max(best, cur.value)
-
-		for i := g.nodes[u]; i > 0; i = g.next[i] {
-			v := g.to[i]
-
-			if item[v].value < cur.value+p[v] {
-				item[v].value = cur.value + p[v]
-			}
-			deg[v]--
-			if deg[v] == 0 {
-				heap.Push(&pq, item[v])
-			}
-		}
-	}
-
 	return best
 }
 

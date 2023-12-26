@@ -143,8 +143,9 @@ func solve(n int, roads [][]int, A []int) bool {
 		vis[i] = -1
 	}
 
+	pq := make(PriorityQueue, 0, n)
+
 	span := func(u int) bool {
-		pq := make(PriorityQueue, 0, 10)
 		heap.Push(&pq, items[u])
 		var cnt int
 		for pq.Len() > 0 {

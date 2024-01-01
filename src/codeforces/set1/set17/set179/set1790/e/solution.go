@@ -97,6 +97,19 @@ func readNNums(reader *bufio.Reader, n int) []int {
 const H = 31
 
 func solve(x int) []int {
+	// a + b = a | b + a & b = a ^ b + a & b + a & b
+	// a & b = (a ^ b) / 2
+
+	y := x >> 1
+
+	if x&1 == 1 || x&y > 0 {
+		return nil
+	}
+
+	return []int{x | y, y}
+}
+
+func solve1(x int) []int {
 	// a ^ b = (a + b) / 2
 	// (a + b) = 2 * (a ^ b) = 2 * x
 	// 如果x的最高位 = 1 =》 a + b的最高位也为1

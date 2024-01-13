@@ -12,28 +12,17 @@ func main() {
 
 	tc := readNum(reader)
 
+	var buf bytes.Buffer
+
 	for tc > 0 {
 		tc--
-		n := readNum(reader)
-		a := readNNums(reader, n)
-
-		ask := func(rem []int) []int {
-			var buf bytes.Buffer
-			buf.WriteString(fmt.Sprintf("- %d", len(rem)))
-			for i := 0; i < len(rem); i++ {
-				buf.WriteString(fmt.Sprintf(" %d", rem[i]))
-			}
-			buf.WriteByte('\n')
-			fmt.Print(buf.String())
-			n -= len(rem)
-			return readNNums(reader, n)
-		}
-
-		res := solve(n, a, ask)
-
-		fmt.Printf("! %d\n", res)
+		n, m := readTwoNums(reader)
+		color := readNNums(reader, n)
+		res := solve(m, color)
+		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 
+	fmt.Print(buf.String())
 }
 
 func readString(reader *bufio.Reader) string {
@@ -122,60 +111,59 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func solve(n int, a []int, fn func([]int) []int) int {
-	//a := fn(nil)
-	freq := getFreq(a)
-	var newFreq []int
-outer:
-	for {
-		a = fn(nil)
-		newFreq = getFreq(a)
-		for j := 1; j <= 9; j++ {
-			if newFreq[j] != freq[j] {
-				break outer
-			}
-		}
-	}
-	var mimic int
-	// 最多两次
-	var rem []int
-	var arr []int
+func solve(k int, c []int) int {
+	n := len(c)
+
+	pos := make([][]int, k+1)
+
 	for i := 0; i < n; i++ {
-		x := a[i]
-		if freq[x] >= newFreq[x] {
-			rem = append(rem, i+1)
-		} else {
-			mimic = x
-			arr = append(arr, i+1)
+		x := c[i]
+		if pos[x] == nil {
+			pos[x] = make([]int, 0, 1)
 		}
+		pos[x] = append(pos[x], i)
 	}
 
-	if len(arr) == 1 {
-		return arr[0]
-	}
+	checkColor := func(j int, md int) bool {
+		ps := pos[j]
 
-	// 剩下的就是 newfreq[x] >
-	a = fn(rem)
-	for i, x := range a {
-		if x != mimic {
-			return i + 1
+		prev := -1
+		var change bool
+
+		for _, i := range ps {
+			gap := i - prev - 1
+			if gap > md {
+				if change || gap/2 > md {
+					return false
+				}
+				change = true
+			}
+			prev = i
 		}
+		return (n-prev-1 <= md) || (n-prev-1)/2 <= md && !change
 	}
 
-	for {
-		a = fn(nil)
-		for i, x := range a {
-			if x != mimic {
-				return i + 1
+	check := func(x int) bool {
+		// 是否能够最大间距，且最多改变一次某个plank的颜色，从1到n
+		// dp[i][0] 表示从i开始，且没有修改时，是否能够到达n
+		// dp[i][1] 表示从i开始，且已经修改过一次后，是否能够到达n
+		// dp[i][1] = dp[next[i][1] || some j, dp[j][0], 且 j - i - 1 <= x
+		for i := 1; i <= k; i++ {
+			if checkColor(i, x) {
+				return true
 			}
 		}
+		return false
 	}
-}
 
-func getFreq(a []int) []int {
-	freq := make([]int, 10)
-	for _, x := range a {
-		freq[x]++
+	l, r := 0, n
+	for l < r {
+		mid := (l + r) / 2
+		if check(mid) {
+			r = mid
+		} else {
+			l = mid + 1
+		}
 	}
-	return freq
+	return r
 }

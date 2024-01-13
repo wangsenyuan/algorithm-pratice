@@ -12,28 +12,17 @@ func main() {
 
 	tc := readNum(reader)
 
+	var buf bytes.Buffer
+
 	for tc > 0 {
 		tc--
 		n := readNum(reader)
 		a := readNNums(reader, n)
-
-		ask := func(rem []int) []int {
-			var buf bytes.Buffer
-			buf.WriteString(fmt.Sprintf("- %d", len(rem)))
-			for i := 0; i < len(rem); i++ {
-				buf.WriteString(fmt.Sprintf(" %d", rem[i]))
-			}
-			buf.WriteByte('\n')
-			fmt.Print(buf.String())
-			n -= len(rem)
-			return readNNums(reader, n)
-		}
-
-		res := solve(n, a, ask)
-
-		fmt.Printf("! %d\n", res)
+		res := solve(a)
+		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 
+	fmt.Print(buf.String())
 }
 
 func readString(reader *bufio.Reader) string {
@@ -122,60 +111,50 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func solve(n int, a []int, fn func([]int) []int) int {
-	//a := fn(nil)
-	freq := getFreq(a)
-	var newFreq []int
-outer:
-	for {
-		a = fn(nil)
-		newFreq = getFreq(a)
-		for j := 1; j <= 9; j++ {
-			if newFreq[j] != freq[j] {
-				break outer
-			}
-		}
-	}
-	var mimic int
-	// 最多两次
-	var rem []int
-	var arr []int
+func solve(a []int) int {
+	n := len(a)
+	ok := make([]bool, n+1)
+	var res int
 	for i := 0; i < n; i++ {
-		x := a[i]
-		if freq[x] >= newFreq[x] {
-			rem = append(rem, i+1)
-		} else {
-			mimic = x
-			arr = append(arr, i+1)
+		if a[i] == 0 {
+			continue
 		}
-	}
-
-	if len(arr) == 1 {
-		return arr[0]
-	}
-
-	// 剩下的就是 newfreq[x] >
-	a = fn(rem)
-	for i, x := range a {
-		if x != mimic {
-			return i + 1
+		res++
+		// a[i] > 0
+		var flag int
+		j := i
+		for i < n && a[i] > 0 {
+			flag |= a[i]
+			i++
 		}
-	}
 
-	for {
-		a = fn(nil)
-		for i, x := range a {
-			if x != mimic {
-				return i + 1
+		if flag&2 == 2 {
+			if j > 0 {
+				ok[j-1] = true
 			}
+			ok[i] = true
+			continue
+		}
+		// flag = 1
+		if j > 0 && !ok[j-1] {
+			ok[j-1] = true
+		} else {
+			ok[i] = true
+		}
+		// i = n or a[i] = 0
+	}
+
+	for i := 0; i < n; i++ {
+		if a[i] == 0 && !ok[i] {
+			res++
 		}
 	}
+	return res
 }
 
-func getFreq(a []int) []int {
-	freq := make([]int, 10)
-	for _, x := range a {
-		freq[x]++
+func max(a, b int) int {
+	if a >= b {
+		return a
 	}
-	return freq
+	return b
 }

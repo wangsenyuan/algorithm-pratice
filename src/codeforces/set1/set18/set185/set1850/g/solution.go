@@ -10,15 +10,18 @@ import (
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 
-	tc := 1
+	tc := readNum(reader)
 
 	var buf bytes.Buffer
 
 	for tc > 0 {
 		tc--
 		n := readNum(reader)
-		a := readNNums(reader, n)
-		res := solve(a)
+		coords := make([][]int, n)
+		for i := 0; i < n; i++ {
+			coords[i] = readNNums(reader, 2)
+		}
+		res := solve(coords)
 		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 
@@ -111,50 +114,35 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func solve(a []int) int {
-	n := len(a)
-	ok := make([]bool, n+1)
-	var res int
-	for i := 0; i < n; i++ {
-		if a[i] == 0 {
-			continue
-		}
-		res++
-		// a[i] > 0
-		var flag int
-		j := i
-		for i < n && a[i] > 0 {
-			flag |= a[i]
-			i++
-		}
+func solve(coords [][]int) int {
+	y := make(map[int]int)
+	x := make(map[int]int)
+	xy := make(map[int]int)
+	yx := make(map[int]int)
 
-		if flag&2 == 2 {
-			if j > 0 {
-				ok[j-1] = true
-			}
-			ok[i] = true
-			continue
-		}
-		// flag = 1
-		if j > 0 && !ok[j-1] {
-			ok[j-1] = true
-		} else {
-			ok[i] = true
-		}
-		// i = n or a[i] = 0
+	for _, coord := range coords {
+		a, b := coord[0], coord[1]
+		y[a]++
+		x[b]++
+		xy[a+b]++
+		yx[a-b]++
 	}
 
-	for i := 0; i < n; i++ {
-		if a[i] == 0 && !ok[i] {
-			res++
-		}
-	}
-	return res
-}
+	var ans int
 
-func max(a, b int) int {
-	if a >= b {
-		return a
+	for _, v := range y {
+		ans += v * (v - 1)
 	}
-	return b
+	for _, v := range x {
+		ans += v * (v - 1)
+	}
+
+	for _, v := range xy {
+		ans += v * (v - 1)
+	}
+	for _, v := range yx {
+		ans += v * (v - 1)
+	}
+
+	return ans
 }

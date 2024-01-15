@@ -4,21 +4,22 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"math"
 	"os"
 )
 
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 
-	tc := 1
+	tc := readNum(reader)
 
 	var buf bytes.Buffer
 
 	for tc > 0 {
 		tc--
-		n := readNum(reader)
+		n, c := readTwoNums(reader)
 		a := readNNums(reader, n)
-		res := solve(a)
+		res := solve(a, c)
 		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 
@@ -111,50 +112,49 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func solve(a []int) int {
-	n := len(a)
-	ok := make([]bool, n+1)
-	var res int
+func solve(s []int, c int) int {
+	// (s[i] + w ) ** 2 sum = c
+	x := s[0]
+	n := len(s)
 	for i := 0; i < n; i++ {
-		if a[i] == 0 {
-			continue
-		}
-		res++
-		// a[i] > 0
-		var flag int
-		j := i
-		for i < n && a[i] > 0 {
-			flag |= a[i]
-			i++
-		}
+		x = min(x, s[i])
+	}
+	// (x + 2 * w) ** 2 * n == c
 
-		if flag&2 == 2 {
-			if j > 0 {
-				ok[j-1] = true
-			}
-			ok[i] = true
-			continue
+	area := func(w int) int {
+		var res int
+		for i := 0; i < n; i++ {
+			res += (s[i] + 2*w) * (s[i] + 2*w)
 		}
-		// flag = 1
-		if j > 0 && !ok[j-1] {
-			ok[j-1] = true
-		} else {
-			ok[i] = true
-		}
-		// i = n or a[i] = 0
+		return res
 	}
 
-	for i := 0; i < n; i++ {
-		if a[i] == 0 && !ok[i] {
-			res++
-		}
-	}
-	return res
+	y := int(math.Sqrt(float64(c / n)))
+	w := (y + 10 - x) / 2
+
+	w = search(w, func(i int) bool {
+		return area(i) >= c
+	})
+
+	return w
 }
 
-func max(a, b int) int {
-	if a >= b {
+func min(a, b int) int {
+	if a <= b {
 		return a
 	}
 	return b
+}
+
+func search(n int, f func(int) bool) int {
+	l, r := 0, n
+	for l < r {
+		mid := (l + r) / 2
+		if f(mid) {
+			r = mid
+		} else {
+			l = mid + 1
+		}
+	}
+	return r
 }

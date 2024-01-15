@@ -10,16 +10,23 @@ import (
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 
-	tc := 1
+	tc := readNum(reader)
 
 	var buf bytes.Buffer
 
 	for tc > 0 {
 		tc--
-		n := readNum(reader)
-		a := readNNums(reader, n)
-		res := solve(a)
-		buf.WriteString(fmt.Sprintf("%d\n", res))
+		n, m := readTwoNums(reader)
+		conditions := make([][]int, m)
+		for i := 0; i < m; i++ {
+			conditions[i] = readNNums(reader, 3)
+		}
+		res := solve(n, conditions)
+		if res {
+			buf.WriteString("YES\n")
+		} else {
+			buf.WriteString("NO\n")
+		}
 	}
 
 	fmt.Print(buf.String())
@@ -111,50 +118,73 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func solve(a []int) int {
-	n := len(a)
-	ok := make([]bool, n+1)
-	var res int
-	for i := 0; i < n; i++ {
-		if a[i] == 0 {
-			continue
-		}
-		res++
-		// a[i] > 0
-		var flag int
-		j := i
-		for i < n && a[i] > 0 {
-			flag |= a[i]
-			i++
-		}
+const inf = 1 << 60
 
-		if flag&2 == 2 {
-			if j > 0 {
-				ok[j-1] = true
+func solve(n int, conditions [][]int) bool {
+	g := NewGraph(n, len(conditions)*2)
+
+	for _, cond := range conditions {
+		u, v, w := cond[0]-1, cond[1]-1, cond[2]
+		g.AddEdge(u, v, w)
+		g.AddEdge(v, u, -w)
+	}
+
+	vis := make([]bool, n)
+	dist := make([]int, n)
+
+	var dfs func(u int, sum int) bool
+
+	dfs = func(u int, sum int) bool {
+		vis[u] = true
+		dist[u] = sum
+
+		for i := g.nodes[u]; i > 0; i = g.next[i] {
+			v := g.to[i]
+			w := g.val[i]
+			if !vis[v] {
+				if !dfs(v, sum+w) {
+					return false
+				}
+			} else if sum+w != dist[v] {
+				return false
 			}
-			ok[i] = true
-			continue
 		}
-		// flag = 1
-		if j > 0 && !ok[j-1] {
-			ok[j-1] = true
-		} else {
-			ok[i] = true
-		}
-		// i = n or a[i] = 0
+		return true
 	}
 
 	for i := 0; i < n; i++ {
-		if a[i] == 0 && !ok[i] {
-			res++
+		if !vis[i] {
+			res := dfs(i, 0)
+			if !res {
+				return false
+			}
 		}
 	}
-	return res
+
+	return true
 }
 
-func max(a, b int) int {
-	if a >= b {
-		return a
-	}
-	return b
+type Graph struct {
+	nodes []int
+	next  []int
+	to    []int
+	val   []int
+	cur   int
+}
+
+func NewGraph(n int, e int) *Graph {
+	nodes := make([]int, n)
+	e++
+	next := make([]int, e)
+	to := make([]int, e)
+	val := make([]int, e)
+	return &Graph{nodes, next, to, val, 0}
+}
+
+func (g *Graph) AddEdge(u, v, w int) {
+	g.cur++
+	g.next[g.cur] = g.nodes[u]
+	g.nodes[u] = g.cur
+	g.to[g.cur] = v
+	g.val[g.cur] = w
 }

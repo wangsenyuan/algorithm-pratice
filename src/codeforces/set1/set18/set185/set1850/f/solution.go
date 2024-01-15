@@ -10,15 +10,15 @@ import (
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 
-	tc := 1
+	tc := readNum(reader)
 
 	var buf bytes.Buffer
 
 	for tc > 0 {
 		tc--
 		n := readNum(reader)
-		a := readNNums(reader, n)
-		res := solve(a)
+		frogs := readNNums(reader, n)
+		res := solve(frogs)
 		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 
@@ -111,45 +111,32 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func solve(a []int) int {
-	n := len(a)
-	ok := make([]bool, n+1)
-	var res int
-	for i := 0; i < n; i++ {
-		if a[i] == 0 {
-			continue
-		}
-		res++
-		// a[i] > 0
-		var flag int
-		j := i
-		for i < n && a[i] > 0 {
-			flag |= a[i]
-			i++
-		}
+func solve(frogs []int) int {
+	n := len(frogs)
 
-		if flag&2 == 2 {
-			if j > 0 {
-				ok[j-1] = true
-			}
-			ok[i] = true
-			continue
+	freq := make([]int, n+1)
+
+	for _, x := range frogs {
+		if x <= n {
+			freq[x]++
 		}
-		// flag = 1
-		if j > 0 && !ok[j-1] {
-			ok[j-1] = true
-		} else {
-			ok[i] = true
-		}
-		// i = n or a[i] = 0
 	}
 
-	for i := 0; i < n; i++ {
-		if a[i] == 0 && !ok[i] {
-			res++
+	cnt := make([]int, n+1)
+
+	for i := 2; i <= n; i++ {
+		for j := i; j <= n; j += i {
+			cnt[j] += freq[i]
 		}
 	}
-	return res
+
+	var ans int
+	for i := 2; i <= n; i++ {
+		ans = max(ans, cnt[i])
+	}
+	ans += freq[1]
+
+	return ans
 }
 
 func max(a, b int) int {

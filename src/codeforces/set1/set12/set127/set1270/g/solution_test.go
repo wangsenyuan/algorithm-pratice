@@ -2,10 +2,10 @@ package main
 
 import "testing"
 
-func runSample(t *testing.T, a []int32) {
+func runSample(t *testing.T, a []int) {
 	res := solve(a)
 
-	var sum int32
+	var sum int
 
 	for _, i := range res {
 		sum += a[i-1]
@@ -17,11 +17,11 @@ func runSample(t *testing.T, a []int32) {
 }
 
 func TestSample1(t *testing.T) {
-	a := []int32{0, 1, 2, 3, 4}
+	a := []int{0, 1, 2, 3, 4}
 	runSample(t, a)
 }
 
 func TestSample2(t *testing.T) {
-	a := []int32{-3, 1, 1, 1}
+	a := []int{-3, 1, 1, 1}
 	runSample(t, a)
 }

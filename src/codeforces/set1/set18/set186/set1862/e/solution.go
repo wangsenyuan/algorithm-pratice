@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"container/heap"
 	"fmt"
 	"os"
 )
@@ -16,9 +17,9 @@ func main() {
 
 	for tc > 0 {
 		tc--
-		n := readNum(reader)
+		n, m, d := readThreeNums(reader)
 		a := readNNums(reader, n)
-		res := solve(a)
+		res := solve(m, d, a)
 		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 
@@ -110,71 +111,54 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	}
 	return res
 }
-func solve(a []int) int {
-	n := len(a)
-	min_pos := 0
-	min_win_val := n
-	var res int
 
-	for i := 1; i < n; i++ {
-		var lose bool
-		if a[i] < a[min_pos] || min_win_val < a[i] {
-			lose = true
+func solve(m int, d int, a []int) int {
+	var sum int
+	var best int
+
+	n := len(a)
+
+	pq := make(IntHeap, 0, n)
+
+	for i := 1; i <= n; i++ {
+		x := max(0, a[i-1])
+		// 如果小于0，没有必要去访问
+		sum += x
+		heap.Push(&pq, x)
+		if pq.Len() > m {
+			// 最多只能有访问m个
+			sum -= heap.Pop(&pq).(int)
 		}
-		if !lose {
-			res++
-			if a[i] < min_win_val {
-				min_win_val = a[i]
-			}
-		}
-		if a[i] < a[min_pos] {
-			min_pos = i
-		}
+		best = max(best, sum-i*d)
 	}
 
-	return res
+	return best
 }
-func solve1(a []int) int {
-	// i是一个win/lose position对于进入的那个人来说
-	// 那么这里就是离开的那个人是相反的
-	// 如果i是目前最小的数, i 是一个 lose position
-	// 如果i不是目前最小的数，且右边存在一个win的position，那么它也是一个lose position
-	// 除此之外，它是一个win的position
-	n := len(a)
-	arr := make([]int, n+1)
 
-	set := func(p int) {
-		for i := p + 1; i <= n; i += i & -i {
-			arr[i]++
-		}
+func max(a, b int) int {
+	if a >= b {
+		return a
 	}
+	return b
+}
 
-	get := func(p int) int {
-		var res int
-		for i := p + 1; i > 0; i -= i & -i {
-			res += arr[i]
-		}
-		return res
-	}
+// An IntHeap is a min-heap of ints.
+type IntHeap []int
 
-	var res int
-	min_pos := 0
+func (h IntHeap) Len() int           { return len(h) }
+func (h IntHeap) Less(i, j int) bool { return h[i] < h[j] }
+func (h IntHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
 
-	for i := 1; i < n; i++ {
-		var lose bool
-		if a[i] < a[min_pos] || get(a[i]-1) > 0 {
-			// a lose position
-			lose = true
-		}
+func (h *IntHeap) Push(x interface{}) {
+	// Push and Pop use pointer receivers because they modify the slice's length,
+	// not just its contents.
+	*h = append(*h, x.(int))
+}
 
-		if !lose {
-			set(a[i] - 1)
-			res++
-		}
-		if a[i] < a[min_pos] {
-			min_pos = i
-		}
-	}
-
-	return res
+func (h *IntHeap) Pop() interface{} {
+	old := *h
+	n := len(old)
+	x := old[n-1]
+	*h = old[0 : n-1]
+	return x
 }

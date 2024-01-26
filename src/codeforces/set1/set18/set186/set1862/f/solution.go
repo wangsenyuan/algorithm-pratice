@@ -135,7 +135,7 @@ func solve(w int, f int, s []int) int {
 
 		for i := 0; i < n; i++ {
 			x := s[i]
-			dp.Copy(fp)
+			dp.CopyTo(fp)
 			fp.LeftShift(x)
 			dp.Union(fp)
 		}
@@ -258,7 +258,7 @@ func (bs *BitSet) RightShift(p int) {
 	}
 }
 
-func (bs *BitSet) Copy(that *BitSet) *BitSet {
+func (bs *BitSet) CopyTo(that *BitSet) *BitSet {
 	copy(that.arr, bs.arr)
 	return that
 }

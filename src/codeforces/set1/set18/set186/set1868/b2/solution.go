@@ -7,35 +7,6 @@ import (
 	"os"
 )
 
-const mod = 998244353
-
-func add(a, b int) int {
-	a += b
-	if a >= mod {
-		a -= mod
-	}
-	return a
-}
-
-// Efficient modular multiplication
-func mul(a, b int) int {
-	c := int64(a) * int64(b) % mod
-	return int(c)
-}
-
-// Fast modular exponentiation
-func pow(a, n int) int {
-	ans := 1
-	for n > 0 {
-		if n&1 == 1 {
-			ans = mul(ans, a)
-		}
-		a = mul(a, a)
-		n >>= 1
-	}
-	return ans
-}
-
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 
@@ -48,7 +19,11 @@ func main() {
 		n := readNum(reader)
 		a := readNNums(reader, n)
 		res := solve(a)
-		buf.WriteString(fmt.Sprintf("%d\n", res))
+		if res {
+			buf.WriteString("YES\n")
+		} else {
+			buf.WriteString("NO\n")
+		}
 	}
 
 	fmt.Print(buf.String())
@@ -140,53 +115,104 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func solve(a []int) int {
-	root := new(Node)
+const D = 31
+
+func solve(a []int) bool {
+	var sum int
 	for _, num := range a {
-		root.Add(num, 29)
+		sum += num
 	}
-	var ans int
-	var dfs func(node *Node, k int)
-	dfs = func(node *Node, k int) {
-		if node.children[0] != nil && node.children[1] != nil {
-			i := k + 1
-			ans = add(ans, mul(2*(i/2)+1, mul(node.children[0].cnt, node.children[1].cnt)))
-			ans = add(ans, mul(2*((i+1)/2), mul(node.children[0].cnt, node.children[1].cnt)))
+
+	n := len(a)
+
+	if sum%n != 0 {
+		return false
+	}
+	avg := sum / n
+
+	p1 := make([]int, D)
+	p2 := make([]int, D)
+	bit := make([]int, D)
+
+	for i := 0; i < n; i++ {
+		diff := avg - a[i]
+
+		if diff == 0 {
+			continue
 		}
-		if node.children[0] == nil && node.children[1] == nil {
-			i := k + 1
-			ans = add(ans, mul(i, mul(node.cnt, node.cnt)))
+
+		r, g := calc(abs(diff))
+		if r < 0 {
+			return false
 		}
-		if node.children[0] != nil {
-			dfs(node.children[0], k)
+		if r == g+1 {
+			// pow of 2
+			if a[i]+(1<<g) == avg {
+				p1[g]++
+			} else {
+				p2[g]++
+			}
+			continue
 		}
-		if node.children[1] != nil {
-			dfs(node.children[1], k+1)
+		if a[i]+(1<<r)-(1<<g) == avg {
+			bit[r]++
+			bit[g]--
+		} else {
+			bit[g]++
+			bit[r]--
 		}
 	}
-	dfs(root, 0)
 
-	n2 := pow(len(a), mod-2)
+	for i := D - 1; i >= 0; i-- {
+		bit[i] += p1[i] - p2[i]
+		if i == 0 {
+			break
+		}
+		if bit[i] < 0 {
+			p1[i-1] -= -bit[i]
+			bit[i-1] -= -bit[i]
+			if p1[i-1] < 0 {
+				return false
+			}
+		} else {
+			p2[i-1] -= bit[i]
+			bit[i-1] += bit[i]
+			if p2[i-1] < 0 {
+				return false
+			}
+		}
+	}
 
-	ans = mul(ans, n2)
-	ans = mul(ans, n2)
+	return bit[0] == 0
+}
 
-	return ans
+func abs(num int) int {
+	if num < 0 {
+		return -num
+	}
+	return num
+}
+
+func calc(num int) (receive int, give int) {
+	var lo int
+	for (num>>lo)&1 == 0 {
+		lo++
+	}
+	// num >> lo & 1 == 1
+	hi := lo
+	for (num>>hi)&1 == 1 {
+		num ^= 1 << hi
+		hi++
+	}
+	// num >> hi & 1 == 0
+	if num != 0 {
+		return -1, -1
+	}
+	return hi, lo
 }
 
 type Node struct {
-	children [2]*Node
-	cnt      int
-}
-
-func (node *Node) Add(num int, pos int) {
-	node.cnt++
-	if pos < 0 {
-		return
-	}
-	x := (num >> pos) & 1
-	if node.children[x] == nil {
-		node.children[x] = new(Node)
-	}
-	node.children[x].Add(num, pos-1)
+	id      int
+	receive int
+	give    int
 }

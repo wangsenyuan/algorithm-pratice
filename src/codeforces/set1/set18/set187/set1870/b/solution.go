@@ -7,35 +7,6 @@ import (
 	"os"
 )
 
-const mod = 998244353
-
-func add(a, b int) int {
-	a += b
-	if a >= mod {
-		a -= mod
-	}
-	return a
-}
-
-// Efficient modular multiplication
-func mul(a, b int) int {
-	c := int64(a) * int64(b) % mod
-	return int(c)
-}
-
-// Fast modular exponentiation
-func pow(a, n int) int {
-	ans := 1
-	for n > 0 {
-		if n&1 == 1 {
-			ans = mul(ans, a)
-		}
-		a = mul(a, a)
-		n >>= 1
-	}
-	return ans
-}
-
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 
@@ -45,10 +16,11 @@ func main() {
 
 	for tc > 0 {
 		tc--
-		n := readNum(reader)
+		n, m := readTwoNums(reader)
 		a := readNNums(reader, n)
-		res := solve(a)
-		buf.WriteString(fmt.Sprintf("%d\n", res))
+		b := readNNums(reader, m)
+		res := solve(a, b)
+		buf.WriteString(fmt.Sprintf("%d %d\n", res[0], res[1]))
 	}
 
 	fmt.Print(buf.String())
@@ -140,53 +112,22 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func solve(a []int) int {
-	root := new(Node)
-	for _, num := range a {
-		root.Add(num, 29)
+const D = 30
+
+func solve(a []int, b []int) []int {
+
+	var or int
+	for i := 0; i < len(b); i++ {
+		or |= b[i]
 	}
-	var ans int
-	var dfs func(node *Node, k int)
-	dfs = func(node *Node, k int) {
-		if node.children[0] != nil && node.children[1] != nil {
-			i := k + 1
-			ans = add(ans, mul(2*(i/2)+1, mul(node.children[0].cnt, node.children[1].cnt)))
-			ans = add(ans, mul(2*((i+1)/2), mul(node.children[0].cnt, node.children[1].cnt)))
-		}
-		if node.children[0] == nil && node.children[1] == nil {
-			i := k + 1
-			ans = add(ans, mul(i, mul(node.cnt, node.cnt)))
-		}
-		if node.children[0] != nil {
-			dfs(node.children[0], k)
-		}
-		if node.children[1] != nil {
-			dfs(node.children[1], k+1)
-		}
+
+	res := make([]int, 2)
+
+	n := len(a)
+	for i := 0; i < n; i++ {
+		res[0] ^= a[i]
+		res[1] ^= (a[i] | or)
 	}
-	dfs(root, 0)
 
-	n2 := pow(len(a), mod-2)
-
-	ans = mul(ans, n2)
-	ans = mul(ans, n2)
-
-	return ans
-}
-
-type Node struct {
-	children [2]*Node
-	cnt      int
-}
-
-func (node *Node) Add(num int, pos int) {
-	node.cnt++
-	if pos < 0 {
-		return
-	}
-	x := (num >> pos) & 1
-	if node.children[x] == nil {
-		node.children[x] = new(Node)
-	}
-	node.children[x].Add(num, pos-1)
+	return res
 }

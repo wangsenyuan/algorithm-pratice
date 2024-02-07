@@ -16,11 +16,11 @@ func main() {
 
 	for tc > 0 {
 		tc--
-		n, m := readTwoNums(reader)
+		n, k := readTwoNums(reader)
 		a := readNNums(reader, n)
-		b := readNNums(reader, m)
-		res := solve(a, b)
-		buf.WriteString(fmt.Sprintf("%d %d\n", res[0], res[1]))
+		h := readNNums(reader, n)
+		res := solve(a, h, k)
+		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 
 	fmt.Print(buf.String())
@@ -112,24 +112,40 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-const D = 30
-
-func solve(a []int, b []int) []int {
-
-	var or int
-	for i := 0; i < len(b); i++ {
-		or |= b[i]
-	}
-
-	res := make([]int, 2)
-
+func solve(a []int, h []int, k int) int {
 	n := len(a)
-	for i := 0; i < n; i++ {
-		res[0] ^= a[i]
-		res[1] ^= (a[i] | or)
+	R := make([]int, n)
+	R[n-1] = n - 1
+	for i := n - 2; i >= 0; i-- {
+		R[i] = i
+		if h[i]%h[i+1] == 0 {
+			R[i] = R[i+1]
+		}
 	}
 
-	return []int{min(res[0], res[1]), max(res[1], res[0])}
+	var ans int
+	var sum int
+	for l, r := n-1, n-1; l >= 0; l-- {
+		sum += a[l]
+		for r > R[l] {
+			sum -= a[r]
+			r--
+		}
+		for sum > k {
+			sum -= a[r]
+			r--
+		}
+		ans = max(ans, r-l+1)
+	}
+
+	return ans
+}
+
+func min(a, b int) int {
+	if a <= b {
+		return a
+	}
+	return b
 }
 
 func max(a, b int) int {
@@ -137,8 +153,4 @@ func max(a, b int) int {
 		return a
 	}
 	return b
-}
-
-func min(a, b int) int {
-	return a + b - max(a, b)
 }

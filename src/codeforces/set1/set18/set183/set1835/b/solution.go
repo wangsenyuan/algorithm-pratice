@@ -5,21 +5,21 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"sort"
 )
 
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 
-	tc := readNum(reader)
+	tc := 1
 
 	var buf bytes.Buffer
 
 	for tc > 0 {
 		tc--
-		n, m := readTwoNums(reader)
+		n, m, k := readThreeNums(reader)
 		a := readNNums(reader, n)
-		b := readNNums(reader, m)
-		res := solve(a, b)
+		res := solve(m, k, a)
 		buf.WriteString(fmt.Sprintf("%d %d\n", res[0], res[1]))
 	}
 
@@ -112,24 +112,53 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-const D = 30
-
-func solve(a []int, b []int) []int {
-
-	var or int
-	for i := 0; i < len(b); i++ {
-		or |= b[i]
-	}
-
-	res := make([]int, 2)
+func solve(m int, k int, a []int) []int {
+	sort.Ints(a)
 
 	n := len(a)
+
+	a = append(a, m+1)
+
+	var pl, pr int
+
+	f := func(pos int) int {
+		for pl < n && a[pl] < pos {
+			pl++
+		}
+		for pr < n && a[pr] <= pos {
+			pr++
+		}
+		x, y := 0, m
+		if pr >= k {
+			x = (pos+a[pr-k])/2 + 1
+		}
+		if pl+k-1 < n {
+			y = (a[pl+k-1] + pos - 1) / 2
+		}
+		return max(0, y-x+1)
+	}
+	res := f(0)
+	best := 0
+
 	for i := 0; i < n; i++ {
-		res[0] ^= a[i]
-		res[1] ^= (a[i] | or)
+		var pos int
+		if i == 0 {
+			pos = max(0, a[i]-2)
+		} else {
+			pos = max(a[i]-2, a[i-1]+3)
+		}
+		kon := min(m, a[i]+2)
+
+		for s := pos; s <= kon; s++ {
+			cur := f(s)
+			if cur > res {
+				res = cur
+				best = s
+			}
+		}
 	}
 
-	return []int{min(res[0], res[1]), max(res[1], res[0])}
+	return []int{res, best}
 }
 
 func max(a, b int) int {
@@ -140,5 +169,8 @@ func max(a, b int) int {
 }
 
 func min(a, b int) int {
-	return a + b - max(a, b)
+	if a <= b {
+		return a
+	}
+	return b
 }

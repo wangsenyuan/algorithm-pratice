@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"sort"
 )
 
 func main() {
@@ -16,11 +17,9 @@ func main() {
 
 	for tc > 0 {
 		tc--
-		n, m := readTwoNums(reader)
-		a := readNNums(reader, n)
-		b := readNNums(reader, m)
-		res := solve(a, b)
-		buf.WriteString(fmt.Sprintf("%d %d\n", res[0], res[1]))
+		s := readString(reader)
+		res := solve(s)
+		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 
 	fmt.Print(buf.String())
@@ -112,24 +111,39 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-const D = 30
-
-func solve(a []int, b []int) []int {
-
-	var or int
-	for i := 0; i < len(b); i++ {
-		or |= b[i]
-	}
-
-	res := make([]int, 2)
-
-	n := len(a)
+func solve(s string) int {
+	// AB => BC
+	// BA => CB
+	// BA 变成CB, 仍然有机会处理B
+	// BAA => CBA => CCB
+	// AAB => ABC => BCC
+	// BAAAAAB => CCCCCBB or BBCCCCC
+	// ABBBBA, 所以，貌似只要数一下A的数量就可以了
+	// A变成了C，并且向前或者向后移动了一下
+	n := len(s)
+	var cnt []int
+	var prev int
 	for i := 0; i < n; i++ {
-		res[0] ^= a[i]
-		res[1] ^= (a[i] | or)
+		if s[i] == 'B' {
+			cnt = append(cnt, i-prev)
+			prev = i + 1
+		}
+	}
+	if prev > 0 {
+		cnt = append(cnt, n-prev)
+	}
+	// no 'B'
+	if len(cnt) == 0 {
+		return 0
+	}
+	sort.Ints(cnt)
+	var res int
+
+	for i := 1; i < len(cnt); i++ {
+		res += cnt[i]
 	}
 
-	return []int{min(res[0], res[1]), max(res[1], res[0])}
+	return res
 }
 
 func max(a, b int) int {
@@ -139,6 +153,12 @@ func max(a, b int) int {
 	return b
 }
 
-func min(a, b int) int {
-	return a + b - max(a, b)
+func min(arr ...int) int {
+	res := arr[0]
+	for i := 1; i < len(arr); i++ {
+		if res > arr[i] {
+			res = arr[i]
+		}
+	}
+	return res
 }

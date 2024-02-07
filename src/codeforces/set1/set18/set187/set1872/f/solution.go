@@ -16,11 +16,13 @@ func main() {
 
 	for tc > 0 {
 		tc--
-		n, m := readTwoNums(reader)
+		n := readNum(reader)
 		a := readNNums(reader, n)
-		b := readNNums(reader, m)
-		res := solve(a, b)
-		buf.WriteString(fmt.Sprintf("%d %d\n", res[0], res[1]))
+		c := readNNums(reader, n)
+		res := solve(c, a)
+		s := fmt.Sprintf("%v", res)
+		s = s[1 : len(s)-1]
+		buf.WriteString(fmt.Sprintf("%s\n", s))
 	}
 
 	fmt.Print(buf.String())
@@ -112,33 +114,76 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-const D = 30
-
-func solve(a []int, b []int) []int {
-
-	var or int
-	for i := 0; i < len(b); i++ {
-		or |= b[i]
-	}
-
-	res := make([]int, 2)
-
+func solve(c []int, a []int) []int {
 	n := len(a)
+	deg := make([]int, n)
 	for i := 0; i < n; i++ {
-		res[0] ^= a[i]
-		res[1] ^= (a[i] | or)
+		deg[a[i]-1]++
 	}
 
-	return []int{min(res[0], res[1]), max(res[1], res[0])}
-}
+	vis := make([]bool, n)
 
-func max(a, b int) int {
-	if a >= b {
-		return a
+	ans := make([]int, n)
+	l, r := 0, n-1
+
+	handle := func(cycle []int) {
+		var it int
+		m := len(cycle)
+		for i := 0; i < m; i++ {
+			if c[cycle[i]] < c[cycle[it]] {
+				it = i
+			}
+		}
+
+		// it 是最后一个
+		for i := 0; i < m; i++ {
+			j := (it - i + m) % m
+			ans[r] = cycle[j] + 1
+			r--
+		}
 	}
-	return b
-}
 
-func min(a, b int) int {
-	return a + b - max(a, b)
+	que := make([]int, n)
+	var front, tail int
+	for u := 0; u < n; u++ {
+		if deg[u] == 0 {
+			vis[u] = true
+			que[front] = u
+			front++
+		}
+	}
+
+	for tail < front {
+		u := que[tail]
+		tail++
+		ans[l] = u + 1
+		l++
+		v := a[u] - 1
+		deg[v]--
+		if deg[v] == 0 {
+			que[front] = v
+			vis[v] = true
+			front++
+		}
+	}
+
+	// only cycles left
+	for u := 0; u < n; u++ {
+		if !vis[u] {
+			vis[u] = true
+			var pos int
+			y := a[u] - 1
+			for y != u {
+				vis[y] = true
+				que[pos] = y
+				pos++
+				y = a[y] - 1
+			}
+			que[pos] = y
+			pos++
+			handle(que[:pos])
+		}
+	}
+
+	return ans
 }

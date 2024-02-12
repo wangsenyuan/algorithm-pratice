@@ -5,26 +5,36 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"sort"
 )
 
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 
 	tc := readNum(reader)
+
 	var buf bytes.Buffer
+
 	for tc > 0 {
 		tc--
-		n, k := readTwoNums(reader)
-		b := readNNums(reader, k)
-		res := solve(n, k, b)
-		if res {
-			buf.WriteString("YES\n")
-		} else {
-			buf.WriteString("NO\n")
-		}
+		n, p := readTwoNums(reader)
+		a := readNNums(reader, n)
+		b := readNNums(reader, n)
+		res := solve(a, b, p)
+		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 
 	fmt.Print(buf.String())
+}
+
+func readString(reader *bufio.Reader) string {
+	s, _ := reader.ReadString('\n')
+	for i := 0; i < len(s); i++ {
+		if s[i] == '\n' || s[i] == '\r' {
+			return s[:i]
+		}
+	}
+	return s
 }
 
 func readNInt64s(reader *bufio.Reader, n int) []int64 {
@@ -54,26 +64,6 @@ func readInt64(bytes []byte, from int, val *int64) int {
 	}
 	*val = tmp * sign
 	return i
-}
-
-func readString(reader *bufio.Reader) string {
-	s, _ := reader.ReadString('\n')
-	for i := 0; i < len(s); i++ {
-		if s[i] == '\n' || s[i] == '\r' {
-			return s[:i]
-		}
-	}
-	return s
-}
-
-func normalize(s string) string {
-
-	for i := len(s); i > 0; i-- {
-		if s[i-1] >= 'a' && s[i-1] <= 'z' {
-			return s[:i]
-		}
-	}
-	return ""
 }
 
 func readInt(bytes []byte, from int, val *int) int {
@@ -123,27 +113,36 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func solve(n int, k int, b []int) bool {
-	// b[0] = s[n-k]
-	// b[1] = s[n-k+1] = s[n-k] + a[n-k+1] = b[0] + a[n-k+1]
-	// b[2] = s[n-k+2] = b[1] + a[n-k+2]
-	// 先判断后面的
-	if k == 1 {
-		return true
+func solve(a []int, b []int, p int) int {
+	n := len(a)
+	// 那些cost >= p的部分，应该直接通知
+	arr := make([]Pair, n)
+	for i := 0; i < n; i++ {
+		arr[i] = Pair{a[i], b[i]}
 	}
-	if k > 1 {
-		cur := b[1] - b[0]
-		for i := 2; i < k; i++ {
-			tmp := b[i] - b[i-1]
-			if tmp < cur {
-				return false
-			}
-			cur = tmp
+
+	sort.Slice(arr, func(i, j int) bool {
+		return arr[i].second < arr[j].second || arr[i].second == arr[j].second && arr[i].first > arr[j].first
+	})
+
+	res := p
+	cnt := 1
+	for i := 0; i < n && arr[i].second <= p; i++ {
+		if cnt+arr[i].first <= n {
+			cnt += arr[i].first
+			res += arr[i].first * arr[i].second
+		} else {
+			res += (n - cnt) * arr[i].second
+			cnt = n
 		}
 	}
-	// 全部是最后一个，看最后一个是否能比最后一个小
-	cur := b[1] - b[0]
-	sum := b[0]
 
-	return sum <= cur*(n-k+1)
+	res += (n - cnt) * p
+
+	return res
+}
+
+type Pair struct {
+	first  int
+	second int
 }

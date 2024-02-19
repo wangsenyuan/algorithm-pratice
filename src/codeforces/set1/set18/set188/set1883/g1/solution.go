@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"sort"
 )
 
 func main() {
@@ -16,10 +17,10 @@ func main() {
 
 	for tc > 0 {
 		tc--
-		n := readNum(reader)
-		a := readNNums(reader, n)
-		res := solve(a)
-
+		n, _ := readTwoNums(reader)
+		a := readNNums(reader, n-1)
+		b := readNNums(reader, n)
+		res := solve(a, b)
 		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 
@@ -112,65 +113,34 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func solve(a []int) int {
-	// 从左往右，贪心处理，但问题是，会溢出
-	var res int
-	n := len(a)
-	// 这个是前面的数左移的数量
-	var prev int
-	for i := 1; i < n; i++ {
-		x := getDigits(a[i-1])
-		y := getDigits(a[i])
-		if len(x)+prev >= len(y) {
-			tmp := len(x) + prev - len(y)
-			ok := true
-			var j int
-			for j < len(x) {
-				var v int
-				if j < len(y) {
-					v = y[j]
-				}
-				if x[j] < v {
-					break
-				}
-				if x[j] > v {
-					ok = false
-					break
-				}
-				j++
+func solve(a []int, b []int) int {
+	// a[1] = 1
+	n := len(a) + 1
+	arr := make([]int, n)
+	arr[0] = 1
+	copy(arr[1:], a)
+	sort.Ints(arr)
+	sort.Ints(b)
+	// 删除a的尾部，和b的头部
+	check := func(k int) bool {
+		for i := 0; i+k < n; i++ {
+			if arr[i] >= b[i+k] {
+				return false
 			}
+		}
 
-			if !ok {
-				tmp++
-			}
-			res += tmp
-			prev = tmp
+		return true
+	}
+
+	l, r := 0, n
+
+	for l < r {
+		mid := (l + r) >> 1
+		if check(mid) {
+			r = mid
 		} else {
-			prev = 0
+			l = mid + 1
 		}
 	}
-	return res
-}
-
-func max(a, b int) int {
-	if a >= b {
-		return a
-	}
-	return b
-}
-
-func getDigits(num int) []int {
-	var res []int
-	for num > 0 {
-		res = append(res, num&1)
-		num >>= 1
-	}
-	reverse(res)
-	return res
-}
-
-func reverse(arr []int) {
-	for i, j := 0, len(arr)-1; i < j; i, j = i+1, j-1 {
-		arr[i], arr[j] = arr[j], arr[i]
-	}
+	return r
 }

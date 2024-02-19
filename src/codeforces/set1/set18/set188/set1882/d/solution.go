@@ -130,6 +130,68 @@ func solve(n int, edges [][]int, a []int) []int {
 		g.AddEdge(v, u)
 	}
 	ans := make([]int, n)
+	sz := make([]int, n)
+
+	dp := make([]int, n)
+
+	var dfs func(p int, u int)
+
+	dfs = func(p int, u int) {
+		for i := g.nodes[u]; i > 0; i = g.next[i] {
+			v := g.to[i]
+			if v != p {
+				dfs(u, v)
+				sz[u] += sz[v]
+				dp[u] += dp[v]
+				dp[u] += sz[v] * (a[u] ^ a[v])
+			}
+		}
+		sz[u]++
+	}
+
+	dfs(-1, 0)
+
+	ans[0] = dp[0]
+
+	var dfs2 func(p int, u int)
+	dfs2 = func(p int, u int) {
+		if p >= 0 {
+			dp[u] += dp[p]
+			dp[u] += sz[p] * (a[p] ^ a[u])
+			ans[u] = dp[u]
+		}
+
+		for i := g.nodes[u]; i > 0; i = g.next[i] {
+			v := g.to[i]
+			if p != v {
+				sz[u] = n - sz[v]
+				ou := dp[u]
+				dp[u] -= dp[v]
+				dp[u] -= sz[v] * (a[u] ^ a[v])
+				dfs2(u, v)
+
+				dp[u] = ou
+				sz[u] = n
+			}
+		}
+	}
+
+	dfs2(-1, 0)
+
+	return ans
+}
+
+func solve1(n int, edges [][]int, a []int) []int {
+	g := NewGraph(n, 2*n)
+
+	for _, edge := range edges {
+		u, v := edge[0], edge[1]
+		u--
+		v--
+		g.AddEdge(u, v)
+		g.AddEdge(v, u)
+	}
+	ans := make([]int, n)
 
 	// dp[i][x] = 将i子树中的都设置位0/1时的最小操作数
 	dp := make([][]int, n)

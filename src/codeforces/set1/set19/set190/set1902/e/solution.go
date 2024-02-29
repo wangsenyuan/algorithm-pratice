@@ -72,7 +72,7 @@ func solve(words []string) int {
 			x := int(word[i] - 'a')
 			next := node.children[x]
 			if next != nil {
-				res -= next.cnt * 2
+				res -= int(next.cnt * 2)
 			}
 			node = next
 		}
@@ -91,7 +91,7 @@ func reverse(s string) string {
 
 type Trie struct {
 	children []*Trie
-	cnt      int
+	cnt      uint32
 }
 
 func NewTrie() *Trie {

@@ -31,35 +31,6 @@ func readString(reader *bufio.Reader) string {
 	return s
 }
 
-func readNInt64s(reader *bufio.Reader, n int) []int64 {
-	res := make([]int64, n)
-	s, _ := reader.ReadBytes('\n')
-
-	var pos int
-
-	for i := 0; i < n; i++ {
-		pos = readInt64(s, pos, &res[i]) + 1
-	}
-
-	return res
-}
-
-func readInt64(bytes []byte, from int, val *int64) int {
-	i := from
-	var sign int64 = 1
-	if bytes[i] == '-' {
-		sign = -1
-		i++
-	}
-	var tmp int64
-	for i < len(bytes) && bytes[i] >= '0' && bytes[i] <= '9' {
-		tmp = tmp*10 + int64(bytes[i]-'0')
-		i++
-	}
-	*val = tmp * sign
-	return i
-}
-
 func readInt(bytes []byte, from int, val *int) int {
 	i := from
 	sign := 1
@@ -82,33 +53,8 @@ func readNum(reader *bufio.Reader) (a int) {
 	return
 }
 
-func readTwoNums(reader *bufio.Reader) (a int, b int) {
-	res := readNNums(reader, 2)
-	a, b = res[0], res[1]
-	return
-}
-
-func readThreeNums(reader *bufio.Reader) (a int, b int, c int) {
-	res := readNNums(reader, 3)
-	a, b, c = res[0], res[1], res[2]
-	return
-}
-
-func readNNums(reader *bufio.Reader, n int) []int {
-	res := make([]int, n)
-	x := 0
-	bs, _ := reader.ReadBytes('\n')
-	for i := 0; i < n; i++ {
-		for x < len(bs) && (bs[x] < '0' || bs[x] > '9') && bs[x] != '-' {
-			x++
-		}
-		x = readInt(bs, x, &res[i])
-	}
-	return res
-}
-
 func solve(words []string) int {
-	t := new(Trie)
+	t := NewTrie()
 	var sum int
 	for _, word := range words {
 		t.Add(reverse(word), 0)
@@ -121,16 +67,15 @@ func solve(words []string) int {
 	for _, word := range words {
 		node := t
 		ln := len(word)
-		tmp := sum + ln*n
+		res += sum + ln*n
 		for i := 0; i < ln && node != nil; i++ {
 			x := int(word[i] - 'a')
 			next := node.children[x]
 			if next != nil {
-				tmp -= next.cnt * 2
+				res -= next.cnt * 2
 			}
 			node = next
 		}
-		res += tmp
 	}
 
 	return res
@@ -145,8 +90,14 @@ func reverse(s string) string {
 }
 
 type Trie struct {
-	children [26]*Trie
+	children []*Trie
 	cnt      int
+}
+
+func NewTrie() *Trie {
+	res := new(Trie)
+	res.children = make([]*Trie, 26)
+	return res
 }
 
 func (t *Trie) Add(word string, i int) {
@@ -158,7 +109,8 @@ func (t *Trie) Add(word string, i int) {
 
 	x := int(word[i] - 'a')
 	if t.children[x] == nil {
-		t.children[x] = new(Trie)
+		t.children[x] = NewTrie()
+
 	}
 	t.children[x].Add(word, i+1)
 }

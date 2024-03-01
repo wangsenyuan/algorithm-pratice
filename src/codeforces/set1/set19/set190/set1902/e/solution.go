@@ -53,7 +53,7 @@ func readNum(reader *bufio.Reader) (a int) {
 	return
 }
 
-func solve(words []string) int {
+func solve1(words []string) int {
 	t := NewTrie()
 	var sum int
 	for _, word := range words {
@@ -113,4 +113,47 @@ func (t *Trie) Add(word string, i int) {
 
 	}
 	t.children[x].Add(word, i+1)
+}
+
+func solve(words []string) int {
+	freq := make(map[Key]int)
+	var sum int
+	for _, w := range words {
+		w = reverse(w)
+		var key Key
+		for i := 0; i < len(w); i++ {
+			key = key.Add(int(w[i]-'a') + 1)
+			freq[key]++
+		}
+		sum += len(w)
+	}
+	var res int
+	n := len(words)
+	for _, w := range words {
+		res += sum + n*len(w)
+		var key Key
+		for i := 0; i < len(w); i++ {
+			key = key.Add(int(w[i]-'a') + 1)
+			res -= 2 * freq[key]
+		}
+	}
+
+	return res
+}
+
+const M1 = 10000000007
+const M2 = 10000000009
+
+const B1 = 29
+const B2 = 31
+
+type Key struct {
+	first  int
+	second int
+}
+
+func (this Key) Add(v int) Key {
+	first := (this.first*B1%M1 + v) % M1
+	second := (this.second*B2%M2 + v) % M2
+	return Key{first, second}
 }

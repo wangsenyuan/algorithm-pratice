@@ -94,6 +94,20 @@ func readNNums(reader *bufio.Reader, n int) []int {
 const H = 62
 
 func solve(n int, x int) int {
+	if n == x {
+		return n
+	}
+	for n > x {
+		lo := n & -n
+		n ^= lo
+		if n == x && n&(lo<<1) == 0 {
+			return n | (lo << 1)
+		}
+	}
+	return -1
+}
+
+func solve1(n int, x int) int {
 	// if n[d] = 0, but x[d] = 1 => -1
 	// if n[d] = 0, x[d] must be 0, and no constraints on m
 	//    n[d] = 1, but x[d] = 1 => m[d] = 1,

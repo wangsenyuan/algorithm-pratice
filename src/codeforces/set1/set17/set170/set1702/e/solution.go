@@ -115,6 +115,67 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 
 func solve(dominoes [][]int) bool {
 	n := len(dominoes)
+	uf := NewUF(n + 1)
+	freq := make([]int, n+1)
+
+	for _, cur := range dominoes {
+		u, v := cur[0], cur[1]
+		freq[u]++
+		freq[v]++
+		if freq[u] > 2 || freq[v] > 2 {
+			return false
+		}
+		uf.Union(u, v)
+	}
+
+	for i := 1; i <= n; i++ {
+		j := uf.Find(i)
+		if i == j && uf.cnt[j]%2 == 1 {
+			return false
+		}
+	}
+
+	return true
+}
+
+type UF struct {
+	arr []int
+	cnt []int
+}
+
+func NewUF(n int) UF {
+	arr := make([]int, n)
+	cnt := make([]int, n)
+	for i := 0; i < n; i++ {
+		arr[i] = i
+		cnt[i]++
+	}
+	return UF{arr, cnt}
+}
+
+func (uf *UF) Find(x int) int {
+	if uf.arr[x] != x {
+		uf.arr[x] = uf.Find(uf.arr[x])
+	}
+	return uf.arr[x]
+}
+
+func (uf *UF) Union(a, b int) bool {
+	pa := uf.Find(a)
+	pb := uf.Find(b)
+	if pa == pb {
+		return false
+	}
+	if uf.cnt[pa] < uf.cnt[pb] {
+		pa, pb = pb, pa
+	}
+	uf.cnt[pa] += uf.cnt[pb]
+	uf.arr[pb] = pa
+	return true
+}
+
+func solve1(dominoes [][]int) bool {
+	n := len(dominoes)
 	// 每个节点最多两条边
 	g := NewGraph(n+1, 2*n)
 

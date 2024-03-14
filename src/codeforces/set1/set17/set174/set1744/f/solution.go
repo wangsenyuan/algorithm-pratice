@@ -82,6 +82,28 @@ func readNNums(reader *bufio.Reader, n int) []int {
 
 func solve(p []int) int64 {
 	n := len(p)
+	pos := make([]int, n)
+
+	for i, x := range p {
+		pos[x] = i
+	}
+
+	ans := 1
+	l, r := pos[0], pos[0]
+
+	for m := 2; m <= n; m++ {
+		i := pos[(m-1)/2]
+		l = min(l, min(i, n-m))
+		r = max(r, max(i, m-1))
+		// 只要包含了区间[l...r], 且长度为m的区间，即满足 mex > median (m-1) / 2
+		ans += max(m-(r-l), 0)
+	}
+
+	return int64(ans)
+}
+
+func solve1(p []int) int64 {
+	n := len(p)
 	if n == 1 {
 		return 1
 	}

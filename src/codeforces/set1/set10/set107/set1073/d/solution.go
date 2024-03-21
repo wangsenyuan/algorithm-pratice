@@ -125,14 +125,18 @@ func solve(a []int, tot int) int {
 	var res int
 	pos := 0
 
+	cancel := func(i int) {
+		sum.Update(i, 0)
+		cnt.Update(i, 0)
+	}
+
 	for cur > 0 && pq.Len() > 0 {
 		it := heap.Pop(&pq).(*Item)
 		i := it.id
 
 		if it.priority > cur {
 			// no use
-			sum.Update(i, 0)
-			cnt.Update(i, 0)
+			cancel(i)
 			continue
 		}
 		if pos < i {
@@ -141,8 +145,7 @@ func solve(a []int, tot int) int {
 			if tmp > cur {
 				// not able to reach here
 				// cancel it
-				sum.Update(i, 0)
-				cnt.Update(i, 0)
+				cancel(i)
 				continue
 			}
 			res += cnt.Get(pos, i)
@@ -150,8 +153,7 @@ func solve(a []int, tot int) int {
 		} else if pos > i {
 			tmp := sum.Get(pos, n) + sum.Get(0, i)
 			if tmp > cur {
-				sum.Update(i, 0)
-				cnt.Update(i, 0)
+				cancel(i)
 				continue
 			}
 			res += cnt.Get(pos, n) + cnt.Get(0, i)
@@ -167,8 +169,7 @@ func solve(a []int, tot int) int {
 			res++
 			cur -= it.priority
 		}
-		sum.Update(i, 0)
-		cnt.Update(i, 0)
+		cancel(i)
 		pos = i
 	}
 

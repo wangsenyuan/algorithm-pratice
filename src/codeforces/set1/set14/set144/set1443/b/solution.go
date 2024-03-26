@@ -111,6 +111,71 @@ func readNNums(reader *bufio.Reader, n int) []int {
 }
 
 func solve(s string, a int, b int) int {
+	var res int
+	var flag bool
+	var cnt int
+	for i := 0; i < len(s); i++ {
+		if s[i] == '1' {
+			if flag {
+				res += min(cnt*b, a)
+			}
+			flag = true
+			cnt = 0
+		} else {
+			cnt++
+		}
+	}
+
+	if !flag {
+		return 0
+	}
+	return res + a
+}
+
+func solve2(s string, a int, b int) int {
+	// 一种方案是，完全不使用操作2
+	// 把连续的1，都是用操作1
+	// 或者把部分1中间的部分，通过2换成1，然后再引爆
+	// 假设三段分别是x,y,z
+	// a + a => a + y * b
+	// 也就是说如果 y * b < a, 那么就有利可图
+	n := len(s)
+	var res int
+	cnt := []int{0, 0}
+	for i := 0; i < n; {
+		if s[i] == '1' {
+			if cnt[1] == 0 {
+				res += a
+				cnt[0] = 0
+			}
+			if cnt[1] > 0 && cnt[0] > 0 {
+				if cnt[0]*b <= a {
+					res += cnt[0] * b
+				} else {
+					res += a
+					cnt[1] = 0
+				}
+				cnt[0] = 0
+
+			}
+
+			cnt[1]++
+			i++
+			continue
+		}
+		cnt[0] = 0
+		// s[i] == 0
+		for i < n && s[i] == '0' {
+			i++
+			cnt[0]++
+		}
+
+	}
+
+	return res
+}
+
+func solve1(s string, a int, b int) int {
 	// n <= 1e5
 	// 一段连续的mines，只需要一个a
 	// dp[i][j] dp[i][0] 表示前i个buildings中的所有的mines都引爆时，且(j=0)第i个没有mine

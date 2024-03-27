@@ -85,29 +85,67 @@ func readNNums(reader *bufio.Reader, n int) []int {
 }
 
 func solve(s string, t string) [][]int {
+	n := len(s)
+	m := len(t)
+
+	s = "$" + s + "$"
+
+	pos1 := make([]bool, len(s))
+	pos2 := make([]bool, len(s))
+
+	t += "#"
+
+	var ans [][]int
+	for i := 0; i < m; {
+		var found bool
+		cur := Pair{-1, -1}
+		for j := 1; j <= n; j++ {
+			pos1[j] = s[j] == t[i]
+			pos2[j] = s[j] == t[i]
+			found = found || pos1[j]
+		}
+		for ln := 1; found; i, ln = i+1, ln+1 {
+			found = false
+			for j := 1; j <= n; j++ {
+				if pos2[j] {
+					cur = Pair{j + ln - 1, j}
+				}
+				pos2[j] = pos2[j+1] && s[j] == t[i+1]
+				found = found || pos2[j]
+			}
+			for j := n; j >= 1; j-- {
+				if pos1[j] {
+					cur = Pair{j - ln + 1, j}
+				}
+				pos1[j] = pos1[j-1] && s[j] == t[i+1]
+				found = found || pos1[j]
+			}
+		}
+		if cur.first < 0 {
+			return nil
+		}
+		ans = append(ans, []int{cur.first, cur.second})
+	}
+
+	return ans
+}
+func solve1(s string, t string) [][]int {
 	// dp[i] 表示到t[i]为止能够获得的最少的操作数
 	// dp[i] = dp[j] + 1 if t[j+1...i]是s的一个子串（反字串）
 	n := len(s)
-	forward := make([]map[Key]int, n+1)
-	back := make([]map[Key]int, n+1)
-
-	for i := 1; i <= n; i++ {
-		forward[i] = make(map[Key]int)
-		back[i] = make(map[Key]int)
-	}
+	fr := NewTrie()
+	bk := NewTrie()
 
 	for i := 0; i < n; i++ {
-		var key Key
+		var cur int
 		for j := i; j < n; j++ {
 			x := int(s[j] - 'a')
-			key = key.Add(x)
-			forward[j-i+1][key] = i
+			cur = fr.Add(cur, x, Pair{i, j})
 		}
-		key = Key{0, 0}
+		cur = 0
 		for j := i; j >= 0; j-- {
 			x := int(s[j] - 'a')
-			key = key.Add(x)
-			back[i-j+1][key] = j
+			cur = bk.Add(cur, x, Pair{i, j})
 		}
 	}
 
@@ -130,22 +168,33 @@ func solve(s string, t string) [][]int {
 
 	for i := 0; i < m; i++ {
 		dp[i] = []int{-1, -1, -1, -1}
-		var key Key
+		var cur int
 		for j := i; j >= 0; j-- {
-			x := int(t[j] - 'a')
-			key = key.Add(x)
-			ln := i - j + 1
-			if ln > n {
+			if i-j+1 > n {
 				// too much
 				break
 			}
-
-			if k, ok := back[ln][key]; ok {
-				update(i, j-1, k+1, k+ln)
+			x := int(t[j] - 'a')
+			cur = fr.next[cur][x]
+			if cur == 0 {
+				break
 			}
-			if k, ok := forward[i-j+1][key]; ok {
-				update(i, j-1, k+ln, k+1)
+			v := fr.val[cur]
+			update(i, i-(v.second-v.first+1), v.second+1, v.first+1)
+		}
+		cur = 0
+		for j := i; j >= 0; j-- {
+			if i-j+1 > n {
+				// too much
+				break
 			}
+			x := int(t[j] - 'a')
+			cur = bk.next[cur][x]
+			if cur == 0 {
+				break
+			}
+			v := bk.val[cur]
+			update(i, i-(v.first-v.second+1), v.second+1, v.first+1)
 		}
 	}
 
@@ -169,18 +218,28 @@ func solve(s string, t string) [][]int {
 	return res
 }
 
-const M = 1000000007
-
-const B1 = 29
-const B2 = 31
-
-type Key struct {
-	first  int64
-	second int64
+type Pair struct {
+	first  int
+	second int
 }
 
-func (this Key) Add(v int) Key {
-	first := (this.first*B1%M + int64(v)) % M
-	second := (this.second*B2%M + int64(v)) % M
-	return Key{first, second}
+type Trie struct {
+	next [][]int
+	val  []Pair
+}
+
+func NewTrie() *Trie {
+	next := make([][]int, 1)
+	next[0] = make([]int, 26)
+	val := make([]Pair, 1)
+	return &Trie{next, val}
+}
+
+func (tr *Trie) Add(node int, x int, v Pair) int {
+	if tr.next[node][x] == 0 {
+		tr.next = append(tr.next, make([]int, 26))
+		tr.val = append(tr.val, v)
+		tr.next[node][x] = len(tr.next) - 1
+	}
+	return tr.next[node][x]
 }

@@ -79,6 +79,45 @@ func main() {
 const inf = 1 << 60
 
 func solve(x int, y int, n int) int {
+	dp := make([]int, n+1)
+
+	for i := 0; i < n; i++ {
+		dp[i] = inf
+	}
+	dp[1] = x
+	que := make([]Pair, n+1)
+	var front, tail int
+	que[front] = Pair{dp[1] + 2*x, 1}
+
+	for i := 2; i <= n; i++ {
+		dp[i] = dp[i-1] + x
+		if i%2 == 0 {
+			dp[i] = min(dp[i], dp[i/2]+y)
+		}
+
+		j := i/2 + 1
+		for tail < front && que[tail].second < j {
+			tail++
+		}
+		if tail < front {
+			dp[i] = min(dp[i], que[tail].first+y-i*x)
+		}
+		for front > tail && que[front-1].first > dp[i]+2*i*x {
+			front--
+		}
+		que[front] = Pair{dp[i] + 2*i*x, i}
+		front++
+	}
+
+	return dp[n]
+}
+
+type Pair struct {
+	first  int
+	second int
+}
+
+func solve1(x int, y int, n int) int {
 
 	m := n + 1
 

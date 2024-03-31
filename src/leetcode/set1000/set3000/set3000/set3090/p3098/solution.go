@@ -4,7 +4,7 @@ import (
 	"slices"
 )
 
-func getLines(points [][]int) []Line {
+func getLine(points [][]int) Line {
 	n := len(points)
 
 	distance := func(i int, j int) int {
@@ -14,7 +14,7 @@ func getLines(points [][]int) []Line {
 	}
 
 	if n == 2 {
-		return []Line{{0, 1, distance(0, 1)}}
+		return Line{0, 1, distance(0, 1)}
 	}
 
 	slices.SortFunc(points, func(a []int, b []int) int {
@@ -50,7 +50,7 @@ func getLines(points [][]int) []Line {
 		j++
 	}
 
-	var arr []Line
+	res := Line{-1, -1, -1}
 	m := len(outer)
 	for l, r := 0, 0; l < m; l++ {
 		var cur int
@@ -64,32 +64,30 @@ func getLines(points [][]int) []Line {
 			r = nr
 		}
 
-		arr = append(arr, Line{outer[l], outer[r], cur})
+		if res.d < cur {
+			res = Line{outer[l], outer[r], cur}
+		}
 	}
 
-	slices.SortFunc(arr, func(a, b Line) int {
-		return b.d - a.d
-	})
-
-	return arr
+	return res
 }
 
 func minimumDistance(points [][]int) int {
 	n := len(points)
-	arr := getLines(points)
-	x, y := arr[0].x, arr[0].y
+	far := getLine(points)
+	x, y := far.x, far.y
 	pts := copyPoints(points)
 	if x != n-1 {
 		pts[x], pts[n-1] = pts[n-1], pts[x]
 	}
-	arr = getLines(pts[:n-1])
-	ans := arr[0].d
+	cur := getLine(pts[:n-1])
+	ans := cur.d
 	pts = copyPoints(points)
 	if y != n-1 {
 		pts[y], pts[n-1] = pts[n-1], pts[y]
 	}
-	arr = getLines(pts[:n-1])
-	ans = min(ans, arr[0].d)
+	cur = getLine(pts[:n-1])
+	ans = min(ans, cur.d)
 	return ans
 }
 

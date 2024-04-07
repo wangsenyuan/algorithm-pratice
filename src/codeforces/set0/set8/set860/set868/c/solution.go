@@ -113,14 +113,30 @@ func readNNums(reader *bufio.Reader, n int) []int {
 
 func solve(k int, problems [][]int) bool {
 	n := len(problems)
-	for j := 0; j < k; j++ {
-		var cnt int
-		for i := 0; i < n; i++ {
-			cnt += problems[i][j]
+	cnt := make([]int, 1<<k)
+
+	for i := 0; i < n; i++ {
+		var res int
+		for j := 0; j < k; j++ {
+			res <<= 1
+			res |= problems[i][j]
 		}
-		if cnt > n/2 {
-			return false
+		cnt[res]++
+	}
+
+	if cnt[0] > 0 {
+		return true
+	}
+
+	for i := 0; i < len(cnt); i++ {
+		if cnt[i] > 0 {
+			for j := i + 1; j < len(cnt); j++ {
+				if cnt[j] > 0 && i&j == 0 {
+					return true
+				}
+			}
 		}
 	}
-	return true
+
+	return false
 }

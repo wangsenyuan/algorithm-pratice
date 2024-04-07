@@ -32,3 +32,21 @@ You can print each character either upper- or lowercase ("YeS" and "yes" are val
 10. 如果不存在k个题目，是不是就一定不存在答案呢？
 11. 似乎是可以的，因为新加入的题目，肯定至少有一个人知道
 12. 但是即使是从n个题目中选出k个，也是非常慢的
+
+### solution
+
+Let us show that if a solution exists, then there is always a solution that uses at most two problems. First, if there
+is a problem not known to any of the teams, that we can just take this only problem in the set. Next, suppose that there
+is a problem known only to one of the teams. If there is a problem this team doesn't know, then these two problems make
+a good set. Otherwise, the team knows all the problems, hence we cannot find a good set.
+
+In the rest case, each problem is known to at least two of the teams. Now, if there is a good set of problems, then each
+of the problems in the set must be known to exactly two of the teams. Indeed, let pi be the number of teams that knows
+the problem. If a good set contains k problems, then we must have , since otherwise we would have a team that knows more
+than half of the problems by pigeonhole principle. We also have pi ≥ 2, hence , and only the case pi = 2 is possible.
+
+At this point, if we can find a pair of problems with pi = 2 and non-intersecting set of teams, then we are done.
+Otherwise, we can show that a good set does not exist by case analysis.
+
+To avoid O(n2) solution, we can leave at most 24 problems with unique types (sets of teams) and do pairwise checking on
+them. This solution has O(n) complexity.

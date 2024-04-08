@@ -96,6 +96,26 @@ func readNNums(reader *bufio.Reader, n int) []int {
 }
 
 func solve(arr []int) bool {
+	dp := make([]int, 10)
+	fp := make([]int, 10)
+	for _, num := range arr {
+		r := num % 10
+		for x := 0; x < 10; x++ {
+			if fp[x] > 0 && (x+r)%10 == 3 {
+				return true
+			}
+		}
+		for x := 0; x < 10; x++ {
+			fp[(x+r)%10] += dp[x]
+		}
+
+		dp[r]++
+	}
+
+	return false
+}
+
+func solve1(arr []int) bool {
 	freq := make([]int, 10)
 
 	for _, num := range arr {

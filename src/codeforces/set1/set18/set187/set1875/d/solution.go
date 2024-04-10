@@ -129,11 +129,9 @@ func solve(a []int) int {
 		}
 	}
 	dp := make([]int, mex+1)
-	for i := 0; i <= mex; i++ {
-		dp[i] = oo
-	}
 	dp[0] = 0
 	for i := 1; i <= mex; i++ {
+		dp[i] = oo
 		for j := 0; j < i; j++ {
 			// 在删除完j前，最大的mex = i，删除完后，mex = j
 			dp[i] = min(dp[i], dp[j]+(cnt[j]-1)*i+j)

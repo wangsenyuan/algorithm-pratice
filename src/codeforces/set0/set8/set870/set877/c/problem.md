@@ -14,3 +14,4 @@ Help Slava to destroy all tanks using as few bombs as possible.
 ### ideas
 
 1. 很有趣的一个题目
+2. 如果n是奇数2,4,6... 1,3,5... 2,4,6

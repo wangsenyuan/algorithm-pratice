@@ -1,16 +1,33 @@
-package main
-
-import "fmt"
-
-func main() {
-	res := combinationSum3(3, 9)
-
-	for _, r := range res {
-		fmt.Println(r)
-	}
-}
+package p216
 
 func combinationSum3(k int, n int) [][]int {
+	var res [][]int
+
+	var dfs func(sum int, i int, x int)
+
+	arr := make([]int, k)
+
+	dfs = func(sum int, i int, x int) {
+		if i == k {
+			if sum == n {
+				tmp := make([]int, k)
+				copy(tmp, arr)
+				res = append(res, tmp)
+			}
+			return
+		}
+		for j := x + 1; j < 10; j++ {
+			arr[i] = j
+			dfs(sum+j, i+1, j)
+		}
+	}
+
+	dfs(0, 0, 0)
+
+	return res
+}
+
+func _combinationSum3(k int, n int) [][]int {
 
 	var sum func(x int, n int, nums []int, j int)
 

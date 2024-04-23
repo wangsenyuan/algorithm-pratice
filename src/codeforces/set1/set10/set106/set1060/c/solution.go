@@ -4,16 +4,16 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"sort"
 )
 
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 
-	n := readNum(reader)
+	n, m := readTwoNums(reader)
 	a := readNNums(reader, n)
-
-	res := solve(a)
+	b := readNNums(reader, m)
+	x := readNum(reader)
+	res := solve(a, b, x)
 
 	fmt.Println(res)
 }
@@ -75,71 +75,51 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-const mod = 1e9 + 7
+const oo = 1 << 60
 
-func add(a, b int) int {
-	a += b
-	if a >= mod {
-		a -= mod
-	}
-	return a
-}
-
-func mul(a, b int) int {
-	return a * b % mod
-}
-
-const X = 1000010
-
-func solve(a []int) int {
+func solve(a []int, b []int, x int) int {
 	n := len(a)
-	dp := make([]int, n+1)
+	m := len(b)
 
-	divs := make([][]int, X)
-
-	getFactors := func(num int) []int {
-		if len(divs[num]) > 0 {
-			return divs[num]
-		}
-		var cur []int
-		for i := 1; i <= num/i; i++ {
-			if num%i == 0 {
-				cur = append(cur, i)
-				if num != i*i {
-					cur = append(cur, num/i)
-				}
-			}
-		}
-		sort.Ints(cur)
-		reverse(cur)
-		divs[num] = cur
-
-		return cur
+	pref := make([]int, n+1)
+	for i := 0; i < n; i++ {
+		pref[i+1] = pref[i] + a[i]
 	}
 
-	dp[0] = 1
-	for i := 1; i <= n; i++ {
-		num := a[i-1]
-		fs := getFactors(num)
-		for _, x := range fs {
-			if x > i {
-				continue
-			}
-			// x <= i
-			dp[x] = add(dp[x], dp[x-1])
+	// 相同长度时，选择最小的sum
+	arr := make([]int, n+1)
+	for l := 1; l <= n; l++ {
+		val := oo
+		for i := 0; i+l <= n; i++ {
+			val = min(val, pref[i+l]-pref[i])
 		}
-
+		arr[l] = val
 	}
 
-	var res int
-	for j := 1; j <= n; j++ {
-		res = add(res, dp[j])
+	// arr[l] 是一个递增序列 (很容易证明, 越长的序列越大）
+	pb := make([]int, m+1)
+	for i := 0; i < m; i++ {
+		pb[i+1] = pb[i] + b[i]
 	}
-	return res
+
+	var best int
+	for l, w := 1, n; l <= m; l++ {
+		val := oo
+		for i := 0; i+l <= m; i++ {
+			val = min(val, pb[i+l]-pb[i])
+		}
+		for w > 0 && val*arr[w] > x {
+			w--
+		}
+		if arr[w]*val <= x {
+			best = max(best, l*w)
+		}
+	}
+
+	return best
 }
 
-func reverse(arr []int) {
-	for i, j := 0, len(arr)-1; i < j; i, j = i+1, j-1 {
-		arr[i], arr[j] = arr[j], arr[i]
-	}
+type Pair struct {
+	first  int
+	second int
 }

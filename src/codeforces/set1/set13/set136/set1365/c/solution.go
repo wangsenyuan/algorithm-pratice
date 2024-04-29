@@ -79,6 +79,24 @@ func main() {
 
 func solve(n int, A []int, B []int) int {
 	pos := make([]int, n+1)
+	for i, num := range B {
+		pos[num] = i
+	}
+	cnt := make([]int, n+1)
+	for i := 0; i < n; i++ {
+		j := pos[A[i]]
+		cnt[(i-j+n)%n]++
+	}
+
+	res := cnt[0]
+	for i := 1; i <= n; i++ {
+		res = max(res, cnt[i])
+	}
+	return res
+}
+
+func solve1(n int, A []int, B []int) int {
+	pos := make([]int, n+1)
 
 	for i := 0; i < n; i++ {
 		pos[A[i]] = i

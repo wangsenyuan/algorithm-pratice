@@ -70,7 +70,41 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
+const oo = 1 << 60
+
 func solve(segs [][]int) int {
+	n := len(segs)
+	dp := make([]Pair, n+1)
+	dp[0] = Pair{-oo, oo}
+
+	for i := 0; i < n; i++ {
+		dp[i+1] = Pair{max(dp[i].first, segs[i][0]), min(dp[i].second, segs[i][1])}
+	}
+
+	suf := Pair{-oo, oo}
+
+	var best int
+
+	check := func(a, b Pair) int {
+		x := max(a.first, b.first)
+		y := min(a.second, b.second)
+		return max(0, y-x)
+	}
+
+	for i := n - 1; i >= 0; i-- {
+		best = max(best, check(dp[i], suf))
+		suf = Pair{max(suf.first, segs[i][0]), min(suf.second, segs[i][1])}
+	}
+
+	return best
+}
+
+type Pair struct {
+	first  int
+	second int
+}
+
+func solve1(segs [][]int) int {
 	n := len(segs)
 
 	sort.Slice(segs, func(i, j int) bool {

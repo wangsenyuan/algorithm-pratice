@@ -21,7 +21,7 @@ Give a ⭐️ if this project helped you!
 
 ## 📝 License
 
-Copyright © 2020 [wangsenyuan](https://github.com/wangsenyuan).<br />
+Copyright © 2024 [wangsenyuan](https://github.com/wangsenyuan).<br />
 This project is [Apache License 2.0](https://github.com/wangsenyuan/golang-pratice/blob/master/LICENSE) licensed.
 
 ***

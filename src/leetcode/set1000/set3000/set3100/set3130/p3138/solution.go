@@ -14,21 +14,9 @@ func minAnagramLength(s string) int {
 			g = gcd(g, cnt[i])
 		}
 	}
-	best := n
+	g = gcd(g, n)
 
-	for i := 1; i <= g/i; i++ {
-		if g%i == 0 {
-			if n%i == 0 {
-				best = min(best, n/i)
-			}
-			j := g / i
-			if n%j == 0 {
-				best = min(best, n/j)
-			}
-		}
-	}
-
-	return best
+	return n / g
 }
 
 func gcd(a, b int) int {

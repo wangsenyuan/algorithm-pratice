@@ -31,3 +31,9 @@ func TestSample2(t *testing.T) {
 	expect := 0
 	runSample(t, n, edges, expect)
 }
+
+func TestSample3(t *testing.T) {
+	n := 100000
+	expect := 296595689
+	runSample(t, n, nil, expect)
+}

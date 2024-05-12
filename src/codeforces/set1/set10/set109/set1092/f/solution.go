@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"bytes"
 	"fmt"
 	"os"
 )
@@ -10,20 +9,16 @@ import (
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 
-	tc := readNum(reader)
-	var buf bytes.Buffer
-	for tc > 0 {
-		tc--
-		n, m := readTwoNums(reader)
-		edges := make([][]int, m)
-		for i := 0; i < m; i++ {
-			edges[i] = readNNums(reader, 2)
-		}
-		res := solve(n, edges)
-		buf.WriteString(fmt.Sprintf("%d\n", res))
+	n := readNum(reader)
+	a := readNNums(reader, n)
+	edges := make([][]int, n-1)
+	for i := 0; i < n-1; i++ {
+		edges[i] = readNNums(reader, 2)
 	}
 
-	fmt.Print(buf.String())
+	res := solve(n, a, edges)
+
+	fmt.Println(res)
 }
 
 func readString(r *bufio.Reader) string {
@@ -83,30 +78,62 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-const mod = 998244353
+func solve(n int, a []int, edges [][]int) int {
+	g := NewGraph(n, len(edges)*2)
 
-func add(a, b int) int {
-	a += b
-	if a >= mod {
-		a -= mod
+	for _, edge := range edges {
+		u, v := edge[0]-1, edge[1]-1
+		g.AddEdge(u, v)
+		g.AddEdge(v, u)
 	}
-	return a
-}
 
-func mul(a, b int) int {
-	return a * b % mod
-}
+	sum := make([]int, n)
+	dp := make([]int, n)
 
-func pow(a, b int) int {
-	r := 1
-	for b > 0 {
-		if b&1 == 1 {
-			r = mul(r, a)
+	var dfs func(p int, u int)
+
+	dfs = func(p int, u int) {
+		sum[u] = a[u]
+		for i := g.nodes[u]; i > 0; i = g.next[i] {
+			v := g.to[i]
+			if p != v {
+				dfs(u, v)
+				dp[u] += dp[v] + sum[v]
+				sum[u] += sum[v]
+			}
 		}
-		a = mul(a, a)
-		b >>= 1
 	}
-	return r
+
+	dfs(0, 0)
+	var ans int
+	var dfs2 func(p int, u int)
+
+	dfs2 = func(p int, u int) {
+		if p >= 0 {
+			dp[u] += dp[p] + sum[p]
+			sum[u] += sum[p]
+		}
+
+		ans = max(ans, dp[u])
+
+		for i := g.nodes[u]; i > 0; i = g.next[i] {
+			v := g.to[i]
+			if p != v {
+				su, du := sum[u], dp[u]
+				dp[u] -= dp[v] + sum[v]
+				sum[u] -= sum[v]
+
+				dfs2(u, v)
+
+				sum[u] = su
+				dp[u] = du
+			}
+		}
+	}
+
+	dfs2(-1, 0)
+
+	return ans
 }
 
 type Graph struct {
@@ -129,52 +156,4 @@ func (g *Graph) AddEdge(u, v int) {
 	g.next[g.cur] = g.nodes[u]
 	g.nodes[u] = g.cur
 	g.to[g.cur] = v
-}
-
-func solve(n int, edges [][]int) int {
-	g := NewGraph(n, len(edges)*2)
-
-	for _, e := range edges {
-		u, v := e[0], e[1]
-		u--
-		v--
-		g.AddEdge(u, v)
-		g.AddEdge(v, u)
-	}
-
-	color := make([]int, n)
-	for i := 0; i < n; i++ {
-		color[i] = -1
-	}
-	cnt := make([]int, 2)
-	var dfs func(u int, c int) bool
-
-	dfs = func(u int, c int) bool {
-		if color[u] >= 0 {
-			return color[u] == c
-		}
-		color[u] = c
-		cnt[c]++
-
-		for i := g.nodes[u]; i > 0; i = g.next[i] {
-			v := g.to[i]
-			if !dfs(v, 1^c) {
-				return false
-			}
-		}
-		return true
-	}
-	res := 1
-	for i := 0; i < n; i++ {
-		if color[i] < 0 {
-			if !dfs(i, 0) {
-				return 0
-			}
-			res = mul(res, add(pow(2, cnt[0]), pow(2, cnt[1])))
-			cnt[0] = 0
-			cnt[1] = 0
-		}
-	}
-
-	return res
 }

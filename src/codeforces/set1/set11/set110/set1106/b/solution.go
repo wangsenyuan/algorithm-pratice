@@ -137,7 +137,9 @@ func solve(a []int, c []int, customers [][]int) []int {
 
 	for i, cur := range customers {
 		t, d := cur[0], cur[1]
+		// 这里不对，即使d > sum, 也是要消耗的
 		if d > sum {
+			sum = 0
 			// 这个customer无法被满足
 			res[i] = 0
 			continue

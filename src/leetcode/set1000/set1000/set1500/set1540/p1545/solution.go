@@ -1,7 +1,10 @@
 package p1545
 
 func longestAwesome(s string) int {
-	pos := make(map[int]int)
+	pos := make([]int, 1<<11)
+	for i := 0; i < len(pos); i++ {
+		pos[i] = -1
+	}
 	pos[0] = 0
 
 	var res int
@@ -12,29 +15,22 @@ func longestAwesome(s string) int {
 
 		cur ^= (1 << x)
 
-		if j, found := pos[cur]; found {
-			res = max(res, i-j)
+		if pos[cur] >= 0 {
+			res = max(res, i-pos[cur])
 		}
 
 		for j := 0; j < 10; j++ {
 			// if j is odd
 			tmp := cur ^ (1 << j)
-			if k, found := pos[tmp]; found {
-				res = max(res, i-k)
+			if pos[tmp] >= 0 {
+				res = max(res, i-pos[tmp])
 			}
 		}
 
-		if _, found := pos[cur]; !found {
+		if pos[cur] < 0 {
 			pos[cur] = i
 		}
 	}
 
 	return res
-}
-
-func max(a, b int) int {
-	if a >= b {
-		return a
-	}
-	return b
 }

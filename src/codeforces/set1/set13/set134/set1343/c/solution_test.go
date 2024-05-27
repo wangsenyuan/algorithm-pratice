@@ -2,7 +2,7 @@ package main
 
 import "testing"
 
-func runSample(t *testing.T, n int, A []int, expect int64) {
+func runSample(t *testing.T, n int, A []int, expect int) {
 	res := solve(n, A)
 
 	if res != expect {

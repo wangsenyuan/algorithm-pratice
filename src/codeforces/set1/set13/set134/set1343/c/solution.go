@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"math"
 	"os"
 )
 
@@ -80,52 +79,26 @@ func main() {
 	}
 }
 
-func solve(n int, A []int) int64 {
-	if n == 1 {
-		return int64(A[0])
-	}
-	// i is for postive & j is for negative
+func solve(n int, A []int) int {
+	var res int
 
-	var res int64
-	var i int
-	if A[0] < 0 {
-		var x int = math.MinInt32
-		var j int
-		for j < n && A[j] < 0 {
-			x = max(x, A[j])
-			j++
-		}
-		res = int64(x)
-		i = j
-	}
-	var x = 0
-	for i <= n {
-		// i is at postive position
-		if i < n && A[i] > 0 {
-			x = max(x, A[i])
-			i++
-			continue
-		}
-		res += int64(x)
-		x = 0
-		if i == n {
-			break
-		}
-		// A[i] < 0
-		var y int = math.MinInt32
-		for i < n && A[i] < 0 {
-			y = max(y, A[i])
+	for i := 0; i < n; {
+		j := i
+		var best = A[j]
+		for i < n && sign(A[i]) == sign(A[j]) {
+			best = max(best, A[i])
 			i++
 		}
-		res += int64(y)
+
+		res += best
 	}
 
 	return res
 }
 
-func max(a, b int) int {
-	if a >= b {
-		return a
+func sign(num int) int {
+	if num < 0 {
+		return -1
 	}
-	return b
+	return 1
 }

@@ -15,9 +15,10 @@ func main() {
 
 	for tc > 0 {
 		tc--
-		n := readNum(reader)
-		a := readNNums(reader, n)
-		res := solve(a)
+		n, x := readTwoNums(reader)
+
+		res := solve(n, x)
+
 		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 
@@ -32,6 +33,35 @@ func readString(reader *bufio.Reader) string {
 		}
 	}
 	return s
+}
+
+func readNInt64s(reader *bufio.Reader, n int) []int64 {
+	res := make([]int64, n)
+	s, _ := reader.ReadBytes('\n')
+
+	var pos int
+
+	for i := 0; i < n; i++ {
+		pos = readInt64(s, pos, &res[i]) + 1
+	}
+
+	return res
+}
+
+func readInt64(bytes []byte, from int, val *int64) int {
+	i := from
+	var sign int64 = 1
+	if bytes[i] == '-' {
+		sign = -1
+		i++
+	}
+	var tmp int64
+	for i < len(bytes) && bytes[i] >= '0' && bytes[i] <= '9' {
+		tmp = tmp*10 + int64(bytes[i]-'0')
+		i++
+	}
+	*val = tmp * sign
+	return i
 }
 
 func readInt(bytes []byte, from int, val *int) int {
@@ -81,61 +111,38 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func solve(a []int) int {
-	n := len(a)
-	dp := make([][][]int, n+1)
-	for i := 0; i <= n; i++ {
-		dp[i] = make([][]int, n+1)
-		for j := 0; j <= n; j++ {
-			dp[i][j] = make([]int, n+1)
-			for k := 0; k <= n; k++ {
-				dp[i][j][k] = n
+func solve(n, x int) int {
+
+	get := func(a int) map[int]bool {
+		candidates := make(map[int]bool)
+		for i := 1; i*i <= a; i++ {
+			if a%i == 0 {
+				if i%2 == 0 {
+					candidates[i] = true
+				}
+				if (a/i)%2 == 0 {
+					candidates[a/i] = true
+				}
 			}
 		}
-	}
-	dp[0][0][0] = 0
-	for i := 0; i < n; i++ {
-		for j := 0; j < n; j++ {
-			for k := 0; k <= n; k++ {
-				// 如果不使用i处的charge
-				// 移动到i+1时
-				// 正常nj要增加1，但是如果在左边没有被覆盖到，那么还是要没有覆盖
-				// 但是如果右边原来没有覆盖到(k=0), 那么此时左边被覆盖的cells的个数，是1（因为i肯定是被覆盖到的）
-				// 向右边移动时，k要递减
-				ni := i + 1
-				var nj int
-				if j > 0 {
-					nj = j + 1
-				} else if k == 0 {
-					nj = 1
-				}
-				nk := max(k-1, 0)
-				dp[ni][nj][nk] = min(dp[ni][nj][nk], dp[i][j][k])
+		res := make(map[int]bool)
 
-				// 使用i向右charge
-				nj = 0
-				if j > 0 {
-					nj = j + 1
-				}
-				// 那么在i的范围内，都被覆盖到了
-				if nj <= a[i] {
-					nj = 0
-				}
-				dp[ni][nj][nk] = min(dp[ni][nj][nk], dp[i][j][k]+1)
-
-				nj = 0
-				if j > 0 {
-					nj = j + 1
-				}
-
-				nk = max(a[i]-1, k-1)
-				dp[ni][nj][nk] = min(dp[ni][nj][nk], dp[i][j][k]+1)
-			}
+		for k := range candidates {
+			res[1+k/2] = true
 		}
+		return res
 	}
-	res := n
-	for k := 0; k <= n; k++ {
-		res = min(res, dp[n][0][k])
+
+	a := get(n - x)
+	b := get(n + x - 2)
+	for k := range b {
+		a[k] = true
+	}
+	var res int
+	for k := range a {
+		if k >= x {
+			res++
+		}
 	}
 	return res
 }

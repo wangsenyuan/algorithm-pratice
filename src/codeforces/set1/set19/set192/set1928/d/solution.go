@@ -15,9 +15,10 @@ func main() {
 
 	for tc > 0 {
 		tc--
-		n := readNum(reader)
-		a := readNNums(reader, n)
-		res := solve(a)
+		n, b, x := readThreeNums(reader)
+		c := readNNums(reader, n)
+		res := solve(b, x, c)
+
 		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 
@@ -32,6 +33,35 @@ func readString(reader *bufio.Reader) string {
 		}
 	}
 	return s
+}
+
+func readNInt64s(reader *bufio.Reader, n int) []int64 {
+	res := make([]int64, n)
+	s, _ := reader.ReadBytes('\n')
+
+	var pos int
+
+	for i := 0; i < n; i++ {
+		pos = readInt64(s, pos, &res[i]) + 1
+	}
+
+	return res
+}
+
+func readInt64(bytes []byte, from int, val *int64) int {
+	i := from
+	var sign int64 = 1
+	if bytes[i] == '-' {
+		sign = -1
+		i++
+	}
+	var tmp int64
+	for i < len(bytes) && bytes[i] >= '0' && bytes[i] <= '9' {
+		tmp = tmp*10 + int64(bytes[i]-'0')
+		i++
+	}
+	*val = tmp * sign
+	return i
 }
 
 func readInt(bytes []byte, from int, val *int) int {
@@ -81,61 +111,53 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func solve(a []int) int {
-	n := len(a)
-	dp := make([][][]int, n+1)
-	for i := 0; i <= n; i++ {
-		dp[i] = make([][]int, n+1)
-		for j := 0; j <= n; j++ {
-			dp[i][j] = make([]int, n+1)
-			for k := 0; k <= n; k++ {
-				dp[i][j][k] = n
+func solve(b int, x int, c []int) int {
+
+	calc := func(k int) int {
+		if k == 1 {
+			return 0
+		}
+		// 当k组时，它的收益时多少
+		var res int
+		for _, num := range c {
+			if num <= k {
+				// <= 1e16
+				res += num * (num - 1) / 2 * b
+			} else {
+				avg, r := num/k, num%k
+				res += (k - r) * avg * (num - avg) / 2 * b
+				res += r * (avg + 1) * (num - (avg + 1)) / 2 * b
 			}
 		}
+
+		res -= (k - 1) * x
+
+		return res
 	}
-	dp[0][0][0] = 0
-	for i := 0; i < n; i++ {
-		for j := 0; j < n; j++ {
-			for k := 0; k <= n; k++ {
-				// 如果不使用i处的charge
-				// 移动到i+1时
-				// 正常nj要增加1，但是如果在左边没有被覆盖到，那么还是要没有覆盖
-				// 但是如果右边原来没有覆盖到(k=0), 那么此时左边被覆盖的cells的个数，是1（因为i肯定是被覆盖到的）
-				// 向右边移动时，k要递减
-				ni := i + 1
-				var nj int
-				if j > 0 {
-					nj = j + 1
-				} else if k == 0 {
-					nj = 1
-				}
-				nk := max(k-1, 0)
-				dp[ni][nj][nk] = min(dp[ni][nj][nk], dp[i][j][k])
 
-				// 使用i向右charge
-				nj = 0
-				if j > 0 {
-					nj = j + 1
-				}
-				// 那么在i的范围内，都被覆盖到了
-				if nj <= a[i] {
-					nj = 0
-				}
-				dp[ni][nj][nk] = min(dp[ni][nj][nk], dp[i][j][k]+1)
-
-				nj = 0
-				if j > 0 {
-					nj = j + 1
-				}
-
-				nk = max(a[i]-1, k-1)
-				dp[ni][nj][nk] = min(dp[ni][nj][nk], dp[i][j][k]+1)
-			}
+	var r int
+	for _, num := range c {
+		r = max(r, num)
+	}
+	l := 1
+	for r-l > 2 {
+		mid1 := l + (r-l)/3
+		mid2 := r - (r-l)/3
+		a := calc(mid1)
+		b := calc(mid2)
+		if a <= b {
+			l = mid1
+		} else {
+			r = mid2
 		}
 	}
-	res := n
-	for k := 0; k <= n; k++ {
-		res = min(res, dp[n][0][k])
+
+	if l == r {
+		return calc(l)
 	}
-	return res
+	if l+1 == r {
+		return max(calc(l), calc(r))
+	}
+	// r - l <= 2
+	return max(calc(l), calc(l+1), calc(r))
 }

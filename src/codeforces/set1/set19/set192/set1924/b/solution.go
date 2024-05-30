@@ -186,7 +186,7 @@ type Tree struct {
 }
 
 func (tr *Tree) pushValue1(v int) {
-	tr.val += v
+	tr.val += v * (tr.r - tr.l + 1)
 	tr.lazy1 += v
 }
 

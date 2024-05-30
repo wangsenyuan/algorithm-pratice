@@ -94,6 +94,60 @@ func readNNums(reader *bufio.Reader, n int) []int {
 const inf = 1 << 60
 
 func solve(a []int, k int, x int) int {
+	n := len(a)
+	if x < 0 {
+		x = -x
+		k = n - k
+	}
+	// x >= 0
+	// 子数组长度超过k和不超过k，分两种情况
+	// 前缀和
+	var sum int
+	// dp[i] 到i为止的最小sum
+	dp := make([]int, n+1)
+	dp[0] = 0
+
+	que := make([]Pair, n+1)
+	var front, tail int
+	que[front] = Pair{0, 0}
+	front++
+
+	var best int
+
+	for i := 1; i <= n; i++ {
+		// 所有的数减去x
+		sum += a[i-1] - x
+		dp[i] = min(dp[i-1], sum)
+		if i-k >= 0 {
+			best = max(best, sum-dp[i-k]+2*k*x)
+		}
+
+		for tail < front && que[tail].second+k < i {
+			tail++
+		}
+		tmp := sum + 2*i*x
+
+		if tail < front {
+			// sum + 2 * i * x - (que[tail].first)
+			best = max(best, tmp-que[tail].first)
+		}
+		// 如果子序列的长度不超过k, 这个队列里面是一个递增的，保证队尾为最小值
+		for front > tail && que[front-1].first > tmp {
+			front--
+		}
+		que[front] = Pair{tmp, i}
+		front++
+	}
+
+	return best
+}
+
+type Pair struct {
+	first  int
+	second int
+}
+
+func solvex(a []int, k int, x int) int {
 	// dp[i][j] 表示到i为止，且修改次数位j次时的最大值？
 	// 似乎有点撞墙
 	// 首先，观察一下
@@ -197,11 +251,4 @@ func solve1(a []int, k int, x int) int {
 	}
 
 	return best
-}
-
-func max(a, b int) int {
-	if a >= b {
-		return a
-	}
-	return b
 }

@@ -16,9 +16,9 @@ func main() {
 
 	for tc > 0 {
 		tc--
-		n := readNum(reader)
+		n, k := readTwoNums(reader)
 		a := readNNums(reader, n)
-		res := solve(a)
+		res := solve(a, k)
 		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 
@@ -82,95 +82,37 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-const mod = 998244353
+const inf = 1 << 60
 
-func add(a, b int) int {
-	a += b
-	if a >= mod {
-		a -= mod
-	}
-	return a
-}
-
-func sub(a, b int) int {
-	return add(a, mod-b)
-}
-
-func solve(a []int) int {
+func solve(a []int, k int) int {
 	n := len(a)
 
-	dp := make([]int, n+1)
-	pref := make([]int, n+1)
-	stack := make([]int, n+1)
-	var top int
-	top++
-
-	dp[0] = 1
-	pref[0] = 1
-	sum := 1
-	for i := 1; i < n; i++ {
-		for top > 0 && a[stack[top-1]] > a[i] {
-			sum = sub(sum, dp[stack[top-1]])
-			top--
-		}
-		if top == 0 {
-			dp[i] = add(1, pref[i-1])
-		} else {
-			dp[i] = add(sum, sub(pref[i-1], pref[stack[top-1]]))
-		}
-		stack[top] = i
-		top++
-		sum = add(sum, dp[i])
-		pref[i] = add(pref[i-1], dp[i])
-	}
-
-	var res int
-	mn := 1 << 30
-	for i := n - 1; i >= 0; i-- {
-		mn = min(mn, a[i])
-		if a[i] == mn {
-			res = add(res, dp[i])
+	dp := make([][]int, n+1)
+	for i := 0; i <= n; i++ {
+		dp[i] = make([]int, k+1)
+		for j := 0; j <= k; j++ {
+			dp[i][j] = inf
 		}
 	}
 
-	return res
-}
+	dp[0][0] = 0
 
-func solve1(a []int) int {
-	n := len(a)
-	sum := make([]int, n+2)
-	dp := make([]int, n+2)
-
-	sum[n] = 1
-	stack := make([]int, n+2)
-	var top int
-
-	for i := n - 1; i >= 0; i-- {
-		for top > 0 && a[stack[top-1]] > a[i] {
-			top--
-		}
-		next := n
-		if top > 0 {
-			next = stack[top-1]
-		}
-		stack[top] = i
-		top++
-		cur := sub(sum[i+1], sum[next+1])
-		if next != n {
-			cur = add(cur, dp[next])
-			dp[i] = add(sub(sum[next], sum[next+1]), dp[next])
-		}
-		sum[i] = add(cur, sum[i+1])
-	}
-
-	var res int
-	mn := a[0]
 	for i := 0; i < n; i++ {
-		mn = min(mn, a[i])
-		if a[i] == mn {
-			res = add(res, sub(sum[i], sum[i+1]))
+		for j := 0; j <= k; j++ {
+			dp[i+1][j] = dp[i][j] + a[i]
+			// 或者使用a[i]去替换前面的值
+			// 或者用前面的某个值来替换a[i]
+			mv := a[i]
+
+			for ii := i; ii >= 0 && i-ii <= j; ii-- {
+				mv = min(mv, a[ii])
+				dp[i+1][j] = min(dp[i+1][j], dp[ii][j-(i-ii)]+(i-ii+1)*mv)
+			}
+			if j > 0 {
+				dp[i+1][j] = min(dp[i+1][j], dp[i+1][j-1])
+			}
 		}
 	}
 
-	return res
+	return dp[n][k]
 }

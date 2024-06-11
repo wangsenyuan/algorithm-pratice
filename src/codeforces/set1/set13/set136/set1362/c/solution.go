@@ -94,7 +94,7 @@ func init() {
 	}
 }
 
-func solve(num uint64) uint64 {
+func solve1(num uint64) uint64 {
 	var res uint64
 
 	for i := N - 1; i > 0; i-- {
@@ -105,6 +105,17 @@ func solve(num uint64) uint64 {
 
 	if num&1 == 1 {
 		res++
+	}
+
+	return res
+}
+
+func solve(num uint64) uint64 {
+	res := num
+
+	for num > 0 {
+		res += num / 2
+		num >>= 1
 	}
 
 	return res

@@ -1,0 +1,1 @@
+[solution](editorial.png)

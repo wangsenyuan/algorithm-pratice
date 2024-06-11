@@ -3,6 +3,46 @@ package p3174
 import "sort"
 
 func maximumLength(nums []int, k int) int {
+	n := len(nums)
+	arr := make([]int, n)
+	copy(arr, nums)
+	sort.Ints(arr)
+	var m int
+	for i := 1; i <= n; i++ {
+		if i == n || arr[i] > arr[i-1] {
+			arr[m] = arr[i-1]
+			m++
+		}
+	}
+
+	getPosition := func(num int) int {
+		return sort.Search(m, func(i int) bool {
+			return arr[i] >= num
+		})
+	}
+
+	fp := make([]int, k+1)
+	dp := make([][]int, m)
+	for i := 0; i < m; i++ {
+		dp[i] = make([]int, k+1)
+	}
+
+	for _, num := range nums {
+		i := getPosition(num)
+		for j := k; j >= 0; j-- {
+			if j > 0 {
+				dp[i][j] = max(dp[i][j], fp[j-1]) + 1
+			} else {
+				dp[i][j]++
+			}
+			fp[j] = max(fp[j], dp[i][j])
+		}
+	}
+
+	return fp[k]
+}
+
+func maximumLength2(nums []int, k int) int {
 	fs := map[int][]int{}
 	records := make([]struct{ mx, mx2, num int }, k+1)
 	for _, x := range nums {

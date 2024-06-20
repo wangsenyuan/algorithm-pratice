@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"math/bits"
 	"os"
 )
 
@@ -17,8 +16,8 @@ func main() {
 
 	for tc > 0 {
 		tc--
-		a, b, c := readThreeNums(reader)
-		res := solve(a, b, c)
+		s := readString(reader)
+		res := solve(s)
 		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 
@@ -82,58 +81,48 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func solve(a, b, c int) int {
-	if a+1 != c {
-		return -1
-	}
-	h := bits.Len(uint(a))
+func solve(s string) int {
+	n := len(s)
 
-	b -= (1 << h) - (a + 1)
-	if b > 0 {
-		h += (b + a) / (a + 1)
-	}
-	return h
-}
-func solve2(a, b, c int) int {
-	if a+1 != c {
-		return -1
-	}
-	if a == 0 {
-		return b
-	}
-	h := 31 - bits.LeadingZeros32(uint32(a))
-	left := (1 << (h + 1)) - (a + 1)
-	if left < b {
-		b -= left
-		base := a - ((1 << h) - 1)
-		base = base*2 + left
-		h += (b + base - 1) / base
-	}
-	h++
-	return h
-}
+	// dp[i][j] 表示从i, j开始的最长的字符串的长度, 以及最后一个字符的在第一段中的结尾
+	// 在长度相同时，选择结尾更小的
 
-func solve1(a, b, c int) int {
-	if a+1 != c {
-		return -1
-	}
-	if a+b+c == 1 {
-		return 0
-	}
-	// 分层
-	cur := 1
-	var next int
-	res := 1
-	for i := 0; i < a+b; i++ {
-		if cur == 0 {
-			cur, next = next, cur
-			res++
+	comp := func(x, y byte) bool {
+		if x == y {
+			return true
 		}
-		cur--
-		next++
-		if i < a {
-			next++
+		return x == '?' || y == '?'
+	}
+
+	// dp[i][j] 表示从(i, j)开始的字符是否一直相等
+	// s[i] == s[j], s[i+1] == s[j+1] ....
+	dp := make([][]int, n+1)
+	for i := 0; i <= n; i++ {
+		dp[i] = make([]int, n+1)
+	}
+	for j := n - 1; j >= 0; j-- {
+		for i := j - 1; i >= 0; i-- {
+			if comp(s[i], s[j]) {
+				if i+1 == j {
+					dp[i][j] = 1
+				} else {
+					tmp := min(dp[i+1][j+1]+1, j-i)
+					dp[i][j] = max(dp[i][j], tmp)
+				}
+			} else {
+				dp[i][j] = 0
+			}
 		}
 	}
-	return res
+
+	var res int
+	for i := 0; i < n; i++ {
+		for j := i + 1; j < n; j++ {
+			k := dp[i][j]
+			if i+k == j {
+				res = max(res, k)
+			}
+		}
+	}
+	return 2 * res
 }

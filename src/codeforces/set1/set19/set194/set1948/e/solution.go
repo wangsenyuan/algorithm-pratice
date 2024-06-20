@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"math/bits"
 	"os"
 )
 
@@ -17,9 +16,16 @@ func main() {
 
 	for tc > 0 {
 		tc--
-		a, b, c := readThreeNums(reader)
-		res := solve(a, b, c)
-		buf.WriteString(fmt.Sprintf("%d\n", res))
+		n, k := readTwoNums(reader)
+		a, q, c := solve(n, k)
+		for i := 0; i < n; i++ {
+			buf.WriteString(fmt.Sprintf("%d ", a[i]))
+		}
+		buf.WriteString(fmt.Sprintf("\n%d\n", q))
+		for i := 0; i < n; i++ {
+			buf.WriteString(fmt.Sprintf("%d ", c[i]))
+		}
+		buf.WriteByte('\n')
 	}
 
 	fmt.Print(buf.String())
@@ -82,58 +88,32 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func solve(a, b, c int) int {
-	if a+1 != c {
-		return -1
+func solve(n int, k int) (a []int, q int, c []int) {
+	a = make([]int, n)
+	c = make([]int, n)
+	for i := 0; i < n; i++ {
+		a[i] = i + 1
+		c[i] = i/k + 1
+		q = c[i]
 	}
-	h := bits.Len(uint(a))
+	l, r := 0, 0
+	for i := 1; i <= q; i++ {
+		for l < n && c[l] < i {
+			l++
+		}
+		for r < n && c[r] == i {
+			r++
+		}
+		mid := (l + r) / 2
+		reverse(a[l:mid])
+		reverse(a[mid:r])
+	}
 
-	b -= (1 << h) - (a + 1)
-	if b > 0 {
-		h += (b + a) / (a + 1)
-	}
-	return h
-}
-func solve2(a, b, c int) int {
-	if a+1 != c {
-		return -1
-	}
-	if a == 0 {
-		return b
-	}
-	h := 31 - bits.LeadingZeros32(uint32(a))
-	left := (1 << (h + 1)) - (a + 1)
-	if left < b {
-		b -= left
-		base := a - ((1 << h) - 1)
-		base = base*2 + left
-		h += (b + base - 1) / base
-	}
-	h++
-	return h
+	return
 }
 
-func solve1(a, b, c int) int {
-	if a+1 != c {
-		return -1
+func reverse(a []int) {
+	for i, j := 0, len(a)-1; i < j; i, j = i+1, j-1 {
+		a[i], a[j] = a[j], a[i]
 	}
-	if a+b+c == 1 {
-		return 0
-	}
-	// 分层
-	cur := 1
-	var next int
-	res := 1
-	for i := 0; i < a+b; i++ {
-		if cur == 0 {
-			cur, next = next, cur
-			res++
-		}
-		cur--
-		next++
-		if i < a {
-			next++
-		}
-	}
-	return res
 }

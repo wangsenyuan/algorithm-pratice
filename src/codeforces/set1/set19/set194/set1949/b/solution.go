@@ -4,8 +4,8 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"math/bits"
 	"os"
+	"sort"
 )
 
 func main() {
@@ -17,8 +17,10 @@ func main() {
 
 	for tc > 0 {
 		tc--
-		a, b, c := readThreeNums(reader)
-		res := solve(a, b, c)
+		n := readNum(reader)
+		a := readNNums(reader, n)
+		b := readNNums(reader, n)
+		res := solve(a, b)
 		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 
@@ -82,58 +84,78 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func solve(a, b, c int) int {
-	if a+1 != c {
-		return -1
-	}
-	h := bits.Len(uint(a))
+func solve(x []int, y []int) int {
+	sort.Ints(x)
+	sort.Ints(y)
 
-	b -= (1 << h) - (a + 1)
-	if b > 0 {
-		h += (b + a) / (a + 1)
+	n := len(x)
+
+	check := func(l int) int {
+		res := 1 << 30
+		for i := 0; i < l; i++ {
+			res = min(res, abs(x[i]-y[n-l+i]))
+		}
+		for i := l; i < n; i++ {
+			res = min(res, abs(x[i]-y[i-l]))
+		}
+
+		return res
 	}
-	return h
-}
-func solve2(a, b, c int) int {
-	if a+1 != c {
-		return -1
+
+	var best int
+	for l := 0; l <= n; l++ {
+		best = max(best, check(l))
 	}
-	if a == 0 {
-		return b
-	}
-	h := 31 - bits.LeadingZeros32(uint32(a))
-	left := (1 << (h + 1)) - (a + 1)
-	if left < b {
-		b -= left
-		base := a - ((1 << h) - 1)
-		base = base*2 + left
-		h += (b + base - 1) / base
-	}
-	h++
-	return h
+
+	return best
 }
 
-func solve1(a, b, c int) int {
-	if a+1 != c {
-		return -1
-	}
-	if a+b+c == 1 {
-		return 0
-	}
-	// 分层
-	cur := 1
-	var next int
-	res := 1
-	for i := 0; i < a+b; i++ {
-		if cur == 0 {
-			cur, next = next, cur
-			res++
+func solve1(x []int, y []int) int {
+	n := len(x)
+	sort.Ints(x)
+	sort.Ints(y)
+
+	check := func(expect int) bool {
+		// abs(x[0] - y[i]) >= expect
+		// 存在x的一个前缀，和y的相同长度的后缀匹配
+		// 假设这个长度是l
+		for l := 0; l <= n; l++ {
+			ok := true
+			for i := 0; i < l; i++ {
+				if abs(x[i]-y[n-l+i]) < expect {
+					ok = false
+					break
+				}
+			}
+			if ok {
+				for i := l; i < n; i++ {
+					if abs(x[i]-y[i-l]) < expect {
+						ok = false
+						break
+					}
+				}
+			}
+			if ok {
+				return true
+			}
 		}
-		cur--
-		next++
-		if i < a {
-			next++
+		return false
+	}
+
+	mx := max(abs(x[0]-y[n-1]), abs(x[n-1]-y[0]))
+
+	l, r := 0, mx+1
+	for l < r {
+		mid := (l + r) / 2
+		if check(mid) {
+			l = mid + 1
+		} else {
+			r = mid
 		}
 	}
-	return res
+	return r - 1
+}
+
+func abs(num int) int {
+	return max(num, -num)
 }

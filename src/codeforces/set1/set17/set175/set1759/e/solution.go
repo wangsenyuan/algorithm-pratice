@@ -92,8 +92,79 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	}
 	return res
 }
-
 func solve(a []int, h int) int {
+
+	sort.Ints(a)
+
+	f := func(ord []int) int {
+		var ans int
+		cur := h
+		var j int
+		for i, num := range a {
+			for cur <= num && j < len(ord) {
+				cur *= ord[j]
+				j++
+			}
+			if cur <= num {
+				break
+			}
+			cur += num / 2
+			ans = i + 1
+		}
+		return ans
+	}
+
+	ans := max(f([]int{2, 2, 3}), f([]int{2, 3, 2}), f([]int{3, 2, 2}))
+
+	return ans
+}
+
+func solve2(a []int, h int) int {
+	sort.Ints(a)
+	// 0, 1, 2
+	// 0 for green, 1 for green, 2 for blue
+	dp := make([]int, 8)
+	dp[0] = h
+	for state := 0; state < 8; state++ {
+		if state&1 == 0 {
+			// use green at the first time
+			dp[state|1] = max(dp[state|1], 2*dp[state])
+		}
+		if state&2 == 0 {
+			dp[state|2] = max(dp[state|2], 2*dp[state])
+		}
+		if state&4 == 0 {
+			dp[state|4] = max(dp[state|4], 3*dp[state])
+		}
+	}
+
+	var ans int
+
+	for i, num := range a {
+		for state := 0; state < 8; state++ {
+			if dp[state] > num {
+				dp[state] = max(dp[state], dp[state]+num/2)
+				ans = i + 1
+			}
+		}
+
+		for state := 0; state < 8; state++ {
+			if (state & 1) == 0 {
+				dp[state|1] = max(dp[state|1], dp[state]*2)
+			}
+			if (state & 2) == 0 {
+				dp[state|2] = max(dp[state|2], dp[state]*2)
+			}
+			if (state & 4) == 0 {
+				dp[state|4] = max(dp[state|4], dp[state]*3)
+			}
+		}
+	}
+
+	return ans
+}
+
+func solve1(a []int, h int) int {
 	sort.Ints(a)
 	// dp[i][g][b] = 吸收完i后，剩余g个green，b个blue后的power
 	n := len(a)
@@ -137,11 +208,4 @@ func solve(a []int, h int) int {
 	}
 
 	return ans
-}
-
-func max(a, b int) int {
-	if a >= b {
-		return a
-	}
-	return b
 }

@@ -85,7 +85,65 @@ type Pair struct {
 	second int
 }
 
+func z_function(s string) []int {
+	n := len(s)
+	z := make([]int, n)
+	l, r := 0, 0
+	for i := 1; i < n; i++ {
+		if i < r {
+			z[i] = min(r-i, z[i-l])
+		}
+		for i+z[i] < n && s[z[i]] == s[i+z[i]] {
+			z[i]++
+		}
+		if i+z[i] > r {
+			l = i
+			r = i + z[i]
+		}
+	}
+	return z
+}
+
 func solve(s string) int {
+	n := len(s)
+	nona := make([]int, n+1)
+	nona[n] = n
+	for i := n - 1; i >= 0; i-- {
+		nona[i] = nona[i+1]
+		if s[i] != 'a' {
+			nona[i] = i
+		}
+	}
+	if nona[0] == n {
+		return n - 1
+	}
+	z := z_function(s[nona[0]:])
+
+	var ans int
+
+	for ln := 1; ln+nona[0] <= n; ln++ {
+		cur := ln + nona[0]
+		mn := nona[0]
+		ok := true
+		for cur < n && nona[cur] < n {
+			// 还有非a的字符
+			mn = min(mn, nona[cur]-cur)
+			cur += nona[cur] - cur
+			if z[cur-nona[0]] < ln {
+				ok = false
+				break
+			}
+			cur += ln
+		}
+		if ok {
+			ans += mn + 1
+		}
+	}
+
+	return ans
+}
+
+func solve1(s string) int {
 	n := len(s)
 	var other []Pair
 	for i := 0; i < n; i++ {

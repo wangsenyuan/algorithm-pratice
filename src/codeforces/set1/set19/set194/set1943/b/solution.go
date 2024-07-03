@@ -94,6 +94,103 @@ func solve(s string, queries [][]int) []int {
 	p1 := make([]int, n)
 	// dp[i] = 和s[i-1, i] 不同的位置
 	p2 := make([]int, n)
+	p1[0] = -1
+	p2[0] = -1
+
+	for i := 1; i < n; i++ {
+		if s[i] != s[i-1] {
+			p1[i] = i - 1
+		} else {
+			p1[i] = p1[i-1]
+		}
+		if i >= 2 && s[i] == s[i-2] {
+			p2[i] = max(p2[i-2], p2[i-1])
+		} else {
+			p2[i] = i - 2
+		}
+	}
+
+	v := manacher(s)
+
+	isPalidrome := func(l int, r int) bool {
+		return v[l+r] >= r-l+1
+	}
+
+	find := func(l int, r int) int {
+		if p1[r] < l {
+			// all a
+			return 0
+		}
+		// 2 + 4 + ... + (r - l + 1)
+		ln := r - l + 1
+		m := (ln-2)/2 + 1
+		res := (2 + 2*m) * m / 2
+		if ln%2 == 0 && isPalidrome(l, r) {
+			res -= ln
+		}
+		if p2[r] >= l && ln >= 3 {
+			// 3， 5， 7。。。
+			// 3 + 2 * k <= ln
+			k := (ln - 3) / 2
+			res += (3 + 3 + 2*k) * (k + 1) / 2
+			if ln%2 == 1 && isPalidrome(l, r) {
+				res -= ln
+			}
+		}
+		// else ababab
+
+		return res
+	}
+
+	ans := make([]int, len(queries))
+
+	for i, cur := range queries {
+		ans[i] = find(cur[0]-1, cur[1]-1)
+	}
+
+	return ans
+}
+
+func manacher(s string) []int {
+	buf := make([]byte, 2*len(s)+1)
+	for i := 0; i < len(s); i++ {
+		buf[i*2] = '#'
+		buf[i*2+1] = s[i]
+	}
+	buf[2*len(s)] = '#'
+
+	v := manacher_odd(string(buf))
+
+	return v[1 : len(v)-1]
+}
+
+func manacher_odd(s string) []int {
+	s = "&" + s + "^"
+	n := len(s)
+	p := make([]int, n)
+
+	l, r := 1, 1
+
+	for i := 1; i < n-1; i++ {
+		p[i] = max(0, min(r-i, p[l+(r-i)]))
+		for s[i-p[i]] == s[i+p[i]] {
+			p[i]++
+		}
+		if i+p[i] > r {
+			l = i - p[i]
+			r = i + p[i]
+		}
+	}
+
+	return p[1 : n-1]
+}
+
+func solve1(s string, queries [][]int) []int {
+	n := len(s)
+	// p1[i] = 和s[i]不同的最近的字符的位置
+	p1 := make([]int, n)
+	// dp[i] = 和s[i-1, i] 不同的位置
+	p2 := make([]int, n)
 	for i := 0; i < n; i++ {
 		p1[i] = -1
 		p2[i] = -1

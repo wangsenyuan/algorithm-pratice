@@ -35,35 +35,6 @@ func readString(reader *bufio.Reader) string {
 	return s
 }
 
-func readNInt64s(reader *bufio.Reader, n int) []int64 {
-	res := make([]int64, n)
-	s, _ := reader.ReadBytes('\n')
-
-	var pos int
-
-	for i := 0; i < n; i++ {
-		pos = readInt64(s, pos, &res[i]) + 1
-	}
-
-	return res
-}
-
-func readInt64(bytes []byte, from int, val *int64) int {
-	i := from
-	var sign int64 = 1
-	if bytes[i] == '-' {
-		sign = -1
-		i++
-	}
-	var tmp int64
-	for i < len(bytes) && bytes[i] >= '0' && bytes[i] <= '9' {
-		tmp = tmp*10 + int64(bytes[i]-'0')
-		i++
-	}
-	*val = tmp * sign
-	return i
-}
-
 func readInt(bytes []byte, from int, val *int) int {
 	i := from
 	sign := 1
@@ -150,11 +121,4 @@ func solve(a []int) int {
 		}
 	}
 	return res
-}
-
-func max(a, b int) int {
-	if a >= b {
-		return a
-	}
-	return b
 }

@@ -17,7 +17,8 @@
       "showLog": true,
       "trace": "log",
       "backend": "native",
-      "console": "integratedTerminal"
+      "console": "integratedTerminal",
+      "logOutput": "dap"
     }
   ]
 }

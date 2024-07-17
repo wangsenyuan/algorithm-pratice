@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"fmt"
 	"os"
-	"sort"
 )
 
 func main() {
@@ -17,13 +16,9 @@ func main() {
 
 	for tc > 0 {
 		tc--
-		n, k := readTwoNums(reader)
-		a := readNNums(reader, n)
-		b := readNNums(reader, k)
-		res := solve(a, b)
-		s := fmt.Sprintf("%v", res)
-		s = s[1 : len(s)-1]
-		buf.WriteString(fmt.Sprintf("%s\n", s))
+		n := readNum(reader)
+		res := solve(n)
+		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 
 	fmt.Print(buf.String())
@@ -114,57 +109,59 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	}
 	return res
 }
-func solve(a []int, b []int) []int {
-	sort.Ints(b)
-	reverse(b)
 
-	var res []int
-	var j int
-	for i := 0; i < len(a); i++ {
-		for j < len(b) && b[j] >= a[i] {
-			res = append(res, b[j])
-			j++
+const MC = 1_000_000_9
+
+var ans [MC]int
+
+func init() {
+
+	lps := make([]int, MC)
+	var primes []int
+	for i := 2; i < MC; i++ {
+		if lps[i] == 0 {
+			lps[i] = i
+			primes = append(primes, i)
 		}
-		res = append(res, a[i])
-	}
-
-	res = append(res, b[j:]...)
-
-	return res
-}
-
-func getLis(arr []int) []int {
-	n := len(arr)
-	res := make([]int, n)
-	var top int
-
-	for i := 0; i < n; i++ {
-		j := search(top, func(j int) bool {
-			return res[j] >= arr[i]
-		})
-		res[j] = arr[i]
-		if j == top {
-			top++
+		for j := 0; j < len(primes); j++ {
+			if i*primes[j] >= MC {
+				break
+			}
+			lps[i*primes[j]] = primes[j]
+			if i%primes[j] == 0 {
+				break
+			}
 		}
 	}
-	return res[:top]
-}
-
-func reverse(arr []int) {
-	for i, j := 0, len(arr)-1; i < j; i, j = i+1, j-1 {
-		arr[i], arr[j] = arr[j], arr[i]
+	sum := make([]int, MC)
+	for i := 0; i < MC; i++ {
+		sum[i] = -1
 	}
-}
-
-func search(n int, f func(int) bool) int {
-	l, r := 0, n
-	for l < r {
-		mid := (l + r) >> 1
-		if f(mid) {
-			r = mid
+	sum[1] = 1
+	for i := 2; i < MC; i++ {
+		if lps[i] == i {
+			sum[i] = 1 + i
 		} else {
-			l = mid + 1
+			j := i
+			sum[i] = 1
+			for j%lps[i] == 0 {
+				j /= lps[i]
+				sum[i] = sum[i]*lps[i] + 1
+			}
+			sum[i] *= sum[j]
 		}
 	}
-	return r
+
+	for i := 1; i < MC; i++ {
+		ans[i] = -1
+	}
+	ans[1] = 1
+	for i := 2; i < MC; i++ {
+		if sum[i] < MC && ans[sum[i]] < 0 {
+			ans[sum[i]] = i
+		}
+	}
+}
+func solve(c int) int {
+	return ans[c]
 }

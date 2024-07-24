@@ -4,7 +4,9 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"math/bits"
 	"os"
+	"slices"
 )
 
 func main() {
@@ -118,6 +120,19 @@ func readNNums(reader *bufio.Reader, n int) []int {
 }
 
 func solve(a []int) []int {
+	m := slices.Min(a)
+	M := slices.Max(a)
+	if m == M {
+		return nil
+	}
+	u := 1<<(bits.Len(uint(M))) - 1
+	x := u - M
+	res := make([]int, 1+bits.Len(uint((u/2)^((m+x)/2))))
+	res[0] = x
+	return res
+}
+
+func solve1(a []int) []int {
 	x, y := a[0], a[0]
 
 	for _, num := range a {

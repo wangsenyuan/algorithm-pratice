@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"slices"
+	"sort"
 )
 
 func main() {
@@ -114,7 +115,35 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	}
 	return res
 }
+
 func solve(l int, messages [][]int) int {
+	sort.Slice(messages, func(i, j int) bool {
+		return messages[i][1] < messages[j][1]
+	})
+	n := len(messages)
+	fp := make([]int, n)
+	var ans int
+	for i, cur := range messages {
+		fp[i] = cur[0] - cur[1]
+		if cur[0] <= l {
+			ans = 1
+		}
+	}
+
+	for i := 1; i < n; i++ {
+		mn := fp[i-1]
+		for j := i; j < n; j++ {
+			fp[j], mn = mn+messages[j][0], min(mn, fp[j])
+			if fp[j]+messages[j][1] <= l {
+				ans = i + 1
+			}
+		}
+	}
+
+	return ans
+}
+
+func solve1(l int, messages [][]int) int {
 	slices.SortFunc(messages, func(x, y []int) int {
 		// 在b相同的情况下，降序排
 		if x[1] == y[1] {

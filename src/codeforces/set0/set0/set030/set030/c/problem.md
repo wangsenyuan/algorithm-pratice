@@ -1,0 +1,5 @@
+One warm and sunny day king Copa decided to visit the shooting gallery, located at the Central Park, and try to win the main prize — big pink plush panda. The king is not good at shooting, so he invited you to help him.
+
+The shooting gallery is an infinite vertical plane with Cartesian coordinate system on it. The targets are points on this plane. Each target is described by it's coordinates xi, and yi, by the time of it's appearance ti and by the number pi, which gives the probability that Copa hits this target if he aims at it.
+
+A target appears and disappears instantly, so Copa can hit the target only if at the moment ti his gun sight aimed at (xi, yi). Speed of movement of the gun sight on the plane is equal to 1. Copa knows all the information about the targets beforehand (remember, he is a king!). He wants to play in the optimal way, which maximizes the expected value of the amount of hit targets. He can aim at any target at the moment 0.

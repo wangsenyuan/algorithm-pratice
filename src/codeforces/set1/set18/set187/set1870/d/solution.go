@@ -115,6 +115,36 @@ func readNNums(reader *bufio.Reader, n int) []int {
 
 func solve(c []int, k int) []int {
 	n := len(c)
+	type pair struct {
+		first  int
+		second int
+	}
+
+	stack := make([]pair, n+1)
+	top := 1
+	for i := 1; i <= n; i++ {
+		for c[i-1] <= stack[top-1].first {
+			top--
+		}
+		stack[top] = pair{c[i-1], i}
+		top++
+	}
+	h := 1 << 30
+	res := make([]int, n)
+
+	for i := 1; i < top; i++ {
+		d := stack[i].first - stack[i-1].first
+		h = min(h, k/d)
+		k -= h * d
+		for j := stack[i-1].second; j < stack[i].second; j++ {
+			res[j] = h
+		}
+	}
+
+	return res
+}
+func solve2(c []int, k int) []int {
+	n := len(c)
 	for i := n - 2; i >= 0; i-- {
 		c[i] = min(c[i], c[i+1])
 	}

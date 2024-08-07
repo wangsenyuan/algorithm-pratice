@@ -1,0 +1,39 @@
+package main
+
+import "testing"
+
+func runSample(t *testing.T, s string, k int, expect int) {
+	res := solve(s, k)
+
+	if res != expect {
+		t.Fatalf("Sample expect %d, but got %d", expect, res)
+	}
+}
+
+func TestSample1(t *testing.T) {
+	s := "AB?A?BA"
+	k := 4
+	expect := 1
+	runSample(t, s, k, expect)
+}
+
+func TestSample2(t *testing.T) {
+	s := "????????????????????????????????????????"
+	k := 7
+	expect := 116295436
+	runSample(t, s, k, expect)
+}
+
+func TestSample3(t *testing.T) {
+	s := "ABABA??????????"
+	k := 5
+	expect := 0
+	runSample(t, s, k, expect)
+}
+
+func TestSample4(t *testing.T) {
+	s := "?A?B??B?B?AA?A?B??B?A???B?BB?B???BA??BAA"
+	k := 8
+	expect := 259240
+	runSample(t, s, k, expect)
+}

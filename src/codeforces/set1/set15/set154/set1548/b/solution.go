@@ -4,12 +4,12 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"math/bits"
 	"os"
 )
 
 func main() {
 	reader := bufio.NewReader(os.Stdin)
-
 	tc := readNum(reader)
 
 	var buf bytes.Buffer
@@ -33,35 +33,6 @@ func readString(reader *bufio.Reader) string {
 		}
 	}
 	return s
-}
-
-func readNInt64s(reader *bufio.Reader, n int) []int64 {
-	res := make([]int64, n)
-	s, _ := reader.ReadBytes('\n')
-
-	var pos int
-
-	for i := 0; i < n; i++ {
-		pos = readInt64(s, pos, &res[i]) + 1
-	}
-
-	return res
-}
-
-func readInt64(bytes []byte, from int, val *int64) int {
-	i := from
-	var sign int64 = 1
-	if bytes[i] == '-' {
-		sign = -1
-		i++
-	}
-	var tmp int64
-	for i < len(bytes) && bytes[i] >= '0' && bytes[i] <= '9' {
-		tmp = tmp*10 + int64(bytes[i]-'0')
-		i++
-	}
-	*val = tmp * sign
-	return i
 }
 
 func readInt(bytes []byte, from int, val *int) int {
@@ -112,17 +83,58 @@ func readNNums(reader *bufio.Reader, n int) []int {
 }
 
 func solve(a []int) int {
-	for i := 1; ; i++ {
-		cnt := make([]int, 2)
-		for _, x := range a {
-			if (x>>(i-1))&1 == 0 {
-				cnt[0]++
-			} else {
-				cnt[1]++
+	// gcd(l...r) > 1
+	n := len(a)
+	b := make([]int, n-1)
+
+	for i := 0; i < n-1; i++ {
+		b[i] = abs(a[i+1] - a[i])
+	}
+	// gcd(l...r) > 1
+	h := bits.Len(uint(n))
+	// dp[i][j] = gcd(i, i + 1 << j - 1)
+	dp := make([][]int, n)
+	dp[n-1] = make([]int, h)
+	for i := n - 2; i >= 0; i-- {
+		dp[i] = make([]int, h)
+		dp[i][0] = b[i]
+		for j := 1; j < h; j++ {
+			if i+(1<<(j-1)) < n {
+				dp[i][j] = gcd(dp[i][j-1], dp[i+(1<<(j-1))][j-1])
 			}
 		}
-		if cnt[0] > 0 && cnt[1] > 0 {
-			return 1 << i
-		}
 	}
+
+	get := func(l int, r int) int {
+		var res int
+		for i := h - 1; i >= 0; i-- {
+			if l+(1<<i) <= r {
+				res = gcd(res, dp[l][i])
+				l += 1 << i
+			}
+		}
+		return gcd(res, dp[l][0])
+	}
+
+	var best int
+
+	for l, r := n-2, n-2; l >= 0; l-- {
+		for r >= l && get(l, r) == 1 {
+			r--
+		}
+		best = max(best, r-l+1)
+	}
+
+	return best + 1
+}
+
+func abs(num int) int {
+	return max(num, -num)
+}
+
+func gcd(a, b int) int {
+	for b > 0 {
+		a, b = b, a%b
+	}
+	return a
 }

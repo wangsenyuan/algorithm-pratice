@@ -11,19 +11,14 @@ func main() {
 	reader := bufio.NewReader(os.Stdin)
 
 	tc := readNum(reader)
-
 	var buf bytes.Buffer
-
 	for tc > 0 {
 		tc--
-		readNum(reader)
-		grid := make([]string, 2)
-		grid[0] = readString(reader)
-		grid[1] = readString(reader)
-		res, cnt := solve(grid)
-		buf.WriteString(fmt.Sprintf("%s\n%d\n", res, cnt))
+		n := readNum(reader)
+		s := readString(reader)[:n]
+		res := solve(s)
+		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
-
 	fmt.Print(buf.String())
 }
 
@@ -84,64 +79,17 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func solve(grid []string) (string, int) {
-	n := len(grid[0])
-	i := 1
-	for i < n && grid[0][i] <= grid[1][i-1] {
-		i++
+func solve(s string) int {
+	var sum int
+	freq := make(map[int]int)
+	freq[0]++
+
+	var res int
+	for i := 0; i < len(s); i++ {
+		sum += int(s[i] - '0')
+		res += freq[sum-(i+1)]
+		freq[sum-(i+1)]++
 	}
 
-	j := i - 1
-	for j > 0 && grid[0][j] == grid[1][j-1] {
-		j--
-	}
-
-	s := grid[0][:i] + grid[1][i-1:]
-	cnt := i - j
-	return s, cnt
-}
-
-func solve1(grid []string) (string, int) {
-	n := len(grid[0])
-
-	dp := make([][]int, 2)
-	for i := 0; i < 2; i++ {
-		dp[i] = make([]int, n)
-	}
-
-	dp[0][0] = 1
-
-	// 也就是只有到 s[0][i+1] == s[1][i]的时候，才能继续
-	for i := 1; i < n; i++ {
-		if dp[0][i-1] > 0 {
-			if grid[0][i] == grid[1][i-1] {
-				dp[0][i] = dp[0][i-1]
-				dp[1][i-1] += dp[0][i-1]
-			} else if grid[0][i] < grid[1][i-1] {
-				dp[0][i] = dp[0][i-1]
-				dp[1][i-1] = 0
-			} else {
-				dp[0][i] = 0
-				dp[1][i-1] += dp[0][i-1]
-			}
-			dp[1][i] += dp[1][i-1]
-		} else {
-			dp[1][i] = dp[1][i-1]
-		}
-	}
-
-	dp[1][n-1] += dp[0][n-1]
-
-	buf := make([]byte, n+1)
-	a, b := 1, n-1
-	for i := n; i >= 0; i-- {
-		buf[i] = grid[a][b]
-		if b == 0 || a == 1 && dp[a-1][b] > 0 {
-			a--
-		} else {
-			b--
-		}
-	}
-
-	return string(buf), dp[1][n-1]
+	return res
 }

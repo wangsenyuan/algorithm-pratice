@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"slices"
 )
 
 func main() {
@@ -16,8 +17,9 @@ func main() {
 
 	for tc > 0 {
 		tc--
-		n, m := readTwoNums(reader)
-		res := solve(n, m)
+		n := readNum(reader)
+		a := readNNums(reader, n)
+		res := solve(a)
 		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 
@@ -110,47 +112,42 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func solve(n int, m int) int {
-	n %= m
-	g := gcd(n, m)
-	n /= g
-	m /= g
+func solve(a []int) int32 {
+	ma := slices.Max(a)
+	n := len(a)
+	pref := make([][]int32, n+1)
 
-	// m需要是2的倍数
-	if m&(m-1) != 0 {
-		return -1
+	for i := 0; i <= n; i++ {
+		pref[i] = make([]int32, ma+1)
+	}
+	var best int32
+
+	arr := make([][]int32, ma+1)
+	pos := make([]int32, n)
+
+	for i := 0; i < n; i++ {
+		if i > 0 {
+			copy(pref[i], pref[i-1])
+		}
+		pref[i][a[i]]++
+		best = max(best, pref[i][a[i]])
+		arr[a[i]] = append(arr[a[i]], int32(i))
+		pos[i] = int32(len(arr[a[i]]) - 1)
 	}
 
-	var ans int
-
-	for n > 0 {
-		ans += n
-		n = n * 2 % m
+	for i := 0; i < n; i++ {
+		x := a[i]
+		l := arr[x][pos[i]]
+		r := arr[x][len(arr[x])-1-int(pos[i])]
+		if l < r {
+			var tmp int32
+			for y := 1; y <= ma; y++ {
+				tmp = max(tmp, pref[r-1][y]-pref[l][y])
+			}
+			tmp += 2 * (pos[i] + 1)
+			best = max(best, tmp)
+		}
 	}
 
-	return ans * g
-}
-func solve1(n int, m int) int {
-	// 如果 n / m 是循环小数，肯定不行
-	// 可以把n平均分配为k份，且k % m = 0
-	// (n << x) % m = 0
-	n %= m
-	g := gcd(n, m)
-	z := m / g
-	if z != z&-z {
-		return -1
-	}
-
-	var cnt int
-	for x := n / g; x > 0; x -= x & -x {
-		cnt++
-	}
-	return cnt*m - n
-}
-
-func gcd(a, b int) int {
-	for b > 0 {
-		a, b = b, a%b
-	}
-	return a
+	return best
 }

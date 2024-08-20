@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"slices"
 )
 
 func main() {
@@ -16,8 +17,9 @@ func main() {
 
 	for tc > 0 {
 		tc--
-		n, m := readTwoNums(reader)
-		res := solve(n, m)
+		n := readNum(reader)
+		a := readNNums(reader, n)
+		res := solve(a)
 		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 
@@ -110,47 +112,54 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func solve(n int, m int) int {
-	n %= m
-	g := gcd(n, m)
-	n /= g
-	m /= g
+func solve(a []int) int {
+	ma := slices.Max(a)
+	n := len(a)
+	pref := make([][]int, n+1)
 
-	// m需要是2的倍数
-	if m&(m-1) != 0 {
-		return -1
+	for i := 0; i <= n; i++ {
+		pref[i] = make([]int, ma+1)
 	}
 
-	var ans int
-
-	for n > 0 {
-		ans += n
-		n = n * 2 % m
+	for i := 0; i < n; i++ {
+		copy(pref[i+1], pref[i])
+		pref[i+1][a[i]]++
 	}
 
-	return ans * g
-}
-func solve1(n int, m int) int {
-	// 如果 n / m 是循环小数，肯定不行
-	// 可以把n平均分配为k份，且k % m = 0
-	// (n << x) % m = 0
-	n %= m
-	g := gcd(n, m)
-	z := m / g
-	if z != z&-z {
-		return -1
+	check := func(u, v int) int {
+		// v is the mid
+		l, r := 0, 0
+		var best int
+		for x, i, j := 0, 0, n-1; i < j; x++ {
+			for i < j && l < x {
+				if a[i] == u {
+					l++
+				}
+				i++
+			}
+			for i < j && r < x {
+				if a[j] == u {
+					r++
+				}
+				j--
+			}
+			if l == x && r == x && i < j+1 {
+				best = max(best, 2*x+pref[j+1][v]-pref[i][v])
+			}
+		}
+
+		return best
 	}
 
-	var cnt int
-	for x := n / g; x > 0; x -= x & -x {
-		cnt++
+	var best int
+	for u := 1; u <= ma; u++ {
+		best = max(best, pref[n][u])
+		for v := 1; v <= ma; v++ {
+			if u != v {
+				best = max(best, check(u, v))
+			}
+		}
 	}
-	return cnt*m - n
-}
 
-func gcd(a, b int) int {
-	for b > 0 {
-		a, b = b, a%b
-	}
-	return a
+	return best
 }

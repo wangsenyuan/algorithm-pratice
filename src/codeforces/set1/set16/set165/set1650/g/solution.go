@@ -110,6 +110,11 @@ func add(a, b int) int {
 	}
 	return a
 }
+
+func mul(a, b int) int {
+	return a * b % MOD
+}
+
 func solve(n int, E [][]int, s int, t int) int {
 	s--
 	t--

@@ -165,7 +165,7 @@ func solve(n int, grid [][]int) []string {
 				return nil
 			}
 
-			if x < 0 && y < 0 {
+			if x < 0 && y < 0 && buf[i][j] == ' ' {
 				// ended in loop
 				for k := 0; k < 4 && buf[i][j] == ' '; k++ {
 					r, c := i+dd[k], j+dd[k+1]

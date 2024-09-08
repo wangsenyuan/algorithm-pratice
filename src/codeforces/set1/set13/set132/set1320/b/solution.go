@@ -121,13 +121,6 @@ func solve(n int, roads [][]int, path []int) []int {
 		}
 	}
 
-	dp := make([]int, n)
-	fp := make([]int, n)
-	for i := 0; i < n; i++ {
-		dp[i] = inf
-		fp[i] = -inf
-	}
-
 	res := []int{0, 0}
 
 	for i := 0; i+1 < len(path); i++ {

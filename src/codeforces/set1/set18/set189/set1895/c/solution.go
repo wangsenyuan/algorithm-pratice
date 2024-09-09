@@ -103,8 +103,55 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	}
 	return res
 }
-
 func solve(s []string) int {
+
+	a := make([][]string, 6)
+	for _, num := range s {
+		a[len(num)] = append(a[len(num)], num)
+	}
+
+	var res int
+
+	cnt := make([]int, 100)
+	// 左边
+	for i := 1; i <= 5; i++ {
+		// 右边
+		for j := 1; j <= 5; j++ {
+			if (i+j)%2 == 1 {
+				continue
+			}
+			clear(cnt)
+			mid := (i + j) / 2
+			for _, num := range a[i] {
+				sum := 50
+				for k, b := range num {
+					if k < mid {
+						// 在左半边
+						sum += int(b - '0')
+					} else {
+						// 在右边
+						sum -= int(b - '0')
+					}
+				}
+				cnt[sum]++
+			}
+			for _, num := range a[j] {
+				sum := 50
+				for k, b := range num {
+					if k+i < mid {
+						sum -= int(b - '0')
+					} else {
+						sum += int(b - '0')
+					}
+				}
+				res += cnt[sum]
+			}
+		}
+	}
+
+	return res
+}
+func solve1(s []string) int {
 	ans := 0
 	cnt := make([][]int, 6)
 	for i := range cnt {

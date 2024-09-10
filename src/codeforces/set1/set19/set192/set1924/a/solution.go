@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"math/bits"
 	"os"
 )
 
@@ -118,6 +119,39 @@ func readNNums(reader *bufio.Reader, n int) []int {
 }
 
 func solve(n int, k int, s string) string {
+	m := len(s)
+
+	buf := make([]byte, n)
+	var mask uint
+
+	var j int
+	for i := 0; i < m && j < n; {
+		for i < m && mask != 1<<k-1 {
+			mask |= 1 << uint(s[i]-'a')
+			i++
+		}
+		if mask == 1<<k-1 {
+			buf[j] = s[i-1]
+			j++
+			mask = 0
+		}
+	}
+
+	if j == n {
+		return ""
+	}
+
+	x := bits.TrailingZeros(^mask)
+	buf[j] = byte('a' + x)
+	j++
+	for j < n {
+		buf[j] = 'a'
+		j++
+	}
+	return string(buf)
+}
+
+func solve1(n int, k int, s string) string {
 	m := len(s)
 
 	// 到目前为止长度为i的是否ok

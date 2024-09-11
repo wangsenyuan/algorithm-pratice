@@ -118,6 +118,29 @@ const inf = 1 << 30
 
 func solve(mat []string) int {
 	n := len(mat)
+	f := make([]byte, n)
+	d1 := make([]byte, n*2)
+	d2 := make([]byte, n*2)
+
+	var ans int
+
+	for i, s := range mat {
+		for j, c := range []byte(s) {
+			f[j] ^= d1[i-j+n] ^ d2[i+j]
+			if f[j] != c&1 {
+				ans++
+				f[j] ^= 1
+				d1[i-j+n] ^= 1
+				d2[i+j] ^= 1
+			}
+		}
+	}
+
+	return ans
+}
+
+func solve1(mat []string) int {
+	n := len(mat)
 
 	// 不大对，每个格子最多操作一次
 	// 如果对于i,j 如果它的奇偶性和上面影响到它的数量

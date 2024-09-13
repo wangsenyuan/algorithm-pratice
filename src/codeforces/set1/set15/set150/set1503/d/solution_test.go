@@ -34,7 +34,7 @@ func TestSample2(t *testing.T) {
 }
 
 func TestSample3(t *testing.T) {
-	n := 2
+	n := 6
 	P := [][]int{
 		{9, 8},
 		{10, 7},

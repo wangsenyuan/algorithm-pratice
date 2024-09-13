@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"slices"
 )
 
 func main() {
@@ -90,7 +91,98 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 
 const INF = 1 << 30
 
+type pair struct {
+	x int
+	y int
+}
+
 func solve(n int, P [][]int) int {
+	to := make([]int, n*2+1)
+	// pos表示在背面，还是在正面
+	pos := make([]int, n*2+1)
+	ps := make([]pair, n)
+	for i := range P {
+		ps[i] = pair{P[i][0], P[i][1]}
+		pos[ps[i].y] = 1
+		to[ps[i].x] = ps[i].y
+		to[ps[i].y] = ps[i].x
+	}
+
+	a := make([]int, n)
+	al, ar := 0, n-1
+	b := make([]int, n)
+	bl, br := 0, n-1
+	vis := make([]bool, n*2+2)
+	mn, mx := 1, n*2
+
+	var ans int
+
+	for {
+		for vis[mn] {
+			mn++
+		}
+		if mn > n*2 {
+			break
+		}
+
+		cnt := [2]int{}
+		t := mn
+		for {
+			last := 0
+			for ; mn <= t; mn++ {
+				if vis[mn] {
+					continue
+				}
+				cnt[pos[mn]]++
+
+				vis[mn] = true
+				a[al] = mn
+				al++
+
+				last = to[mn]
+				vis[last] = true
+				b[bl] = last
+				bl++
+			}
+
+			if last == 0 {
+				break
+			}
+
+			t = last
+			last = 0
+			for ; mx >= t; mx-- {
+				if vis[mx] {
+					continue
+				}
+				cnt[pos[mx]]++
+
+				vis[mx] = true
+				a[ar] = mx
+				ar--
+
+				last = to[mx]
+				vis[last] = true
+				b[br] = last
+				br--
+			}
+
+			if last == 0 {
+				break
+			}
+			t = last
+		}
+		ans += min(cnt[0], cnt[1])
+	}
+	slices.Reverse(b)
+	if !slices.IsSorted(a) || !slices.IsSorted(b) {
+		return -1
+	}
+
+	return ans
+}
+
+func solve1(n int, P [][]int) int {
 	f := make([]int, n+1)
 	c := make([]int, n+1)
 	for i := 0; i < n; i++ {

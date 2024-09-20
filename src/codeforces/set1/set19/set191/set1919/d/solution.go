@@ -89,6 +89,51 @@ func readNNums(reader *bufio.Reader, n int) []int {
 }
 
 func solve(a []int) bool {
+	n := len(a)
+	var cnt0 int
+	for _, v := range a {
+		if v == 0 {
+			cnt0++
+		}
+	}
+
+	if cnt0 != 1 {
+		return false
+	}
+
+	stack := make([]int, n+1)
+	var top int
+	stack[top] = -1
+	top++
+	left := make([]int, n)
+	for i, v := range a {
+		for top > 1 && stack[top-1] >= v {
+			top--
+		}
+		left[i] = stack[top-1]
+		stack[top] = v
+		top++
+	}
+
+	top = 1
+
+	for i := n - 1; i >= 0; i-- {
+		v := a[i]
+		for top > 1 && stack[top-1] >= v {
+			top--
+		}
+		right := stack[top-1]
+		if v > 0 && right != v-1 && left[i] != v-1 {
+			return false
+		}
+		stack[top] = v
+		top++
+	}
+
+	return true
+}
+
+func solve1(a []int) bool {
 	// 从leaf开始，每个节点进入的边的weight是可以确定的
 	// a[i] > a[i+1] 那么i的入边=1, else 0
 	// 但是这里有个问题，就是遇到 [1, 0, 1] 的时候，

@@ -115,7 +115,58 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
+type pair struct {
+	first  int
+	second int
+}
+
 func solve(n int, E [][]int, a []int) int {
+	if len(a) == 1 {
+		return 0
+	}
+	marked := make([]bool, n)
+	for _, x := range a {
+		marked[x-1] = true
+	}
+
+	g := NewGraph(n, 2*n)
+
+	for _, e := range E {
+		u, v := e[0], e[1]
+		g.AddEdge(u-1, v-1)
+		g.AddEdge(v-1, u-1)
+	}
+
+	// 答案应该是这些marked的点组成的子树的，直径的中点？
+	// 如果只有一个点，那么答案就是那个点（0）
+
+	var dfs func(p int, u int, d int) pair
+
+	dfs = func(p int, u int, d int) pair {
+		var res pair
+
+		for i := g.nodes[u]; i > 0; i = g.next[i] {
+			v := g.to[i]
+			if p != v {
+				tmp := dfs(u, v, d+1)
+				if tmp.first > 0 && res.first < tmp.first {
+					res = tmp
+				}
+			}
+		}
+		if res.first == 0 && marked[u] {
+			res = pair{d, u}
+		}
+		return res
+	}
+
+	first := dfs(-1, a[0], 0)
+	second := dfs(-1, first.second, 0)
+
+	return (second.first + 1) / 2
+}
+
+func solve1(n int, E [][]int, a []int) int {
 	// 假设 dist[0] = 0到marked的最大距离
 	// 假设u是0的其中一个children，
 	// 要计算dist[u] 必须知道两个信息, 一个是u到它的子树中的marked的距离

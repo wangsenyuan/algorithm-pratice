@@ -81,7 +81,7 @@ func readNNums(reader *bufio.Reader, n int) []int32 {
 type pair struct {
 	first  int32
 	second int32
-	id     int
+	id     int32
 }
 
 func solve(buildings [][]int32) [][]int32 {
@@ -90,8 +90,8 @@ func solve(buildings [][]int32) [][]int32 {
 	points := make([]pair, 2*n)
 	for i, building := range buildings {
 		h, l, r := building[0], building[1], building[2]
-		points[2*i] = pair{l, -h, i}
-		points[2*i+1] = pair{r, h, i}
+		points[2*i] = pair{l, -h, int32(i)}
+		points[2*i+1] = pair{r, h, int32(i)}
 		it := new(Item)
 		it.id = int32(i)
 		it.priority = 1 << 30
@@ -136,7 +136,7 @@ func solve(buildings [][]int32) [][]int32 {
 type Item struct {
 	id       int32
 	priority int32
-	index    int
+	index    int32
 }
 
 type Heap []*Item
@@ -145,13 +145,13 @@ func (h Heap) Len() int           { return len(h) }
 func (h Heap) Less(i, j int) bool { return h[i].priority > h[j].priority }
 func (h Heap) Swap(i, j int) {
 	h[i], h[j] = h[j], h[i]
-	h[i].index = i
-	h[j].index = j
+	h[i].index = int32(i)
+	h[j].index = int32(j)
 }
 
 func (h *Heap) Push(x any) {
 	it := x.(*Item)
-	it.index = len(*h)
+	it.index = int32(len(*h))
 	*h = append(*h, it)
 }
 
@@ -165,6 +165,6 @@ func (h *Heap) Pop() any {
 
 func (h *Heap) remove(it *Item) {
 	it.priority = 1 << 30
-	heap.Fix(h, it.index)
+	heap.Fix(h, int(it.index))
 	heap.Pop(h)
 }

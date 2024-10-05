@@ -2,6 +2,67 @@ package p3303
 
 const B = 27
 
+func minStartingIndex1(s string, pattern string) int {
+	n := len(s)
+
+	bases := make([]Hash, n+1)
+	bases[0] = NewHash(1)
+
+	for i := 1; i <= n; i++ {
+		bases[i] = bases[i-1].MulInt(B)
+	}
+	pref := make([]Hash, n+1)
+	pref[0] = NewHash(0)
+
+	for i, x := range []byte(s) {
+		pref[i+1] = pref[i].MulInt(B).AddInt(int(x - 'a'))
+	}
+
+	m := len(pattern)
+
+	get := func(arr []Hash, l int, r int) Hash {
+		res := arr[r+1]
+		res = res.Sub(arr[l].Mul(bases[r-l+1]))
+		return res
+	}
+
+	pos := make(map[Hash]int)
+
+	for i := n - m; i >= 0; i-- {
+		pos[get(pref, i, i+m-1)] = i
+	}
+	exp := make([]Hash, m+1)
+
+	for i, x := range []byte(pattern) {
+		exp[i+1] = exp[i].MulInt(B).AddInt(int(x - 'a'))
+	}
+
+	res := n
+	if i, ok := pos[exp[m]]; ok {
+		res = i
+	}
+	var first Hash
+	for i := 0; i < m; i++ {
+		first = first.MulInt(B)
+		// 在改变s[i]的情况下
+		second := get(exp, i+1, m-1)
+
+		for x := 0; x < 26; x++ {
+			tmp := first.AddInt(x).Mul(bases[m-i-1]).Add(second)
+			if j, ok := pos[tmp]; ok {
+				res = min(res, j)
+			}
+		}
+		first = first.AddInt(int(pattern[i] - 'a'))
+	}
+
+	if res == n {
+		return -1
+	}
+
+	return res
+}
+
 func minStartingIndex(s string, pattern string) int {
 	n := len(s)
 

@@ -102,6 +102,24 @@ func readUint64(bytes []byte, from int, val *uint64) int {
 }
 
 func solve(n int, ask func(c int) int) int {
+	l, r := 1, n-1
+
+	for l < r {
+		m := (l + r) / 2
+		c := n - 1 - m%n
+		res := ask(c)
+		if res == m/n {
+			l += c
+			r = m + c
+		} else {
+			l = m + 1 + c
+			r += c
+		}
+	}
+	return l
+}
+
+func solve1(n int, ask func(c int) int) int {
 
 	l, r := 1, n
 	var div int

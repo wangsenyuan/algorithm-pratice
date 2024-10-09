@@ -2,31 +2,20 @@ package main
 
 import (
 	"bufio"
-	"bytes"
 	"fmt"
 	"os"
+	"slices"
 )
 
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 
-	tc := readNum(reader)
+	n := readNum(reader)
+	a := readNNums(reader, n)
 
-	var buf bytes.Buffer
+	res := solve(a)
 
-	for tc > 0 {
-		tc--
-		n, x := readTwoNums(reader)
-		records := make([][]int, n)
-		for i := 0; i < n; i++ {
-			records[i] = readNNums(reader, 2)
-		}
-		res := solve(x, records)
-
-		buf.WriteString(fmt.Sprintf("%d\n", res))
-	}
-
-	fmt.Print(buf.String())
+	fmt.Println(res)
 }
 
 func readString(reader *bufio.Reader) string {
@@ -86,42 +75,19 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-const inf = 1 << 50
-
-func solve(x int, records [][]int) int {
-	// m := len(records)
-	// dp[i] 表示alice手头有
-	// 这个算法逻辑上是成立的
-	// 但是它的复杂性过高
-	// 是因为每个节点，相当于存储了用或者不用的信息
-	// 如果要获得h的happiness最少需要多少钱？
-	// dp[i][j] = dp[i-1][j-h[i]] + c[i] 如果 dp[i][j] <= (i+1) * x
-	//
-	var sh int
-	for _, rec := range records {
-		sh += rec[1]
-	}
-
-	dp := make([]int, sh+1)
-	for i := 0; i <= sh; i++ {
-		dp[i] = inf
-	}
-	dp[0] = 0
-
-	for i, rec := range records {
-		c, h := rec[0], rec[1]
-		for j := sh; j >= h; j-- {
-			if dp[j-h]+c <= i*x {
-				dp[j] = min(dp[j], dp[j-h]+c)
-			}
+func solve(a []int) int {
+	n := len(a)
+	dp := make([]int, n+1)
+	stack := make([]int, n)
+	var top int
+	for i := n - 1; i >= 0; i-- {
+		for top > 0 && stack[top-1] < a[i] {
+			dp[a[i]] = max(dp[a[i]]+1, dp[stack[top-1]])
+			top--
 		}
+		stack[top] = a[i]
+		top++
 	}
 
-	for j := sh; j > 0; j-- {
-		if dp[j] < inf {
-			return j
-		}
-	}
-
-	return 0
+	return slices.Max(dp)
 }

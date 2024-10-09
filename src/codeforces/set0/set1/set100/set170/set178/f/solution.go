@@ -2,31 +2,23 @@ package main
 
 import (
 	"bufio"
-	"bytes"
 	"fmt"
 	"os"
+	"sort"
 )
 
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 
-	tc := readNum(reader)
-
-	var buf bytes.Buffer
-
-	for tc > 0 {
-		tc--
-		n, x := readTwoNums(reader)
-		records := make([][]int, n)
-		for i := 0; i < n; i++ {
-			records[i] = readNNums(reader, 2)
-		}
-		res := solve(x, records)
-
-		buf.WriteString(fmt.Sprintf("%d\n", res))
+	n, k := readTwoNums(reader)
+	words := make([]string, n)
+	for i := 0; i < n; i++ {
+		words[i] = readString(reader)
 	}
 
-	fmt.Print(buf.String())
+	res := solve(k, words)
+
+	fmt.Println(res)
 }
 
 func readString(reader *bufio.Reader) string {
@@ -86,42 +78,43 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-const inf = 1 << 50
+func solve(k int, words []string) int {
+	sort.Strings(words)
 
-func solve(x int, records [][]int) int {
-	// m := len(records)
-	// dp[i] 表示alice手头有
-	// 这个算法逻辑上是成立的
-	// 但是它的复杂性过高
-	// 是因为每个节点，相当于存储了用或者不用的信息
-	// 如果要获得h的happiness最少需要多少钱？
-	// dp[i][j] = dp[i-1][j-h[i]] + c[i] 如果 dp[i][j] <= (i+1) * x
-	//
-	var sh int
-	for _, rec := range records {
-		sh += rec[1]
+	n := len(words)
+	f := make([]int, n)
+	for i := 1; i < n; i++ {
+		for f[i] < len(words[i-1]) && f[i] < len(words[i]) && words[i-1][f[i]] == words[i][f[i]] {
+			f[i]++
+		}
 	}
 
-	dp := make([]int, sh+1)
-	for i := 0; i <= sh; i++ {
-		dp[i] = inf
-	}
-	dp[0] = 0
+	var get func(l int, r int) []int
 
-	for i, rec := range records {
-		c, h := rec[0], rec[1]
-		for j := sh; j >= h; j-- {
-			if dp[j-h]+c <= i*x {
-				dp[j] = min(dp[j], dp[j-h]+c)
+	get = func(l int, r int) []int {
+		if r-l < 2 {
+			return []int{0, 0}
+		}
+		mid := l + 1
+		for i := l + 1; i < r; i++ {
+			if f[i] < f[mid] {
+				mid = i
 			}
 		}
-	}
+		left := get(l, mid)
+		right := get(mid, r)
+		ans := make([]int, r-l+1)
 
-	for j := sh; j > 0; j-- {
-		if dp[j] < inf {
-			return j
+		for i := 0; i < len(left); i++ {
+			for j := 0; j < len(right); j++ {
+				ans[i+j] = max(ans[i+j], left[i]+right[j]+i*j*f[mid])
+			}
 		}
+
+		return ans
 	}
 
-	return 0
+	ans := get(0, n)
+
+	return ans[k]
 }

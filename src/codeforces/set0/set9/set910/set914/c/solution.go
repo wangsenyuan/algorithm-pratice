@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math/bits"
 	"os"
 )
 
@@ -142,6 +143,66 @@ func nCr(n, r int) int {
 }
 
 func solve(num string, k int) int {
+	if k == 0 {
+		return 1
+	}
+	if k == 1 {
+		return len(num) - 1
+	}
+	n := len(num)
+	dp := make([][]int, n)
+	for i := 0; i < n; i++ {
+		dp[i] = make([]int, n+1)
+		for j := 0; j <= n; j++ {
+			dp[i][j] = -1
+		}
+	}
+
+	var f func(i int, left int, limit bool) int
+
+	f = func(i int, left int, limit bool) (ans int) {
+		if left == 0 {
+			return 1
+		}
+		if i == n {
+			return
+		}
+		if !limit {
+			if dp[i][left] >= 0 {
+				return dp[i][left]
+			}
+			defer func() {
+				dp[i][left] = ans
+			}()
+		}
+
+		up := 1
+		if limit {
+			up = int(num[i] - '0')
+		}
+		for d := 0; d <= up; d++ {
+			ans = add(ans, f(i+1, left-d, limit && d == up))
+		}
+		return ans
+	}
+
+	var ans int
+
+	cnt := make([]int, n+1)
+
+	// 优秀～
+	for i := 1; i <= n; i++ {
+		cnt[i] = cnt[bits.OnesCount(uint(i))] + 1
+		if cnt[i] == k {
+			// 数字i可以得到最终结果k
+			// 那么希望能获得正好这么多个数字，且不超过num的计数
+			ans = add(ans, f(0, i, true))
+		}
+	}
+	return ans
+}
+
+func solve1(num string, k int) int {
 	if k > MK+2 {
 		return 0
 	}

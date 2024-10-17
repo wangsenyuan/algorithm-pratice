@@ -113,6 +113,67 @@ func readNNums(reader *bufio.Reader, n int) []int {
 }
 
 func solve(n int, E [][]int) int64 {
+	set := NewDSU(n)
+
+	for _, e := range E {
+		u, v, w := e[0]-1, e[1]-1, e[2]
+		if checkLuck(w) {
+			continue
+		}
+		set.Union(u, v)
+	}
+
+	var res int
+
+	for u := 0; u < n; u++ {
+		p := set.Find(u)
+		if p == u {
+			sz := set.cnt[p]
+			res += sz * (n - sz) * (n - sz - 1)
+		}
+	}
+
+	return int64(res)
+}
+
+type DSU struct {
+	arr []int
+	cnt []int
+}
+
+func NewDSU(n int) *DSU {
+	arr := make([]int, n)
+	cnt := make([]int, n)
+	for i := 0; i < n; i++ {
+		arr[i] = i
+		cnt[i] = 1
+	}
+	return &DSU{arr, cnt}
+}
+
+func (this *DSU) Find(x int) int {
+	if this.arr[x] != x {
+		this.arr[x] = this.Find(this.arr[x])
+	}
+	return this.arr[x]
+}
+
+func (this *DSU) Union(x int, y int) bool {
+	px := this.Find(x)
+	py := this.Find(y)
+
+	if px == py {
+		return false
+	}
+	if this.cnt[px] < this.cnt[py] {
+		px, py = py, px
+	}
+	this.cnt[px] += this.cnt[py]
+	this.arr[py] = px
+	return true
+}
+
+func solve1(n int, E [][]int) int64 {
 	//如果一条边是lucky的，
 	// u, v 那么 i在u一侧，(j, k)属于 v一侧的组合，就满足条件
 	// 另外一种情况是 (j, i) & (i, k)

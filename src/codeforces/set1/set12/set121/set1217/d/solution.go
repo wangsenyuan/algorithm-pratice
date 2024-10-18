@@ -5,33 +5,24 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"slices"
 )
 
 func main() {
 	reader := bufio.NewReader(os.Stdin)
-	n := readNum(reader)
-	src := make([]string, n)
-	for i := 0; i < n; i++ {
-		src[i] = readString(reader)
-	}
-	tgt := make([]string, n)
-	for i := 0; i < n; i++ {
-		tgt[i] = readString(reader)
-	}
-	bar := readString(reader)
-	ok, res := solve(src, tgt, bar)
-	if !ok {
-		fmt.Println(-1)
-		return
-	}
-	var buf bytes.Buffer
-	buf.WriteString(fmt.Sprintf("%d\n", len(res)))
-	for _, x := range res {
-		buf.WriteString(x)
-		buf.WriteByte('\n')
+	n, k := readTwoNums(reader)
+	edges := make([][]int, k)
+	for i := 0; i < k; i++ {
+		edges[i] = readNNums(reader, 2)
 	}
 
-	fmt.Print(buf.String())
+	cnt, res := solve(n, edges)
+	var buf bytes.Buffer
+	buf.WriteString(fmt.Sprintf("%d\n", cnt))
+	for i := 0; i < k; i++ {
+		buf.WriteString(fmt.Sprintf("%d ", res[i]))
+	}
+	fmt.Println(buf.String())
 }
 
 func readString(reader *bufio.Reader) string {
@@ -91,58 +82,67 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func solve(src []string, tgt []string, bar string) (bool, []string) {
-	n := len(src)
+func solve(n int, edges [][]int) (int, []int) {
+	g := NewGraph(n, len(edges))
 
-	g := make([][]int32, n)
-	for i := 0; i < n; i++ {
-		g[i] = make([]int32, n)
-		for j := 0; j < n; j++ {
-			if src[i][j] != tgt[i][j] {
-				g[i][j] = 1
+	for i, e := range edges {
+		u, v := e[0], e[1]
+		g.AddEdge(u-1, v-1, i)
+	}
+	vis := make([]int, n)
+
+	var dfs func(u int)
+	color := make([]int, len(edges))
+	for i := 0; i < len(edges); i++ {
+		color[i] = 1
+	}
+
+	dfs = func(u int) {
+		vis[u]++
+
+		for i := g.nodes[u]; i > 0; i = g.next[i] {
+			v := g.to[i]
+
+			if vis[v] == 0 {
+				dfs(v)
+			} else if vis[v] == 1 {
+				color[g.val[i]] = 2
 			}
 		}
-	}
 
-	id := -1
-	b := make([]int32, n)
-	for i := 0; i < n; i++ {
-		b[i] = int32(bar[i] - '0')
-		if b[i] == 1 && id < 0 {
-			id = i
-		}
-	}
-	if id < 0 {
-		return false, nil
-	}
-
-	var ans []string
-
-	for i := 0; i < n; i++ {
-		if g[id][i] == 1 {
-			ans = append(ans, fmt.Sprintf("col %d", i))
-			for j := 0; j < n; j++ {
-				g[j][i] ^= b[j]
-			}
-		}
+		vis[u]++
 	}
 
 	for i := 0; i < n; i++ {
-		if g[i][id] == 1 {
-			ans = append(ans, fmt.Sprintf("row %d", i))
-			for j := 0; j < n; j++ {
-				g[i][j] ^= b[j]
-			}
+		if vis[i] == 0 {
+			dfs(i)
 		}
 	}
 
-	for i := 0; i < n; i++ {
-		for j := 0; j < n; j++ {
-			if g[i][j] == 1 {
-				return false, nil
-			}
-		}
-	}
+	return slices.Max(color), color
+}
 
-	return true, ans
+type Graph struct {
+	nodes []int
+	next  []int
+	to    []int
+	val   []int
+	cur   int
+}
+
+func NewGraph(n int, e int) *Graph {
+	nodes := make([]int, n)
+	e++
+	next := make([]int, e)
+	to := make([]int, e)
+	val := make([]int, e)
+	return &Graph{nodes, next, to, val, 0}
+}
+
+func (g *Graph) AddEdge(u, v, w int) {
+	g.cur++
+	g.next[g.cur] = g.nodes[u]
+	g.nodes[u] = g.cur
+	g.to[g.cur] = v
+	g.val[g.cur] = w
 }

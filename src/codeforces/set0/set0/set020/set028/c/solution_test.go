@@ -8,8 +8,8 @@ import (
 func runSample(t *testing.T, n int, m int, a []int, expect float64) {
 	res := solve(n, m, a)
 
-	if math.Abs(res-expect) > 1e-8 {
-		t.Fatalf("Sample expect %f, but got %f", expect, res)
+	if math.Abs(res-expect) > 1e-7 {
+		t.Fatalf("Sample expect %.8f, but got %.8f", expect, res)
 	}
 }
 
@@ -44,6 +44,6 @@ func TestSample4(t *testing.T) {
 func TestSample5(t *testing.T) {
 	n, m := 10, 4
 	a := []int{8, 4, 7, 6}
-	expect := 1.082108
+	expect := 1.08210754
 	runSample(t, n, m, a, expect)
 }

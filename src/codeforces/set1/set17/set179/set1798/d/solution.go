@@ -44,16 +44,6 @@ func readString(reader *bufio.Reader) string {
 	return s
 }
 
-func normalize(s string) string {
-
-	for i := len(s); i > 0; i-- {
-		if s[i-1] >= 'a' && s[i-1] <= 'z' {
-			return s[:i]
-		}
-	}
-	return ""
-}
-
 func readInt(bytes []byte, from int, val *int) int {
 	i := from
 	sign := 1
@@ -101,7 +91,68 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
+const inf = 1 << 60
+
 func solve(a []int) []int {
+	var res []int
+	var pos []int
+	var neg []int
+	ma, mn := -inf, inf
+	for _, x := range a {
+		ma = max(ma, x)
+		mn = min(mn, x)
+		if x == 0 {
+			res = append(res, x)
+			continue
+		}
+		if x > 0 {
+			pos = append(pos, x)
+		} else {
+			neg = append(neg, x)
+		}
+	}
+	expect := ma - mn
+
+	if expect == 0 {
+		return nil
+	}
+
+	sort.Ints(pos)
+	reverse(pos)
+	sort.Ints(neg)
+
+	lp := len(pos)
+	ln := len(neg)
+	var sum int
+	for lp > 0 || ln > 0 {
+		// 上次是负数，或者0
+		for lp > 0 && sum <= 0 {
+			res = append(res, pos[lp-1])
+			sum += pos[lp-1]
+			lp--
+		}
+		if sum >= expect {
+			return nil
+		}
+		for ln > 0 && sum > 0 {
+			res = append(res, neg[ln-1])
+			sum += neg[ln-1]
+			ln--
+		}
+		if abs(sum) >= expect {
+			return nil
+		}
+	}
+	return res
+}
+
+func reverse(arr []int) {
+	for i, j := 0, len(arr)-1; i < j; i, j = i+1, j-1 {
+		arr[i], arr[j] = arr[j], arr[i]
+	}
+}
+
+func solve1(a []int) []int {
 	sort.Ints(a)
 	n := len(a)
 

@@ -65,3 +65,17 @@ func TestSample8(t *testing.T) {
 	expect := 0
 	runSample(t, a, k, expect)
 }
+
+func TestSample9(t *testing.T) {
+	a := []int{2, 3, 9, 14, 17, 10, 22, 20, 18, 30, 1, 4, 28}
+	k := 3
+	expect := 14
+	runSample(t, a, k, expect)
+}
+
+func TestSample10(t *testing.T) {
+	a := []int{2, 4, 2, 1, 3}
+	k := 1
+	expect := 1
+	runSample(t, a, k, expect)
+}

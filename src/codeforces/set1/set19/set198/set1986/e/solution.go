@@ -83,6 +83,56 @@ func readNNums(reader *bufio.Reader, n int) []int {
 }
 
 func solve(a []int, k int) int {
+
+	rem := make(map[int][]int)
+
+	for _, v := range a {
+		rem[v%k] = append(rem[v%k], v)
+	}
+
+	var res int
+
+	pairty := len(a) % 2
+
+	for _, vs := range rem {
+		sort.Ints(vs)
+		if len(vs)%2 == 1 {
+			if pairty == 0 {
+				// no answer
+				return -1
+			}
+			// pairty == 1
+			var pref []int
+			var sum int
+			for i, v := range vs {
+				if i%2 == 1 {
+					sum += v - vs[i-1]
+				}
+				pref = append(pref, sum)
+			}
+			best := sum
+			sum = 0
+			// 0, 1, 2, 3, 4
+			for i := len(vs) - 1; i >= 0; i-- {
+				if i%2 == 0 {
+					best = min(best, sum+pref[i])
+				} else {
+					sum += vs[i+1] - vs[i]
+				}
+			}
+			res += best
+			pairty--
+		} else {
+			for i := 1; i < len(vs); i += 2 {
+				res += vs[i] - vs[i-1]
+			}
+		}
+	}
+
+	return res / k
+}
+
+func solve1(a []int, k int) int {
 	rem := make(map[int][]int)
 
 	for _, num := range a {

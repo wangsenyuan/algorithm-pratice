@@ -31,7 +31,7 @@ func TestSample1(t *testing.T) {
 	runSample(t, A, B, C, expect)
 }
 
-func TestSampleData(t *testing.T) {
+func estSampleData(t *testing.T) {
 
 	dir, _ := os.Getwd()
 

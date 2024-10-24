@@ -32,7 +32,10 @@ func TestSample1(t *testing.T) {
 }
 
 func TestSampleData(t *testing.T) {
-	dat, _ := os.Open("sample/data.in")
+
+	dir, _ := os.Getwd()
+
+	dat, _ := os.Open(dir + "/sample/data.in")
 
 	defer dat.Close()
 
@@ -40,7 +43,7 @@ func TestSampleData(t *testing.T) {
 
 	res := process(reader)
 
-	ans, _ := os.Open("sample/data.ans")
+	ans, _ := os.Open(dir + "/sample/data.ans")
 	defer ans.Close()
 
 	ansReader := bufio.NewReader(ans)

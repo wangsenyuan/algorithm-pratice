@@ -135,24 +135,6 @@ func solve(boxes [][]int) [][]int {
 		from[i] = pair{-1, -3}
 	}
 
-	var dfs func(p int, u int, x int, flag int) int
-
-	dfs = func(p int, u int, x int, flag int) int {
-		if u == p {
-			return flag
-		}
-		if flag&(1<<u) > 0 {
-			// 回到了前面的节点，但是不是开始位置
-			return -1
-		}
-		// 这里的y是确定的
-		// box - x + y = sum
-		y := sum - box_sum[u] + x
-		if v, ok := comp[y]; ok {
-			return dfs(p, v, y, flag|(1<<u))
-		}
-		return -1
-	}
 	// 这里的复杂度是 n * n * 5000
 	for i := 0; i < n; i++ {
 		for _, x := range boxes[i] {

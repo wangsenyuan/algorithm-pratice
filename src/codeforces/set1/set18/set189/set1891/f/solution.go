@@ -128,6 +128,58 @@ func readNNums(reader *bufio.Reader, n int) []int {
 }
 
 func solve(ops [][]int) []int {
+	m := len(ops)
+	n := 1
+	addAt := make([]int, m+2)
+	type pair struct {
+		first  int
+		second int
+	}
+	history := make([][]pair, m+2)
+
+	g := NewGraph(m+2, m+2)
+
+	for i, op := range ops {
+		if op[0] == 1 {
+			v := op[1]
+			n++
+			g.AddEdge(v, n)
+			addAt[n] = i
+		} else {
+			v, x := op[1], op[2]
+			history[v] = append(history[v], pair{x, i})
+		}
+	}
+
+	ans := make([]int, n+1)
+	var dfs func(u int)
+
+	set := make(fenwick, m+10)
+
+	dfs = func(u int) {
+		for _, p := range history[u] {
+			x, i := p.first, p.second
+			// 在时刻i进行了增加数x
+			set.update(m-i, x)
+		}
+		ans[u] = set.pre(m - addAt[u])
+
+		for i := g.nodes[u]; i > 0; i = g.next[i] {
+			dfs(g.to[i])
+		}
+
+		for _, p := range history[u] {
+			x, i := p.first, p.second
+			set.update(m-i, -x)
+		}
+	}
+
+	dfs(1)
+
+	return ans[1:]
+}
+
+func solve1(ops [][]int) []int {
 	n := 1
 	for _, op := range ops {
 		if op[0] == 1 {

@@ -80,6 +80,78 @@ func readNNums(reader *bufio.Reader, n int) []int {
 
 func solve(n int, enemies [][]int) int {
 	g := NewGraph(n, 2*len(enemies))
+	deg := make([]int, n)
+	for _, e := range enemies {
+		u, v := e[0]-1, e[1]-1
+		g.AddEdge(u, v)
+		g.AddEdge(v, u)
+		deg[u]++
+		deg[v]++
+	}
+
+	que := make([]int, n)
+	var head, tail int
+	marked := make([]bool, n)
+
+	for i := 0; i < n; i++ {
+		if deg[i] == 0 {
+			marked[i] = true
+		} else if deg[i] == 1 {
+			que[head] = i
+			head++
+			marked[i] = true
+		}
+	}
+
+	for tail < head {
+		u := que[tail]
+		tail++
+		for i := g.nodes[u]; i > 0; i = g.next[i] {
+			v := g.to[i]
+			deg[v]--
+			if deg[v] == 1 {
+				marked[v] = true
+				que[head] = v
+				head++
+			}
+		}
+	}
+
+	getNext := func(u int) int {
+		for i := g.nodes[u]; i > 0; i = g.next[i] {
+			v := g.to[i]
+			if !marked[v] {
+				return v
+			}
+		}
+		return -1
+	}
+
+	var rem int
+	for i := 0; i < n; i++ {
+		if deg[i] > 1 {
+			// a cycle
+			u := i
+			var cnt int
+			for u >= 0 && !marked[u] {
+				cnt++
+				marked[u] = true
+				u = getNext(u)
+			}
+			if cnt&1 == 1 {
+				rem++
+			}
+		}
+	}
+
+	m := n - rem
+	m = m / 2 * 2
+
+	return n - m
+}
+
+func solve1(n int, enemies [][]int) int {
+	g := NewGraph(n, 2*len(enemies))
 
 	for _, e := range enemies {
 		u, v := e[0]-1, e[1]-1

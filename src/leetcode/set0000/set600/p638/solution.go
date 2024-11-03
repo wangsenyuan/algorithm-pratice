@@ -1,65 +1,52 @@
-package main
+package p638
 
-import (
-	"math"
-	"fmt"
-)
+const inf = 1 << 60
 
 func shoppingOffers(price []int, special [][]int, needs []int) int {
-	if satisfied(needs) {
-		return 0
+	n := len(price)
+
+	// 过滤不需要计算的大礼包，只保留需要计算的大礼包
+	filterSpecial := [][]int{}
+	for _, s := range special {
+		totalCount, totalPrice := 0, 0
+		for i, c := range s[:n] {
+			totalCount += c
+			totalPrice += c * price[i]
+		}
+		if totalCount > 0 && totalPrice > s[n] {
+			filterSpecial = append(filterSpecial, s)
+		}
 	}
 
-	best := math.MaxInt32
-	tmpNeeds := make([]int, len(needs))
-	for _, offer := range special {
-		i := 0
-		for i < len(needs) {
-			if offer[i] > needs[i] {
-				break
+	// 记忆化搜索计算满足购物清单所需花费的最低价格
+	dp := map[string]int{}
+	var dfs func([]byte) int
+	dfs = func(curNeeds []byte) (minPrice int) {
+		if res, has := dp[string(curNeeds)]; has {
+			return res
+		}
+		for i, p := range price {
+			minPrice += int(curNeeds[i]) * p // 不购买任何大礼包，原价购买购物清单中的所有物品
+		}
+		nextNeeds := make([]byte, n)
+	outer:
+		for _, s := range filterSpecial {
+			for i, need := range curNeeds {
+				if need < byte(s[i]) { // 不能购买超出购物清单指定数量的物品
+					continue outer
+				}
+				nextNeeds[i] = need - byte(s[i])
 			}
-			tmpNeeds[i] = needs[i] - offer[i]
-			i++
+			minPrice = min(minPrice, dfs(nextNeeds)+s[n])
 		}
-
-		if i == len(needs) {
-			//can use this offer
-			tmp := offer[i] + shoppingOffers(price, special, tmpNeeds)
-			if tmp < best {
-				best = tmp
-			}
-		}
+		dp[string(curNeeds)] = minPrice
+		return
 	}
 
-	//try use the single price
-	ans := 0
-
-	for i := 0; i < len(needs); i++ {
-		ans += needs[i] * price[i]
+	curNeeds := make([]byte, n)
+	for i, need := range needs {
+		curNeeds[i] = byte(need)
 	}
+	return dfs(curNeeds)
 
-	if ans < best {
-		return ans
-	}
-	return best
-}
-
-func satisfied(needs []int) bool {
-	for i := 0; i < len(needs); i++ {
-		if needs[i] > 0 {
-			return false
-		}
-	}
-	return true
-}
-
-func main() {
-	//items := []int{2, 5}
-	//offers := [][]int{{3, 0, 5}, {1, 2, 10}}
-	//needs := []int{3, 2}
-
-	items := []int{2, 3, 4}
-	offers := [][]int{{1, 1, 0, 4}, {2, 2, 1, 9}}
-	needs := []int{1, 2, 1}
-	fmt.Println(shoppingOffers(items, offers, needs))
 }

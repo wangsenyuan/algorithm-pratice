@@ -33,3 +33,15 @@ func TestSample4(t *testing.T) {
 	expect := 4
 	runSample(t, nums, expect)
 }
+
+func TestSample5(t *testing.T) {
+	nums := []int{0, 0, 0, 0, 1, 2, 4}
+	expect := 7
+	runSample(t, nums, expect)
+}
+
+func TestSample6(t *testing.T) {
+	nums := []int{2, 0}
+	expect := 2
+	runSample(t, nums, expect)
+}

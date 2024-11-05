@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"fmt"
 	"os"
-	"slices"
 )
 
 func main() {
@@ -17,9 +16,8 @@ func main() {
 
 	for tc > 0 {
 		tc--
-		n := readNum(reader)
-		a := readNNums(reader, n)
-		res := solve(a)
+		s := readString(reader)
+		res := solve(s)
 		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 
@@ -82,98 +80,23 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-const D = 20
-
-func solve(nums []int) int {
-	x := slices.Max(nums)
-
-	if x == 0 {
-		return 1
-	}
-	n := len(nums)
-	check := func(d int) int {
-		var res int
-		var cnt int
-		for i := 0; i < n; i++ {
-			if (nums[i]>>d)&1 == 0 {
-				cnt++
-			} else {
-				res = max(res, cnt+1)
-				cnt = 0
-			}
-		}
-
-		if cnt == n {
-			return 1
-		}
-		// 最后一段
-		return max(res, cnt+1)
-	}
-
+func solve(s string) int {
+	dp := make([]int, 2)
 	var res int
-
-	for i := 0; i < D; i++ {
-		res = max(res, check(i))
+	for _, x := range []byte(s) {
+		a, b := dp[0], dp[1]
+		if x == '0' {
+			dp[0] = b + 1
+			dp[1] = 0
+		} else if x == '1' {
+			dp[0] = 0
+			dp[1] = a + 1
+		} else {
+			// ?
+			dp[0] = b + 1
+			dp[1] = a + 1
+		}
+		res += max(dp[0], dp[1])
 	}
-
 	return res
-}
-
-func solve1(nums []int) int {
-	n := len(nums)
-
-	var or int
-	for _, num := range nums {
-		or |= num
-	}
-
-	cnt := make([]int, D)
-	var cur int
-
-	add := func(num int) {
-		for i := 0; i < D; i++ {
-			cnt[i] += (num >> i) & 1
-			if cnt[i] > 0 {
-				cur |= 1 << i
-			}
-		}
-	}
-
-	rem := func(num int) {
-		for i := 0; i < D; i++ {
-			cnt[i] -= (num >> i) & 1
-			if cnt[i] == 0 && (cur>>i)&1 == 1 {
-				cur ^= 1 << i
-			}
-		}
-	}
-
-	k := 1
-
-	for j, i := 0, 0; j < n && i < n; j++ {
-		for i < n && cur != or {
-			add(nums[i])
-			i++
-		}
-		if cur == or {
-			k = max(k, i-j)
-		}
-		// else i == n
-		rem(nums[j])
-	}
-
-	cur = 0
-	clear(cnt)
-	for j, i := n-1, n-1; j >= 0 && i >= 0; j-- {
-		for i >= 0 && cur != or {
-			add(nums[i])
-			i--
-		}
-		if cur == or {
-			k = max(k, j-i)
-		}
-		rem(nums[j])
-	}
-
-	return k
 }

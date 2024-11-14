@@ -6,6 +6,7 @@ import (
 	"container/heap"
 	"fmt"
 	"os"
+	"slices"
 	"sort"
 )
 
@@ -86,6 +87,52 @@ func readNNums(reader *bufio.Reader, n int) []int {
 }
 
 func solve(k int, a []int, b []int) int {
+	type pair struct {
+		first  int
+		second int
+	}
+
+	n := len(a)
+
+	arr := make([]pair, n)
+
+	for i := 0; i < n; i++ {
+		arr[i] = pair{b[i], a[i]}
+	}
+	// 按照b降序排列
+	slices.SortFunc(arr, func(x, y pair) int {
+		return y.first - x.first
+	})
+	// suf[i] 表示在i...n的最大收益
+	suf := make([]int, n+1)
+
+	for i := n - 1; i >= 0; i-- {
+		suf[i] = suf[i+1] + max(arr[i].first-arr[i].second, 0)
+	}
+	if k == 0 {
+		return suf[0]
+	}
+	// 前缀的最小cost
+	cost := make(IntHeap, 0, k+1)
+	var sum int
+	var res int
+	for i := 0; i < n; i++ {
+		heap.Push(&cost, arr[i].second)
+		sum += arr[i].second
+		if cost.Len() > k {
+			// 把最贵的舍弃掉
+			sum -= heap.Pop(&cost).(int)
+		}
+
+		if cost.Len() == k {
+			res = max(res, suf[i+1]-sum)
+		}
+	}
+
+	return res
+}
+
+func solve1(k int, a []int, b []int) int {
 	n := len(a)
 	arr := make([]Pair, n)
 	var profit int

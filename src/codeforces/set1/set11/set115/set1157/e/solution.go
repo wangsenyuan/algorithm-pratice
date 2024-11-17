@@ -70,17 +70,17 @@ func process(reader *bufio.Reader) string {
 
 func solve(a []int, b []int) []int {
 	n := len(a)
-	at := make([][]int, n)
-	for i, x := range b {
-		at[x] = append(at[x], i)
+	cnt := make([]int, n)
+	for _, x := range b {
+		cnt[x]++
 	}
 
 	set := NewSegTree(n)
 
 	for i := 0; i < n; i++ {
-		if len(at[i]) > 0 {
+		if cnt[i] > 0 {
 			set.Update(i, i)
-			at[i] = at[i][1:]
+			cnt[i]--
 		}
 	}
 
@@ -92,12 +92,11 @@ func solve(a []int, b []int) []int {
 		// n - v, n
 		x := set.Get(n-v, n)
 		if x == inf {
-			x = set.Get(0, n)
+			x = set.Get(0, n-v)
 		}
 		c[i] = (v + x) % n
-		if len(at[x]) > 0 {
-			at[x] = at[x][1:]
-		} else {
+		cnt[x]--
+		if cnt[x] < 0 {
 			set.Update(x, inf)
 		}
 	}

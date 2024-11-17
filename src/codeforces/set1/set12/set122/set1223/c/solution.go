@@ -85,7 +85,6 @@ func solve(prices []int, first []int, second []int, k int) int {
 		first, second = second, first
 	}
 	// x >= y
-	c := lcm(first[1], second[1])
 	sort.Ints(prices)
 	reverse(prices)
 
@@ -97,6 +96,7 @@ func solve(prices []int, first []int, second []int, k int) int {
 
 	a, b := first[1], second[1]
 	x, y := first[0], second[0]
+	c := lcm(a, b)
 
 	check := func(m int) bool {
 		// 使用m个是否能够得到k的收益

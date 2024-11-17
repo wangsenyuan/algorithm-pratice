@@ -1,16 +1,4 @@
-package main
-
-import "fmt"
-
-func main() {
-	fmt.Println(singleNonDuplicate([]int{1, 1, 2, 3, 3, 4, 4, 8, 8}))
-	fmt.Println(singleNonDuplicate([]int{3,3,7,7,10,11,11}))
-	fmt.Println(singleNonDuplicate([]int{3,3,7,7,10,10,11}))
-	fmt.Println(singleNonDuplicate([]int{2, 3,3,7,7,10,10}))
-
-
-
-}
+package p540
 
 func singleNonDuplicate(nums []int) int {
 	n := len(nums)

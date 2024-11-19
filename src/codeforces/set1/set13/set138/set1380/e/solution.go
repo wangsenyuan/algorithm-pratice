@@ -76,7 +76,7 @@ func process(reader *bufio.Reader) []int {
 	return solve(a, m, queries)
 }
 
-func solve(discs []int, m int, queries [][]int) (ans []int) {
+func solve1(discs []int, m int, queries [][]int) (ans []int) {
 	// n := len(discs)
 	g := NewGraph(m*2, m*2)
 	set := make([]int, m)
@@ -178,12 +178,198 @@ func (g *Graph) AddEdge(u, v int) {
 	g.to[g.cur] = v
 }
 
-type pair struct {
-	first  int
-	second int
+func solve(discs []int, m int, queries [][]int) (ans []int) {
+	n := len(discs)
+
+	set := make([]int, n+m)
+	for i := 0; i < m; i++ {
+		set[i] = i
+	}
+	for i := 0; i < n; i++ {
+		discs[i]--
+		set[i+m] = discs[i]
+	}
+
+	var find func(u int) int
+	find = func(u int) int {
+		if set[u] != u {
+			set[u] = find(set[u])
+		}
+		return set[u]
+	}
+
+	head := make([]int, m)
+	sz := make([]int, m)
+	for i := 0; i < m; i++ {
+		head[i] = -1
+	}
+	next := make([]int, n)
+	prev := make([]int, n)
+
+	for i := 0; i < n; i++ {
+		next[i] = n
+		prev[i] = -1
+	}
+
+	mx := NewSegTree(n, -1, max)
+	mn := NewSegTree(n, n, min)
+	sum := NewSegTree(n, 0, add)
+
+	for i := 0; i < n; {
+		j := i
+		for i < n && find(i+m) == find(j+m) {
+			i++
+		}
+		t := find(j + m)
+
+		if head[t] >= 0 {
+			next[head[t]] = j
+			prev[j] = head[t]
+		}
+		head[t] = j
+		sz[t]++
+
+		mx.Update(j, j)
+		mn.Update(j, j)
+		sum.Update(j, 1)
+	}
+
+	remove := func(x int, a int) {
+		if head[a] == x {
+			head[a] = prev[x]
+		}
+		l, r := prev[x], next[x]
+		if l >= 0 {
+			next[l] = r
+		}
+		if r < n {
+			prev[r] = l
+		}
+		prev[x] = -1
+		next[x] = n
+		sz[a]--
+	}
+
+	merge := func(a, b int) {
+		a = find(a)
+		b = find(b)
+		if sz[a] < sz[b] {
+			a, b = b, a
+		}
+
+		for x := head[b]; x >= 0; x = head[b] {
+			remove(x, b)
+			if x > 0 {
+				l := mx.Query(0, x)
+				if l >= 0 && find(l+m) == a {
+					mn.Update(x, n)
+					mx.Update(x, -1)
+					sum.Update(x, 0)
+					x = l
+				}
+			}
+
+			if x+1 < n {
+				r := mn.Query(x+1, n)
+				if r < n && find(r+m) == a {
+					remove(r, a)
+					mn.Update(r, n)
+					mx.Update(r, -1)
+					sum.Update(r, 0)
+				}
+			}
+
+			if find(x+m) != a {
+				// 如果这个区间和前面的没有merge在一起
+				if head[a] >= 0 {
+					next[head[a]] = x
+					prev[x] = head[a]
+				}
+				head[a] = x
+				next[x] = n
+				set[x+m] = a
+
+				sz[a]++
+			}
+		}
+
+		set[b] = a
+	}
+
+	ans = append(ans, sum.Query(0, n)-1)
+
+	for _, cur := range queries {
+		a, b := cur[0], cur[1]
+		merge(a-1, b-1)
+		ans = append(ans, sum.Query(0, n)-1)
+	}
+
+	return ans
 }
 
-func solve1(discs []int, m int, queries [][]int) (ans []int) {
+type SegTree struct {
+	f   func(int, int) int
+	arr []int
+	iv  int
+	n   int
+}
+
+func NewSegTree(n int, iv int, f func(int, int) int) *SegTree {
+	arr := make([]int, n*2)
+	for i := 0; i < len(arr); i++ {
+		arr[i] = iv
+	}
+	return &SegTree{f, arr, iv, n}
+}
+
+func (t *SegTree) Update(p int, v int) {
+	p += t.n
+	t.arr[p] = v
+
+	for p > 1 {
+		t.arr[p>>1] = t.f(t.arr[p], t.arr[p^1])
+		p >>= 1
+	}
+}
+
+func (t *SegTree) Query(l int, r int) int {
+	res := t.iv
+	l += t.n
+	r += t.n
+	for l < r {
+		if l&1 == 1 {
+			res = t.f(res, t.arr[l])
+			l++
+		}
+		if r&1 == 1 {
+			r--
+			res = t.f(res, t.arr[r])
+		}
+		l >>= 1
+		r >>= 1
+	}
+	return res
+}
+
+func add(a, b int) int {
+	return a + b
+}
+
+func min(a, b int) int {
+	if a <= b {
+		return a
+	}
+	return b
+}
+
+func max(a, b int) int {
+	if a >= b {
+		return a
+	}
+	return b
+}
+
+func solve2(discs []int, m int, queries [][]int) (ans []int) {
 	n := len(discs)
 
 	set := make([]int, n+m)

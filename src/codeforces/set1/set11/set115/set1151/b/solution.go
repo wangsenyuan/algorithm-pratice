@@ -2,29 +2,22 @@ package main
 
 import (
 	"bufio"
-	"bytes"
 	"fmt"
-	"math/bits"
 	"os"
 )
 
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 
-	tc := readNum(reader)
+	res, _ := process(reader)
 
-	var buf bytes.Buffer
-
-	for tc > 0 {
-		tc--
-		n := readNum(reader)
-		a := readNNums(reader, n)
-		res := solve(a)
-
-		buf.WriteString(fmt.Sprintf("%d\n", res))
+	if len(res) == 0 {
+		fmt.Println("NIE")
+		return
 	}
-
-	fmt.Print(buf.String())
+	fmt.Println("TAK")
+	s := fmt.Sprintf("%v", res)
+	fmt.Println(s[1 : len(s)-1])
 }
 
 func readString(reader *bufio.Reader) string {
@@ -84,68 +77,66 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-const D = 30
-
-func solve(a []int) int {
-
-	var sum int
-	cnt := make([][2]int, D)
-
-	for _, num := range a {
-		sum ^= num
-		for i := D - 1; i >= 0; i-- {
-			x := (sum >> i) & 1
-			cnt[i][x]++
-		}
+func process(reader *bufio.Reader) ([]int, [][]int) {
+	n, m := readTwoNums(reader)
+	a := make([][]int, n)
+	for i := range n {
+		a[i] = readNNums(reader, m)
 	}
-	var res int
-	sum = 0
-
-	prev := make([][2]int, D)
-
-	for _, num := range a {
-		for i := D - 1; i >= 0; i-- {
-			x := (sum >> i) & 1
-			prev[i][x]++
-		}
-		j := bits.Len(uint(num)) - 1
-		res += prev[j][0]*cnt[j][0] + prev[j][1]*cnt[j][1]
-
-		sum ^= num
-		for i := D - 1; i >= 0; i-- {
-			x := (sum >> i) & 1
-			cnt[i][x]--
-		}
-	}
-
-	return res
+	return solve(a), a
 }
 
-func solve1(a []int) int {
-	var res int
+func solve(a [][]int) []int {
+	n := len(a)
+	m := len(a[0])
 
-	// dp[i] = a[y][i] 时的 g(x-1)[i] = 它相反数时的计数
-	dp := make([][2]int, D)
-	gp := make([][2]int, D)
+	construct := func(last int) []int {
+		res := make([]int, n)
+		var sum int
+		for i := 0; i < n; i++ {
+			res[i] = 1
+			if i != last {
+				sum ^= a[i][0]
 
-	for i := 0; i < D; i++ {
-		gp[i][0]++
+			}
+		}
+		if last < 0 {
+			// 随便选
+			return res
+		}
+		// 除了last，其他的随便选
+		for j := 0; j < m; j++ {
+			if sum^a[last][j] != 0 {
+				res[last] = j + 1
+				break
+			}
+		}
+
+		return res
 	}
 
-	var sum int
-	for _, num := range a {
-		sum ^= num
+	for d := 0; d < 10; d++ {
+		var cnt2 int
 
-		j := 31 - bits.LeadingZeros32(uint32(num))
-		dp[j][0] += gp[j][0]
-		dp[j][1] += gp[j][1]
-
-		for i := D - 1; i >= 0; i-- {
-			x := (sum >> i) & 1
-			res += dp[i][x]
-			gp[i][x]++
+		for i := 0; i < n; i++ {
+			var cnt int
+			for j := 0; j < m; j++ {
+				x := (a[i][j] >> d) & 1
+				cnt += x
+			}
+			if cnt > 0 && cnt < m {
+				// 这一位时个关键
+				return construct(i)
+			}
+			if cnt == m {
+				cnt2++
+			}
+		}
+		if cnt2%2 == 1 {
+			// 有一些是全0的，有一些全1的
+			return construct(-1)
 		}
 	}
 
-	return res
+	return nil
 }

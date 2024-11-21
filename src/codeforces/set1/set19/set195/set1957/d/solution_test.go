@@ -21,3 +21,9 @@ func TestSample2(t *testing.T) {
 	expect := 16
 	runSample(t, a, expect)
 }
+
+func TestSample3(t *testing.T) {
+	a := []int{4, 4, 7, 2, 5}
+	expect := 18
+	runSample(t, a, expect)
+}

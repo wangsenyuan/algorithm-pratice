@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"slices"
 )
 
 func main() {
@@ -113,10 +114,7 @@ func readNNums(reader *bufio.Reader, n int) []int {
 
 func solve(c []int) int {
 	n := len(c)
-	mx := c[0]
-	for i := 0; i < n; i++ {
-		mx = max(mx, c[i])
-	}
+	mx := slices.Max(c)
 	if mx < 0 {
 		return mx
 	}
@@ -129,11 +127,4 @@ func solve(c []int) int {
 		}
 	}
 	return max(a, b)
-}
-
-func max(a, b int) int {
-	if a >= b {
-		return a
-	}
-	return b
 }

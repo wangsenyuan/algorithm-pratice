@@ -50,14 +50,14 @@ func maximizeSumOfWeights(edges [][]int, k int) int64 {
 			for i := len(arr); i > k-1; i-- {
 				dp[u][1] += arr[i-1]
 			}
-		
-		tmp = dp[u][1]
-		for i := min(len(arr), k-1); i > 0; i-- {
-			tmp += arr[i-1]
-			dp[u][1] = max(dp[u][1], tmp)
+
+			tmp = dp[u][1]
+			for i := min(len(arr), k-1); i > 0; i-- {
+				tmp += arr[i-1]
+				dp[u][1] = max(dp[u][1], tmp)
+			}
 		}
 	}
-
 	dfs(-1, 0)
 
 	return int64(dp[0][0])

@@ -79,14 +79,29 @@ func main() {
 }
 
 func solve(s string) (bool, string) {
-	//假设 x + t + y = s
-	// x + t = t + y
-	// 那么t是x+t的一个前缀， 也就是s的一个前缀
-	// 同时t也是t+y的一个后缀，也就是s的一个后缀
-	// x和y的长度要相同
-	// 也就是要找到这样的一个t，它既是s的前缀，也是s的一个后缀
-	// 同时，它前面的x+t, 要等于t + y， x和y的长度要相同
-	// 可以利用len(x) = len(y)往中间迭代
+	n := len(s)
+	next := make([]int, n)
+
+	for i := 1; i < n; i++ {
+		j := next[i-1]
+		for j > 0 && s[i] != s[j] {
+			j = next[j-1]
+		}
+		if s[i] == s[j] {
+			j++
+		}
+		next[i] = j
+	}
+
+	m := next[n-1]
+
+	if 2*m <= n {
+		return false, ""
+	}
+	return true, s[:m]
+}
+
+func solve1(s string) (bool, string) {
 	n := len(s)
 	base := make([]Key, n+1)
 	base[0] = Key{1, 1}

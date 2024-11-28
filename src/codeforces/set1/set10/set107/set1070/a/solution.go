@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math/bits"
 	"os"
 )
 
@@ -75,31 +76,36 @@ func readNNums(reader *bufio.Reader, n int) []int {
 
 func solve(D int, S int) string {
 
+	hd := bits.Len(uint(D))
+	hs := bits.Len(uint(S))
+	mask1 := int32(1<<hs - 1)
+
 	// rem < d < 500 使用最高8位
 	// ds < 5000 < 1e20 使用中间19位
 	// num < 10, 使用最低的4位
-	encode := func(rem int32, ds int32, num int32) int32 {
-		return rem<<17 | ds<<4 | num
+	encode := func(rem int32, ds int32) int32 {
+		return rem<<hs | (ds & mask1)
 	}
-	mask3 := int32(1<<9 - 1)
-	mask1 := int32(1<<13 - 1)
-	mask2 := int32(1<<4 - 1)
-	decode := func(state int32) (rem int32, ds int32, num int32) {
-		rem = (state >> 17) & mask3
-		ds = (state >> 4) & mask1
-		num = state & mask2
+
+	decode := func(state int32) (rem int32, ds int32) {
+		rem = (state >> hs)
+		ds = state & mask1
 		return
 	}
 
 	s := int32(S)
 	d := int32(D)
-	from := make(map[int32]int32)
+
+	from := make([]int32, 1<<(hs+hd))
+	for i := range len(from) {
+		from[i] = -2
+	}
 
 	var que []int32
 
 	for i := int32(1); i <= 9; i++ {
 		if i <= s {
-			x := encode(i%d, i, i)
+			x := encode(i%d, i)
 			que = append(que, x)
 			from[x] = -1
 		}
@@ -110,7 +116,12 @@ func solve(D int, S int) string {
 
 		for pos >= 0 {
 			x := que[pos]
-			_, _, num := decode(x)
+			_, num := decode(x)
+			if from[x] >= 0 {
+				y := que[from[x]]
+				_, ds2 := decode(y)
+				num -= ds2
+			}
 			buf = append(buf, byte(num+'0'))
 			pos = from[x]
 		}
@@ -127,7 +138,7 @@ func solve(D int, S int) string {
 			cur := que[tail]
 			tail++
 
-			rem, ds, _ := decode(cur)
+			rem, ds := decode(cur)
 
 			if rem == 0 && ds == s {
 				return update(int32(tail - 1))
@@ -137,8 +148,8 @@ func solve(D int, S int) string {
 				nextRem := (rem*10 + i) % d
 				nextDs := ds + i
 				if nextDs <= s {
-					nextState := encode(nextRem, nextDs, i)
-					if _, ok := from[nextState]; !ok {
+					nextState := encode(nextRem, nextDs)
+					if from[nextState] == -2 {
 						from[nextState] = int32(tail - 1)
 						que = append(que, nextState)
 					}

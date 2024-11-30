@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math/bits"
 	"os"
 )
 
@@ -70,7 +71,95 @@ func process(reader *bufio.Reader) string {
 	return solve(p, a, queries)
 }
 
+type Graph struct {
+	nodes []int
+	next  []int
+	to    []int
+	cur   int
+}
+
+func NewGraph(n int, e int) *Graph {
+	g := new(Graph)
+	g.nodes = make([]int, n)
+	e++
+	g.next = make([]int, e)
+	g.to = make([]int, e)
+	g.cur = 0
+	return g
+}
+
+func (g *Graph) AddEdge(u, v int) {
+	g.cur++
+	g.next[g.cur] = g.nodes[u]
+	g.nodes[u] = g.cur
+	g.to[g.cur] = v
+}
+
 func solve(p []int, a []int, queries [][]int) string {
+	rewrite(p, a)
+	n := len(p)
+	m := len(a)
+	last := make([]int, n+1)
+	for i := 0; i <= n; i++ {
+		last[i] = m
+	}
+	g := NewGraph(m+1, m)
+	for i := m - 1; i >= 0; i-- {
+		v := a[i]
+		g.AddEdge(last[(v+1)%n], i)
+		last[v] = i
+	}
+
+	h := bits.Len(uint(m))
+
+	fa := make([][]int, m+1)
+
+	var dfs func(p int, u int)
+	dfs = func(p int, u int) {
+		fa[u] = make([]int, h)
+		fa[u][0] = p
+		for i := 1; i < h; i++ {
+			fa[u][i] = fa[fa[u][i-1]][i-1]
+		}
+		for i := g.nodes[u]; i > 0; i = g.next[i] {
+			v := g.to[i]
+			dfs(u, v)
+		}
+	}
+
+	dfs(m, m)
+
+	kth := func(u int, k int) int {
+		for i := h - 1; i >= 0; i-- {
+			if (k>>i)&1 == 1 {
+				u = fa[u][i]
+			}
+		}
+		return u
+	}
+
+	dp := make([]int, m+1)
+	dp[m] = m
+	for i := m - 1; i >= 0; i-- {
+		j := kth(i, n-1)
+		dp[i] = min(dp[i+1], j)
+	}
+
+	buf := make([]byte, len(queries))
+
+	for i, cur := range queries {
+		l, r := cur[0]-1, cur[1]-1
+		if dp[l] <= r {
+			buf[i] = '1'
+		} else {
+			buf[i] = '0'
+		}
+	}
+
+	return string(buf)
+}
+
+func rewrite(p []int, a []int) {
 	n := len(p)
 	pos := make([]int, n+1)
 	for i, x := range p {
@@ -81,7 +170,12 @@ func solve(p []int, a []int, queries [][]int) string {
 	for i := 0; i < m; i++ {
 		a[i] = pos[a[i]]
 	}
+}
 
+func solve1(p []int, a []int, queries [][]int) string {
+	rewrite(p, a)
+	m := len(a)
+	n := len(p)
 	nodes := make([]*Node, m+1)
 
 	next := make([]int, m+1)

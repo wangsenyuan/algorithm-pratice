@@ -18,6 +18,10 @@ func main() {
 	var buf bytes.Buffer
 	for i := range n {
 		buf.WriteString(fmt.Sprintf("%d %d\n", res[i].first, res[i].second))
+		if buf.Len() > 1000 {
+			fmt.Print(buf.String())
+			buf.Reset()
+		}
 	}
 	fmt.Print(buf.String())
 }
@@ -80,8 +84,8 @@ func readNNums(reader *bufio.Reader, n int) []int {
 }
 
 type pair struct {
-	first  int
-	second int
+	first  int32
+	second int32
 }
 
 func solve(n int, edges [][]int) []pair {
@@ -93,20 +97,20 @@ func solve(n int, edges [][]int) []pair {
 		g.AddEdge(v, u)
 	}
 
-	vs := make([][]int, n)
+	vs := make([][]int32, n)
 
 	ans := make([]pair, n)
 
 	var dfs func(p int, u int)
 
 	dfs = func(p int, u int) {
-		var sum int
+		var sum int32
 		bst := -1
 		for i := g.nodes[u]; i > 0; i = g.next[i] {
 			v := g.to[i]
 			if p != v {
 				dfs(u, v)
-				sum += 2 * len(vs[v])
+				sum += 2 * int32(len(vs[v]))
 				if bst < 0 || len(vs[v]) > len(vs[bst]) {
 					bst = v
 				}
@@ -114,14 +118,14 @@ func solve(n int, edges [][]int) []pair {
 		}
 
 		if bst < 0 {
-			vs[u] = append(vs[u], u)
+			vs[u] = append(vs[u], int32(u))
 			ans[u] = pair{1, 2}
 			return
 		}
 
 		vs[u] = vs[bst]
 		last := ans[bst].second
-		sum -= 2 * len(vs[bst])
+		sum -= 2 * int32(len(vs[bst]))
 		sum++
 		ans[bst].second += sum
 
@@ -138,12 +142,12 @@ func solve(n int, edges [][]int) []pair {
 				vs[u] = append(vs[u], w)
 			}
 			last = ans[v].second
-			sum -= 2 * len(vs[v])
+			sum -= 2 * int32(len(vs[v]))
 			ans[v].second += sum
 			clear(vs[v])
 		}
 
-		vs[u] = append(vs[u], u)
+		vs[u] = append(vs[u], int32(u))
 		ans[u] = pair{last, ans[bst].second + 1}
 	}
 
@@ -153,15 +157,15 @@ func solve(n int, edges [][]int) []pair {
 }
 
 type Graph struct {
-	nodes []int
-	next  []int
+	nodes []int32
+	next  []int32
 	to    []int
-	cur   int
+	cur   int32
 }
 
 func NewGraph(n int, e int) *Graph {
-	nodes := make([]int, n)
-	next := make([]int, e)
+	nodes := make([]int32, n)
+	next := make([]int32, e)
 	to := make([]int, e)
 	return &Graph{nodes, next, to, 0}
 }

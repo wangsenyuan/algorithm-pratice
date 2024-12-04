@@ -2,32 +2,25 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"os"
 )
 
 func main() {
 	reader := bufio.NewReader(os.Stdin)
-
-	n := readNum(reader)
-	a := readNNums(reader, n)
-	edges := make([][]int, n-1)
-	for i := 0; i < n-1; i++ {
-		edges[i] = readNNums(reader, 2)
-	}
-	res := solve(n, a, edges)
-	s := fmt.Sprintf("%v", res)
-	fmt.Println(s[1 : len(s)-1])
-}
-
-func readString(reader *bufio.Reader) string {
-	s, _ := reader.ReadString('\n')
-	for i := 0; i < len(s); i++ {
-		if s[i] == '\n' || s[i] == '\r' {
-			return s[:i]
+	var buf bytes.Buffer
+	tc := readNum(reader)
+	for tc > 0 {
+		tc--
+		res := process(reader)
+		if res {
+			buf.WriteString("YES\n")
+		} else {
+			buf.WriteString("NO\n")
 		}
 	}
-	return s
+	fmt.Print(buf.String())
 }
 
 func readInt(bytes []byte, from int, val *int) int {
@@ -77,59 +70,70 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func solve(n int, a []int, edges [][]int) []int {
-	g := NewGraph(n, 2*n)
+func process(reader *bufio.Reader) bool {
+	n, m := readTwoNums(reader)
+	v := readNNums(reader, n)
+	t := readNNums(reader, n)
+	edges := make([][]int, m)
+	for i := range m {
+		edges[i] = readNNums(reader, 2)
+	}
+	return solve(v, t, edges)
+}
 
+func solve(val []int, a []int, edges [][]int) bool {
+	n := len(a)
+
+	g := NewGraph(n, 2*len(edges)+1)
 	for _, e := range edges {
 		u, v := e[0]-1, e[1]-1
 		g.AddEdge(u, v)
 		g.AddEdge(v, u)
 	}
-	// cnt[u] = cnt_w[u] - cnt_b[u]
-	dp := make([]int, n)
+
+	sum := make([]int, 2)
+	color := make([]int, n)
 
 	for i := 0; i < n; i++ {
-		if a[i] == 0 {
-			a[i]--
-		}
+		sum[0] += val[i]
+		sum[1] += a[i]
+		color[i] = -1
 	}
 
-	var dfs func(p int, u int)
+	if (sum[0]-sum[1])%2 != 0 {
+		return false
+	}
 
-	dfs = func(p int, u int) {
+	clear(sum)
+
+	var dfs func(p int, u int, c int) bool
+
+	dfs = func(p int, u int, c int) bool {
+		if color[u] != -1 {
+			return color[u] == c
+		}
+		color[u] = c
+		sum[c] += a[u] - val[u]
+
 		for i := g.nodes[u]; i > 0; i = g.next[i] {
 			v := g.to[i]
 			if p != v {
-				dfs(u, v)
-				dp[u] += max(0, dp[v]+a[v])
+				if !dfs(u, v, c^1) {
+					return false
+				}
 			}
 		}
-		// dp[u] += a[u]
+		return true
 	}
 
-	dfs(-1, 0)
+	bi := dfs(-1, 0, 0)
 
-	var dfs2 func(p int, u int, f int)
-
-	dfs2 = func(p int, u int, f int) {
-		if p >= 0 {
-			dp[u] += max(0, f+a[p])
-		}
-		// 必须知道除子节点v后的dp[u]
-		// dp[u] = max(0, dp[v])
-		for i := g.nodes[u]; i > 0; i = g.next[i] {
-			v := g.to[i]
-			if p != v {
-				tmp := dp[u] - max(0, dp[v]+a[v])
-				dfs2(u, v, tmp)
-			}
-		}
-		dp[u] += a[u]
+	if !bi {
+		// 非2部图始终可以(神奇)
+		return true
 	}
 
-	dfs2(-1, 0, 0)
-
-	return dp
+	return sum[0] == sum[1]
 }
 
 type Graph struct {
@@ -141,8 +145,8 @@ type Graph struct {
 
 func NewGraph(n int, e int) *Graph {
 	nodes := make([]int, n)
-	next := make([]int, e+10)
-	to := make([]int, e+10)
+	next := make([]int, e)
+	to := make([]int, e)
 	return &Graph{nodes, next, to, 0}
 }
 

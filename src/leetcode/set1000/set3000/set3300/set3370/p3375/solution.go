@@ -21,8 +21,9 @@ func minOperations(nums []int, k int) int {
 			}
 			return -1
 		}
-		if nums[j] < k
-		res++
+		if nums[j] < k {
+			res++
+		}
 	}
 	return res
 }

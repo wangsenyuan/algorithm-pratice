@@ -28,6 +28,7 @@ func findMinimumTime(strength []int, K int) int {
 				dp[next] = min(dp[next], dp[state]+m)
 			}
 		}
+		
 	}
 
 	return dp[N-1]

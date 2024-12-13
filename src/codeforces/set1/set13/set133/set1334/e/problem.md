@@ -1,53 +1,82 @@
-### description
+You are given a positive integer 𝐷
+. Let's build the following graph from it:
 
-Let's denote the following function 𝑓
-. This function takes an array 𝑎
-of length 𝑛
-and returns an array. Initially the result is an empty array. For each integer 𝑖
-from 1
-to 𝑛
-we add element 𝑎𝑖
-to the end of the resulting array if it is greater than all previous elements (more formally, if 𝑎𝑖>max1≤𝑗<𝑖𝑎𝑗
-). Some examples of the function 𝑓
+each vertex is a divisor of 𝐷
+ (not necessarily prime, 1
+ and 𝐷
+ itself are also included);
+two vertices 𝑥
+ and 𝑦
+ (𝑥>𝑦
+) have an undirected edge between them if 𝑥
+ is divisible by 𝑦
+ and 𝑥𝑦
+ is a prime;
+the weight of an edge is the number of divisors of 𝑥
+ that are not divisors of 𝑦
+.
+For example, here is the graph for 𝐷=12
 :
 
-if 𝑎=[3,1,2,7,7,3,6,7,8]
-then 𝑓(𝑎)=[3,7,8]
-;
-if 𝑎=[1]
-then 𝑓(𝑎)=[1]
-;
-if 𝑎=[4,1,1,2,3]
-then 𝑓(𝑎)=[4]
-;
-if 𝑎=[1,3,1,2,6,8,7,7,4,11,10]
-then 𝑓(𝑎)=[1,3,6,8,11]
-.
-You are given two arrays: array 𝑎1,𝑎2,…,𝑎𝑛
-and array 𝑏1,𝑏2,…,𝑏𝑚
-. You can delete some elements of array 𝑎
-(possibly zero). To delete the element 𝑎𝑖
-, you have to pay 𝑝𝑖
-coins (the value of 𝑝𝑖
-can be negative, then you get |𝑝𝑖|
-coins, if you delete this element). Calculate the minimum number of coins (possibly negative) you have to spend for
-fulfilling equality 𝑓(𝑎)=𝑏
+
+Edge (4,12)
+ has weight 3
+ because 12
+ has divisors [1,2,3,4,6,12]
+ and 4
+ has divisors [1,2,4]
+. Thus, there are 3
+ divisors of 12
+ that are not divisors of 4
+ — [3,6,12]
 .
 
-### thoughts
+There is no edge between 3
+ and 2
+ because 3
+ is not divisible by 2
+. There is no edge between 12
+ and 3
+ because 123=4
+ is not a prime.
 
-1. 先考虑一个dp[i][j] 表示b[..i] 由a[...j]得到时的最小cost
-2. 状态转移，dp[i+1][j] = dp[i][j-1] 如果 b[i] = a[j]
-   or dp[i+1][j] = dp[i+1][j-1] + cost[j]
-3. 这个复杂度时 m * n
-4. dp[i] = {j, cost}
-    - 状态转移为 dp[i+1] = {k, newcost},
-    - 满足条件是 b[i+1] = a[k]
-    - 且在 j...k中间不存在 > a[j]的值 （删除它们就是新的cost）
-5. 这里k比较容易找到，就是 b[i+1]对应的下个位置，
-6. 但是如何计算j...k中间的cost是个问题
-    - 并不是删除越少越好，因为cost有可能是负值
-    - 在中间的负值全部删掉（这个可以搞个前缀和）
-    - 中间的正值，应该仅删除那部分 > b[i]的部分（越少越好）
-7. 用persistent二叉树，是可以处理的。但是似乎也太复杂了吧～
-8. b是递增的，处理b[i]的时候，只需要关心b[i-1]的情况，所以此时可以将b[i-1]前面的记录给清理掉
+Let the length of the path between some vertices 𝑣
+ and 𝑢
+ in the graph be the total weight of edges on it. For example, path [(1,2),(2,6),(6,12),(12,4),(4,2),(2,6)]
+ has length 1+2+2+3+1+2=11
+. The empty path has length 0
+.
+
+So the shortest path between two vertices 𝑣
+ and 𝑢
+ is the path that has the minimal possible length.
+
+Two paths 𝑎
+ and 𝑏
+ are different if there is either a different number of edges in them or there is a position 𝑖
+ such that 𝑎𝑖
+ and 𝑏𝑖
+ are different edges.
+
+You are given 𝑞
+ queries of the following form:
+
+𝑣
+ 𝑢
+ — calculate the number of the shortest paths between vertices 𝑣
+ and 𝑢
+.
+The answer for each query might be large so print it modulo 998244353
+.
+
+### ideas
+1. 考虑u和v的边的weight
+2. u / v = p (一个prime数)， 假设v的 divisors的数是已知的，
+3. 那么u-v的weight = 那些 v % (x * p) != 0 的部分
+4. 比如 (12, 6) [1, 2, 3, 4, 6, 12] vs (1, 2, 3，6)
+5. (4, 12) (也就是2, 6的倍数)
+6. 也就是那些因数x，v / x 的部分，不包含p了
+7. 假设u的质因数，这里找出来，v的质因数也找出
+8. gcd(u, v)的质因数找出来
+9. 但是怎么算边的数量呢？
+10. 

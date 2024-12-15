@@ -5,6 +5,48 @@ import "slices"
 const inf = 1 << 30
 
 func makeStringGood(s string) int {
+	freq := make([]int, 26)
+	for _, x := range []byte(s) {
+		freq[int(x-'a')]++
+	}
+	n := len(s)
+	ans := n
+
+	dp := make([]int, 27)
+
+	x := slices.Max(freq)
+
+	for avg := 1; avg <= x; avg++ {
+		for i := 0; i < 27; i++ {
+			dp[i] = inf
+		}
+		dp[26] = 0
+		dp[25] = min(freq[25], abs(avg-freq[25]))
+		for j := 24; j >= 0; j-- {
+			a, b := freq[j], freq[j+1]
+
+			dp[j] = dp[j+1] + min(a, abs(avg-a))
+
+			if b < avg {
+				if a > avg {
+					dp[j] = min(dp[j], dp[j+2]+max(a-avg, avg-b))
+				} else {
+					// 把a(全部)移动到j+1的位置，补充部分j+1
+					dp[j] = min(dp[j], dp[j+2]+max(a, avg-b))
+				}
+			}
+		}
+		ans = min(ans, dp[0])
+	}
+
+	return ans
+}
+
+func abs(num int) int {
+	return max(num, -num)
+}
+
+func makeStringGood1(s string) int {
 	// 在给定长度时，找出最小的代价? 可行吗？
 	// 删除和添加时比较好处理的
 	// 第三个操作，貌似可以省下一步操作,

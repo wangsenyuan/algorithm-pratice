@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"fmt"
 	"os"
-	"strings"
 )
 
 func readString(reader *bufio.Reader) string {
@@ -67,74 +66,55 @@ func readNNums(reader *bufio.Reader, n int) []int {
 
 func main() {
 	reader := bufio.NewReader(os.Stdin)
-	var buf bytes.Buffer
 
 	tc := readNum(reader)
+
+	var buf bytes.Buffer
+
 	for tc > 0 {
 		tc--
-		readString(reader)
-		s := readString(reader)
-		t := readString(reader)
-		cnt, res := solve(s, t)
-		buf.WriteString(fmt.Sprintf("%d\n", cnt))
-
-		for i := 0; i < len(res); i++ {
-			if i+1 < len(res) {
-				buf.WriteString(fmt.Sprintf("%d ", res[i]))
-			} else {
-				buf.WriteString(fmt.Sprintf("%d\n", res[i]))
-			}
-		}
+		n, k := readTwoNums(reader)
+		s := readString(reader)[:n]
+		res := solve(s, k)
+		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
+
 	fmt.Print(buf.String())
 }
 
-func solve(s string, t string) (int, []int) {
-	lsh := func(s string, k int) string { return s[k:] + strings.Repeat("0", k) }
-	rsh := func(s string, k int) string { return strings.Repeat("0", k) + s[:len(s)-k] }
-	xor := func(s, t string) string {
-		x := []byte(s)
-		for i := range x {
-			x[i] ^= t[i] ^ '0'
+const RGB = "RGB"
+
+const inf = 1 << 30
+
+func solve(s string, k int) int {
+	n := len(s)
+
+	dp := make([][]int, n+1)
+	for i := 0; i <= n; i++ {
+		dp[i] = make([]int, 3)
+	}
+
+	best := inf
+
+	for i := 0; i < n; i++ {
+		for j := 0; j < 3; j++ {
+			// dp[i][j]
+			nj := (j + 1) % 3
+			if s[i] != RGB[nj] {
+				dp[i+1][nj] = dp[i][j] + 1
+			} else {
+				dp[i+1][nj] = dp[i][j]
+			}
 		}
-		return string(x)
-	}
-
-	i := strings.IndexByte(s, '1')
-	j := strings.IndexByte(t, '1')
-	if i < 0 && j < 0 {
-		return 0, nil
-	}
-	if i < 0 || j < 0 {
-		return -1, nil
-	}
-
-	var ans []int
-
-	if i > j {
-		ans = append(ans, i-j)
-		s = xor(s, lsh(s, i-j))
-		i = j
-	}
-
-	k := i + 1
-	for s[i+1:] != t[i+1:] {
-		for s[k] == t[k] {
-			k++
+		if i >= k-1 {
+			i1 := i - k + 1
+			for j := 0; j < 3; j++ {
+				nj := (j + k) % 3
+				tmp := dp[i+1][nj] - dp[i1][j]
+				best = min(best, tmp)
+			}
 		}
-		ans = append(ans, i-k)
-		s = xor(s, rsh(s, k-i))
 	}
 
-	r := strings.LastIndexByte(s, '1')
-	k = i
-	for s != t {
-		for s[k] == t[k] {
-			k--
-		}
-		ans = append(ans, r-k)
-		s = xor(s, lsh(s, r-k))
-	}
-
-	return len(ans), ans
+	return best
 }

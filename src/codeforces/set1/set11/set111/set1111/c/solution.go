@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"math/big"
 	"os"
 	"sort"
 )
@@ -77,46 +76,50 @@ func solve(n int, A int, B int, a []int) int {
 	}
 	count := func(l int, r int) int {
 		// 在范围l...r中有多少
-		i := sort.SearchInts(a, l)
-		j := sort.SearchInts(a, r)
-		if j < len(a) && a[j] == r {
-			j++
-		}
+		i := search(len(a), func(i int) bool {
+			return a[i] >= l
+		})
+
+		j := search(len(a), func(j int) bool {
+			return a[j] >= r
+		})
+
 		return j - i
 	}
 
-	tmp := big.NewInt(int64(B))
+	var dfs func(i int, k int) int
 
-	var dfs func(i int, k int) *big.Int
-
-	dfs = func(i int, k int) *big.Int {
-		m := count(i, i+k-1)
+	dfs = func(i int, k int) int {
+		m := count(i, i+k)
 
 		if m == 0 {
-			return big.NewInt(int64(A))
+			return A
 		}
 
 		if k == 1 {
-			return tmp
+			return B * m
 		}
 
-		l := dfs(i, k/2)
-		r := dfs(i+k/2, k/2)
-
-		lr := big.NewInt(0).Add(l,r)
-	
-		ans := big.NewInt(1)
-		ans = ans.Mul(ans, tmp)
-		ans = ans.Mul(ans, big.NewInt(int64(m)))
-		ans = ans.Mul(ans, big.NewInt(int64(k)))
-		
-		if lr.Cmp(ans) < 0 {
-			return lr
-		}
-		return ans
+		ans := B * m * k
+		ansl := dfs(i, k/2)
+		ansr := dfs(i+k/2, k/2)
+		return min(ans, ansl+ansr)
 	}
 
-	ans := dfs(0, 1<<n)
+	return dfs(0, 1<<n)
+}
 
-	return int(ans.Int64())
+func search(n int, f func(int) bool) int {
+	l, r := 0, n
+
+	for l < r {
+		mid := (l + r) / 2
+		if f(mid) {
+			r = mid
+		} else {
+			l = mid + 1
+		}
+	}
+
+	return l
 }

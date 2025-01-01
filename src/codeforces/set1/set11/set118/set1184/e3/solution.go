@@ -211,17 +211,13 @@ func solve(n int, edges [][]int) []int {
 			if p != v {
 				dfs2(u, v)
 				eid := g.val[i]
-				ans[eid] = inf
-				for j := 0; j < h; j++ {
-					ans[eid] = min(ans[eid], fp[v][j])
-				}
+				ans[eid] = fp[v][0]
 			}
 		}
-		tmp := inf
 		for j := h - 1; j > 0; j-- {
-			tmp = min(tmp, fp[u][j])
+			fp[u][j-1] = min(fp[u][j-1], fp[u][j])
 			v := fa[u][j-1]
-			fp[v][j-1] = min(fp[v][j-1], tmp)
+			fp[v][j-1] = min(fp[v][j-1], fp[u][j])
 		}
 	}
 

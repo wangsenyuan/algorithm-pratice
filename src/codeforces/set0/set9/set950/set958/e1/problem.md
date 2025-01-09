@@ -1,0 +1,2 @@
+The Rebel fleet is afraid that the Empire might want to strike back again. Princess Heidi needs to know if it is possible to assign R Rebel spaceships to guard B bases so that every base has exactly one guardian and each spaceship has exactly one assigned base (in other words, the assignment is a perfect matching). Since she knows how reckless her pilots are, she wants to be sure that any two (straight) paths – from a base to its assigned spaceship – do not intersect in the galaxy plane (that is, in 2D), and so there is no risk of collision.
+

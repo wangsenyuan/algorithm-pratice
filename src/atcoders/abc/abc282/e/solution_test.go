@@ -16,3 +16,10 @@ func TestSample1(t *testing.T) {
 	expect := 1733
 	runSample(t, m, a, expect)
 }
+
+func TestSample2(t *testing.T) {
+	m := 10
+	a := []int{4, 2, 3, 2}
+	expect := 20
+	runSample(t, m, a, expect)
+}

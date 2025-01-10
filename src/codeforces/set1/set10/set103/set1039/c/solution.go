@@ -152,8 +152,9 @@ func solve(k int, c []int, edges [][]int) int {
 				dfs(u)
 				w++
 			}
-
 		}
+		// 所有的方案数，选中使用x或者不使用, pow(2, sz)
+		// 其中对于同一个连通块，如果全部选中或者全部不选中，是安全的
 		tmp := sub(pow(2, sz), pow(2, w))
 		tmp = mul(tmp, pow(2, n-sz))
 		res = sub(res, tmp)

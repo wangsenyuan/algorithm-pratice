@@ -1,0 +1,4 @@
+There is unrest in the Galactic Senate. Several thousand solar systems have declared their intentions to leave the Republic. Master Heidi needs to select the Jedi Knights who will go on peacekeeping missions throughout the galaxy. It is well-known that the success of any peacekeeping mission depends on the colors of the lightsabers of the Jedi who will go on that mission.
+
+Heidi has n Jedi Knights standing in front of her, each one with a lightsaber of one of m possible colors. She knows that for the mission to be the most effective, she needs to select some contiguous interval of knights such that there are exactly k1 knights with lightsabers of the first color, k2 knights with lightsabers of the second color, ..., km knights with lightsabers of the m-th color. Help her find out if this is possible.
+

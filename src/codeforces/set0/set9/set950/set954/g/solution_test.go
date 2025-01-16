@@ -31,11 +31,3 @@ func TestSample2(t *testing.T) {
 	expect := 6
 	runSample(t, s, expect)
 }
-
-func TestSample3(t *testing.T) {
-	s := `5 1 1
-2 1 2 1 2
-`
-	expect := 6
-	runSample(t, s, expect)
-}

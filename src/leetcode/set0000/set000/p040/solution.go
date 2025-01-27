@@ -1,60 +1,42 @@
-package main
+package p040
 
-import (
-	"fmt"
-	"sort"
-)
-
-func main() {
-	nums := []int{10, 1, 2, 7, 6, 1, 5}
-	res := combinationSum2(nums, 8)
-	for _, r := range res {
-		fmt.Printf("%v\n", r)
-	}
-}
+import "sort"
 
 func combinationSum2(candidates []int, target int) [][]int {
 	sort.Ints(candidates)
 
 	var res [][]int
-	checked := make(map[string]bool)
+	n := len(candidates)
+	arr := make([]int, n)
+	var dfs func(i int, j int, sum int)
 
-	check := func(path []int) bool {
-		key := fmt.Sprintf("%v", path)
-		if checked[key] {
-			return true
+	dfs = func(i int, j int, sum int) {
+		if sum > target {
+			return
 		}
-		checked[key] = true
-		return false
-	}
-
-	var combine func(start int, target int, path []int)
-	combine = func(start int, target int, path []int) {
-		if target == 0 {
-			//fmt.Printf("candidate: %v\n", path)
-			if len(path) > 0 && !check(path) {
-				res = append(res, copySlice(path))
+		if i == n {
+			if sum == target {
+				tmp := make([]int, j)
+				copy(tmp, arr[:j])
+				res = append(res, tmp)
 			}
 			return
 		}
 
-		for i := start; i < len(candidates); i++ {
-			if candidates[i] > target {
-				break
-			}
-			path = append(path, candidates[i])
-			combine(i + 1, target-candidates[i], path)
-			path = path[:len(path)-1]
+		ni := i
+		for ni < n && candidates[ni] == candidates[i] {
+			ni++
+		}
+		dfs(ni, j, sum)
+		for ii := i; ii < ni; ii++ {
+			arr[j] = candidates[i]
+			j++
+			sum += candidates[i]
+			dfs(ni, j, sum)
 		}
 	}
 
-	combine(0, target, make([]int, 0, 10))
+	dfs(0, 0, 0)
 
 	return res
-}
-
-func copySlice(a []int) []int {
-	b := make([]int, len(a), len(a))
-	copy(b, a)
-	return b
 }

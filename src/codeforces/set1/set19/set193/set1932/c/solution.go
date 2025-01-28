@@ -114,6 +114,34 @@ func readNNums(reader *bufio.Reader, n int) []int {
 }
 
 func solve(a []int, m int, s string) []int {
+	n := len(a)
+	l, r := 0, n-1
+	for i := 0; i < n; i++ {
+		if s[i] == 'L' {
+			l++
+		} else {
+			r--
+		}
+	}
+	// l = r + 1,
+	prod := 1
+	ans := make([]int, n)
+
+	for i := n - 1; i >= 0; i-- {
+		if s[i] == 'L' {
+			l--
+			prod = (prod * a[l]) % m
+		} else {
+			r++
+			prod = (prod * a[r]) % m
+		}
+		ans[i] = prod
+	}
+
+	return ans
+}
+
+func solve1(a []int, m int, s string) []int {
 
 	n := len(a)
 	arr := make([]int, n*2)

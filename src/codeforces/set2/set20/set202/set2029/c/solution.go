@@ -117,6 +117,9 @@ func solve1(a []int) int {
 				return true
 			}
 			if a[i] >= g {
+				// 如果要达到k，那么在i+1的时候，需要至少是g (为啥是至少）
+				// 如果a[i] >= g, 在进入i之前x = g - 1, 这里可以增加到g
+				// 如果进入i前是g, 那么这里也可以保持不变
 				g--
 			} else {
 				g++

@@ -23,13 +23,8 @@ func minimumIncrements(nums []int, target []int) int {
 	for _, num := range nums {
 		// 如果使用num得到一个结果
 		for state := 0; state < M; state++ {
-			if dp[state] == inf {
-				continue
-			}
-			for next := 0; next < M; next++ {
-				if state&next > 0 {
-					continue
-				}
+			sub := (M - 1) ^ state
+			for next := sub; next > 0; next = (next - 1) & sub {
 				var l = 1
 				for j := 0; j < m; j++ {
 					if (next>>j)&1 == 1 {

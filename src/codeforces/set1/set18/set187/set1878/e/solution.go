@@ -124,6 +124,49 @@ const H = 31
 
 func solve(a []int, queries [][]int) []int {
 	n := len(a)
+	next := make([][]int, n+1)
+	for i := range n + 1 {
+		next[i] = make([]int, H)
+		for j := 0; j < H; j++ {
+			next[i][j] = n
+		}
+	}
+
+	for i := n - 1; i >= 0; i-- {
+		copy(next[i], next[i+1])
+		for j := 0; j < H; j++ {
+			if (a[i]>>j)&1 == 0 {
+				next[i][j] = i
+			}
+		}
+	}
+
+	ans := make([]int, len(queries))
+
+	for i, cur := range queries {
+		l, k := cur[0]-1, cur[1]
+		num := a[l]
+		if num < k {
+			ans[i] = -1
+			continue
+		}
+		ans[i] = l + 1
+		r := n
+		for j := H - 1; j >= 0; j-- {
+			x := (k >> j) & 1
+			if x == 0 {
+				ans[i] = max(ans[i], min(r, next[l][j]))
+			} else {
+				r = min(r, next[l][j])
+			}
+		}
+		ans[i] = max(ans[i], r)
+	}
+	return ans
+}
+
+func solve2(a []int, queries [][]int) []int {
+	n := len(a)
 	pt := make([][]int, n+1)
 	for i := 0; i <= n; i++ {
 		pt[i] = make([]int, H)

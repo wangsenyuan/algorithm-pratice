@@ -19,7 +19,7 @@ func main() {
 	for _, cur := range res {
 		buf.WriteString(fmt.Sprintf("%d %d\r\n", cur[0], cur[1]))
 	}
-	fmt.Fprintf(w, buf.String())
+	fmt.Fprint(w, buf.String())
 }
 
 func readString(reader *bufio.Reader) string {

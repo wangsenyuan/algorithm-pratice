@@ -20,7 +20,7 @@ func main() {
 		buf.WriteString(fmt.Sprintf("%d\n", res))
 	}
 
-	fmt.Printf(buf.String())
+	fmt.Print(buf.String())
 }
 
 func readInt(bytes []byte, from int, val *int) int {

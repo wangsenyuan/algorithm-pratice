@@ -38,15 +38,12 @@ func maxSubstringLength(s string, k int) bool {
 			}
 			if ok {
 				dp[i+1] = max(dp[i], dp[l]+1)
-				if i < n-1 && dp[i+1] >= k {
+				if dp[i+1] >= k && (i < n-1 || l > 0) {
 					return true
-				}
-				if k == 1 && i == n-1 && l == 0 {
-					return false
 				}
 			}
 		}
 	}
 
-	return dp[n] >= k
+	return false
 }

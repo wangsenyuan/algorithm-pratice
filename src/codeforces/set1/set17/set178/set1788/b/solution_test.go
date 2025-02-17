@@ -49,11 +49,16 @@ func TestSample3(t *testing.T) {
 }
 
 func TestSample4(t *testing.T) {
-	for i := 0; i < 100; i++ {
-		n := rand.Int()
+	for i := 0; i < 1000; i++ {
+		n := rand.Int31()
 		if n%2 == 0 {
 			n++
 		}
-		runSample(t, n)
+		runSample(t, int(n))
 	}
+}
+
+func TestSample5(t *testing.T) {
+	n := 19
+	runSample(t, n)
 }

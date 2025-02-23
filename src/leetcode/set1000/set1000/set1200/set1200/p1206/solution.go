@@ -29,7 +29,7 @@ func (this *Skiplist) Search(target int) bool {
 	cur := this.header
 
 	for i := this.level; i >= 0; i-- {
-		if cur.forward[i] != nil && cur.forward[i].value < target {
+		for cur.forward[i] != nil && cur.forward[i].value < target {
 			cur = cur.forward[i]
 		}
 	}
@@ -82,7 +82,7 @@ func (this *Skiplist) Erase(num int) bool {
 	cur := this.header
 
 	for i := this.level; i >= 0; i-- {
-		if cur.forward[i] != nil && cur.forward[i].value < num {
+		for cur.forward[i] != nil && cur.forward[i].value < num {
 			cur = cur.forward[i]
 		}
 		update[i] = cur

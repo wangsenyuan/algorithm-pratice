@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"math/bits"
 	"os"
 )
 
@@ -52,7 +51,7 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	x := 0
 	bs, _ := reader.ReadBytes('\n')
 	for i := 0; i < n; i++ {
-		for x < len(bs) && (bs[x] < '0' || bs[x] > '9') && bs[x] != '-' {
+		for x < len(bs) && (bs[x] < '0' || bs[x] > '9') {
 			x++
 		}
 		x = readInt(bs, x, &res[i])
@@ -62,54 +61,32 @@ func readNNums(reader *bufio.Reader, n int) []int {
 
 func process(reader *bufio.Reader) int {
 	n := readNum(reader)
-	layers := make([][][]int, n)
-	for i := 0; i < n; i++ {
-		layers[i] = make([][]int, n)
-		for j := 0; j < n; j++ {
-			layers[i][j] = readNNums(reader, n)
-		}
-	}
-	return solve(n, layers)
+	a := readNNums(reader, n)
+	return solve(a)
 }
 
-const inf = 1 << 60
-
-func solve(n int, layers [][][]int) int {
-	N := 1 << n
-	dp := make([][]int, N)
-	for i := range N {
-		dp[i] = make([]int, N)
-		for j := range N {
-			dp[i][j] = inf
-		}
+func solve(a []int) int {
+	n := len(a)
+	// pref[i] = a[1] + a[2] + ... + a[i]
+	// flip(l..r) = pref[l-1] + r - (l - 1) - (pref[r] - pref[l-1])
+	//            = 2 * pref[l-1] + r - (l - 1) - pref[r]
+	//            = 2 * pref[l-1] - (l - 1) + r - pref[r]
+	var suf int
+	for i := n - 1; i >= 0; i-- {
+		suf += a[i]
 	}
 
-	states := make([][]int, n+1)
+	best := 0
 
-	pos := make([][]int, N)
+	var pl, pr int
 
-	for state := 0; state < N; state++ {
-		i := bits.OnesCount(uint(state))
-		states[i] = append(states[i], state)
-		for j := 0; j < n; j++ {
-			if (state>>j)&1 == 1 {
-				pos[state] = append(pos[state], j)
-			}
-		}
+	for r, x := range a {
+		suf -= x
+		pr += x
+		tmp := r + 1 - pr + pl + suf
+		best = max(best, tmp)
+		pl = max(pl, 2*pr-(r+1))
 	}
 
-	dp[0][0] = 0
-	for i, cur := range layers {
-		for _, s1 := range states[i+1] {
-			for _, s2 := range states[i+1] {
-				for _, y := range pos[s1] {
-					for _, z := range pos[s2] {
-						dp[s1][s2] = min(dp[s1][s2], dp[s1^(1<<y)][s2^(1<<z)]+cur[y][z])
-					}
-				}
-			}
-		}
-	}
-
-	return dp[N-1][N-1]
+	return best
 }

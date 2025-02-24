@@ -2,15 +2,22 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
-	"math/bits"
 	"os"
+	"slices"
 )
 
 func main() {
 	reader := bufio.NewReader(os.Stdin)
-	res := process(reader)
-	fmt.Println(res)
+	var buf bytes.Buffer
+	tc := readNum(reader)
+	for range tc {
+		res := process(reader)
+		buf.WriteString(fmt.Sprintf("%d\n", res))
+	}
+
+	buf.WriteTo(os.Stdout)
 }
 
 func readInt(bytes []byte, from int, val *int) int {
@@ -62,54 +69,56 @@ func readNNums(reader *bufio.Reader, n int) []int {
 
 func process(reader *bufio.Reader) int {
 	n := readNum(reader)
-	layers := make([][][]int, n)
-	for i := 0; i < n; i++ {
-		layers[i] = make([][]int, n)
-		for j := 0; j < n; j++ {
-			layers[i][j] = readNNums(reader, n)
-		}
-	}
-	return solve(n, layers)
+	a := readNNums(reader, n)
+	return solve(a)
 }
 
-const inf = 1 << 60
+const inf = 1 << 30
 
-func solve(n int, layers [][][]int) int {
-	N := 1 << n
-	dp := make([][]int, N)
-	for i := range N {
-		dp[i] = make([]int, N)
-		for j := range N {
-			dp[i][j] = inf
+func solve(a []int) int {
+	type pair struct {
+		first  int
+		second int
+	}
+	n := len(a)
+	arr := make([]pair, n)
+	for i := range n {
+		arr[i] = pair{a[i], i}
+	}
+	slices.SortFunc(arr, func(x, y pair) int {
+		if x.first != y.first {
+			return x.first - y.first
+		}
+		return x.second - y.second
+	})
+
+	l, r := arr[0].second, arr[0].second
+
+	for i := 1; i < n; i++ {
+		j := arr[i].second
+		v := arr[i].first
+		l = min(l, j)
+		r = max(r, j)
+		if r-l+1 > v {
+			return 0
 		}
 	}
 
-	states := make([][]int, n+1)
+	val1 := inf
+	pref := make([]int, n)
 
-	pos := make([][]int, N)
-
-	for state := 0; state < N; state++ {
-		i := bits.OnesCount(uint(state))
-		states[i] = append(states[i], state)
-		for j := 0; j < n; j++ {
-			if (state>>j)&1 == 1 {
-				pos[state] = append(pos[state], j)
-			}
-		}
+	for i := 0; i < n; i++ {
+		pref[i] = val1
+		val1 = min(val1, a[i]+i)
 	}
 
-	dp[0][0] = 0
-	for i, cur := range layers {
-		for _, s1 := range states[i+1] {
-			for _, s2 := range states[i+1] {
-				for _, y := range pos[s1] {
-					for _, z := range pos[s2] {
-						dp[s1][s2] = min(dp[s1][s2], dp[s1^(1<<y)][s2^(1<<z)]+cur[y][z])
-					}
-				}
-			}
+	val2 := -inf
+	var res int
+	for i := n - 1; i >= 0; i-- {
+		if pref[i] > i && val2 < i {
+			res++
 		}
+		val2 = max(val2, i-a[i])
 	}
-
-	return dp[N-1][N-1]
+	return res
 }

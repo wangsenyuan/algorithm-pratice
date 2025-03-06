@@ -1,0 +1,5 @@
+In one school with Vasya there is a student Kostya. Kostya does not like physics, he likes different online games. Every day, having come home, Kostya throws his bag in the farthest corner and sits down at his beloved computer. Kostya even eats glued to the game. A few days ago Kostya bought a new RPG game "HaresButtle", which differs from all other games in this genre. It has a huge number of artifacts. As we know, artifacts are divided into basic and composite ones. Only the basic artifacts are available on sale. More powerful composite artifacts are collected from some number of basic artifacts.
+
+After the composing composite artifact, all the components disappear.
+
+Kostya is the head of the alliance, so he has to remember, what artifacts has not only himself, but also his allies. You must identify by sequence of artifacts purchased by Kostya and his allies, how many and which artifacts has been collected by each of them. It is believed that initially no one has any artifacts.

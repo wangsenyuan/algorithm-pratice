@@ -1,0 +1,133 @@
+package main
+
+import (
+	"bufio"
+	"bytes"
+	"fmt"
+	"os"
+)
+
+func main() {
+	reader := bufio.NewReader(os.Stdin)
+	tc := readNum(reader)
+	var buf bytes.Buffer
+	for range tc {
+		ok, label, nums, _, _, _, _ := process(reader)
+		if !ok {
+			buf.WriteString("NO\n")
+		} else {
+			buf.WriteString(fmt.Sprintf("YES\n%d\n", len(label)))
+			for i := range len(label) {
+				buf.WriteString(fmt.Sprintf("%c %d\n", label[i], nums[i]))
+			}
+		}
+	}
+	buf.WriteTo(os.Stdout)
+}
+
+func readInt(bytes []byte, from int, val *int) int {
+	i := from
+	sign := 1
+	if bytes[i] == '-' {
+		sign = -1
+		i++
+	}
+	tmp := 0
+	for i < len(bytes) && bytes[i] >= '0' && bytes[i] <= '9' {
+		tmp = tmp*10 + int(bytes[i]-'0')
+		i++
+	}
+	*val = tmp * sign
+	return i
+}
+
+func readNum(reader *bufio.Reader) (a int) {
+	bs, _ := reader.ReadBytes('\n')
+	readInt(bs, 0, &a)
+	return
+}
+
+func readTwoNums(reader *bufio.Reader) (a int, b int) {
+	res := readNNums(reader, 2)
+	a, b = res[0], res[1]
+	return
+}
+
+func readThreeNums(reader *bufio.Reader) (a int, b int, c int) {
+	res := readNNums(reader, 3)
+	a, b, c = res[0], res[1], res[2]
+	return
+}
+
+func readNNums(reader *bufio.Reader, n int) []int {
+	res := make([]int, n)
+	x := 0
+	bs, _ := reader.ReadBytes('\n')
+	for i := 0; i < n; i++ {
+		for x < len(bs) && (bs[x] < '0' || bs[x] > '9') && bs[x] != '-' {
+			x++
+		}
+		x = readInt(bs, x, &res[i])
+	}
+	return res
+}
+
+func process(reader *bufio.Reader) (ok bool, label []byte, nums []int, n int, q []int, k []int, j []int) {
+	n = readNum(reader)
+	q = readNNums(reader, n)
+	k = readNNums(reader, n)
+	j = readNNums(reader, n)
+	ok, label, nums = solve(n, q, k, j)
+	return
+}
+
+const cards = "qkj"
+
+func solve(n int, q []int, k []int, j []int) (bool, []byte, []int) {
+	next := []int{n - 1, n - 1, n - 1}
+
+	type state struct {
+		label byte
+		num   int
+	}
+	dp := make([]state, n)
+
+	for i := n - 2; i >= 0; i-- {
+		dp[i] = state{'-', -1}
+		if q[i] > q[next[0]] {
+			dp[i] = state{'q', next[0]}
+		}
+		if k[i] > k[next[1]] {
+			dp[i] = state{'k', next[1]}
+		}
+		if j[i] > j[next[2]] {
+			dp[i] = state{'j', next[2]}
+		}
+		if dp[i].num > i {
+			if q[i] < q[next[0]] {
+				next[0] = i
+			}
+			if k[i] < k[next[1]] {
+				next[1] = i
+			}
+			if j[i] < j[next[2]] {
+				next[2] = i
+			}
+		}
+	}
+
+	if dp[0].num < 0 {
+		return false, nil, nil
+	}
+	var label []byte
+	var num []int
+	cur := 0
+	for cur < n-1 {
+		s := dp[cur]
+		label = append(label, s.label)
+		num = append(num, s.num+1)
+		cur = s.num
+	}
+	return true, label, num
+}
+

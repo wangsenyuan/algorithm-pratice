@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"math/bits"
-	"math/rand"
 	"os"
 )
 
@@ -105,8 +104,6 @@ func solve(k int, color []int, g [][]int) int {
 		fa[i] = make([]int, h)
 	}
 
-	root := rand.Intn(n)
-
 	dep := make([]int, n)
 
 	var dfs func(p int, u int)
@@ -123,7 +120,7 @@ func solve(k int, color []int, g [][]int) int {
 		}
 	}
 
-	dfs(root, root)
+	dfs(0, 0)
 
 	lca := func(u int, v int) int {
 		if dep[u] < dep[v] {
@@ -246,11 +243,11 @@ func solve(k int, color []int, g [][]int) int {
 		return color[u]
 	}
 
-	c := dfs2(-1, root)
+	c := dfs2(-1, 0)
 	if c == -2 {
 		return 0
 	}
-	return dp[root][1]
+	return dp[0][1]
 }
 
 func reverse(arr []int) {

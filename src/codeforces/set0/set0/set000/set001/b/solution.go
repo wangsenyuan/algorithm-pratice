@@ -11,20 +11,20 @@ func main() {
 	reader := bufio.NewReader(os.Stdin)
 
 	tc := readNum(reader)
-	// var buf bytes.Buffer
-	for tc > 0 {
-		tc--
+	var buf bytes.Buffer
+	for range tc {
 		s := readString(reader)
 		r := solve(s)
-		fmt.Println(r)
+		buf.WriteString(r)
+		buf.WriteByte('\n')
 	}
-	// fmt.Print(buf.String())
+	buf.WriteTo(os.Stdout)
 }
 
 func readString(reader *bufio.Reader) string {
 	s, _ := reader.ReadString('\n')
 	for i := 0; i < len(s); i++ {
-		if s[i] == '\n' {
+		if s[i] == '\n' || s[i] == '\r' {
 			return s[:i]
 		}
 	}
@@ -78,26 +78,13 @@ func readNNums(reader *bufio.Reader, n int) []int {
 	return res
 }
 
-func readUint64(bytes []byte, from int, val *uint64) int {
-	i := from
-
-	var tmp uint64
-	for i < len(bytes) && bytes[i] >= '0' && bytes[i] <= '9' {
-		tmp = tmp*10 + uint64(bytes[i]-'0')
-		i++
-	}
-	*val = tmp
-
-	return i
-}
-
 func solve(s string) string {
 	if s[0] == 'R' {
 		i := 1
 		for i < len(s) && isDigit(s[i]) {
 			i++
 		}
-		if i > 1 && s[i] == 'C' {
+		if i < len(s) && i > 1 && s[i] == 'C' {
 			j := i + 1
 			for j < len(s) && isDigit(s[j]) {
 				j++

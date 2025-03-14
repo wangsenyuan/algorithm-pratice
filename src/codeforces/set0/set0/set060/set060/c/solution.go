@@ -145,7 +145,7 @@ func solve(n int, roads [][]int) []int {
 					return false
 				}
 			} else {
-				if a[u]*a[v] != l*m {
+				if a[u]*a[v] != l*m || gcd(a[u], a[v]) != l {
 					return false
 				}
 			}

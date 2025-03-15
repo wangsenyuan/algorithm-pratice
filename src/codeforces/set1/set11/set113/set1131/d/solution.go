@@ -48,16 +48,6 @@ func readString(reader *bufio.Reader) string {
 	return s
 }
 
-func normalize(s string) string {
-
-	for i := len(s); i > 0; i-- {
-		if s[i-1] >= 'a' && s[i-1] <= 'z' {
-			return s[:i]
-		}
-	}
-	return ""
-}
-
 func readInt(bytes []byte, from int, val *int) int {
 	i := from
 	sign := 1

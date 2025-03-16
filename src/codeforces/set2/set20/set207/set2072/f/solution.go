@@ -90,15 +90,10 @@ func solve(n int, k int) []int {
 		}
 		return 0
 	}
-	for d := 0; 1<<d <= k; d++ {
-		x := (k >> d) & 1
-		if x == 1 {
-			for i := range n {
-				u := get(n-1, i)
-				if u == 1 {
-					res[i] |= 1 << d
-				}
-			}
+	for i := range n {
+		u := get(n-1, i)
+		if u == 1 {
+			res[i] = k
 		}
 	}
 

@@ -72,12 +72,13 @@ func process(reader *bufio.Reader) []int {
 	return solve(cards)
 }
 
-func solve(cards [][]int) []int {
-	type item struct {
-		id     int
-		pos    int
-		height int
-	}
+type item struct {
+	id     int
+	pos    int
+	height int
+}
+
+func getAndSort(cards [][]int) []item {
 	n := len(cards)
 	items := make([]item, n)
 	for i := 0; i < n; i++ {
@@ -86,6 +87,13 @@ func solve(cards [][]int) []int {
 	sort.Slice(items, func(i, j int) bool {
 		return items[i].pos < items[j].pos
 	})
+	return items
+}
+
+func solve(cards [][]int) []int {
+	items := getAndSort(cards)
+	n := len(cards)
+
 	st := NewSegTree(n)
 	ans := make([]int, n)
 	for i := n - 1; i >= 0; i-- {

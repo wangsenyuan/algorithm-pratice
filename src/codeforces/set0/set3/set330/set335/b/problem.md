@@ -1,0 +1,1 @@
+Given a string s, determine if it contains any palindrome of length exactly 100 as a subsequence. If it has any, print any one of them. If it doesn't have any, print a palindrome that is a subsequence of s and is as long as possible.

@@ -1,0 +1,5 @@
+Robot Bender decided to make Fray a birthday present. He drove n nails and numbered them from 1 to n in some order. Bender decided to make a picture using metal rods. The picture is a closed polyline, which vertices should be nails (in the given order). The segments of the polyline should be parallel to the coordinate axes. Polyline is allowed to have self-intersections. Bender can take a rod and fold it exactly once in any place to form an angle of 90 degrees. Then he can attach the place of the fold to some unoccupied nail and attach two ends of this rod to adjacent nails. A nail is considered unoccupied if there is no rod attached to it (neither by it's end nor the by the fold place). No rod could be used twice. It is not required to use all the rods.
+
+### ideas
+1. 没有3个连续的钉子在一条线上，所以每个钉子，唯一的能确定使用哪个长度的线
+2. 就模拟就可以了
